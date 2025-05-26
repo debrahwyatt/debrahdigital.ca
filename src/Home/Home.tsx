@@ -1,0 +1,124 @@
+import './Home.css';
+import { Link } from 'react-router-dom';
+
+const Home: React.FC = () => {
+  return (
+    <>
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-text">
+          <h1>
+            Tech Help at Your Doorstep –{' '}
+            <span className="highlight">Fast, Friendly, Local.</span>
+          </h1>
+          <p>
+            Personalized IT, automation, and software solutions for homes, farms, and businesses in Fairview.
+            <br />
+            <br />
+            Serving Fairview, Alberta and surrounding areas.
+          </p>
+          <div className="hero-buttons">
+            <button className="quote-btn btn">Request a Quote</button>
+            <button className="call-btn btn">Call Now: (780) 330-9965</button>
+          </div>
+        </div>
+        <div className="hero-image">
+          <img className="ai-head" src="ai-head.png" alt="AI Head" />
+        </div>
+      </section>
+
+      {/* Services Icons Grid */}
+      <section className="services-section">
+        <h2>What We Do</h2>
+        <p className="subtitle">Expert Tech Help with a Human Touch</p>
+
+        <div className="services-grid">
+          <div className="service-item">
+            <img src="icon-web.png" alt="Website Design" />
+            <p>Website Design</p>
+          </div>
+          <div className="service-item">
+            <img src="icon-ai.png" alt="AI Tools & Automation" />
+            <p>AI Tools & Automation</p>
+          </div>
+          <div className="service-item">
+            <img src="icon-consulting.png" alt="Business Tech Consulting" />
+            <p>Business Tech Consulting</p>
+          </div>
+          <div className="service-item">
+            <img src="icon-network.png" alt="Computer & Network Optimization" />
+            <p>Computer & Network Optimization</p>
+          </div>
+          <div className="service-item">
+            <img src="icon-onsite.png" alt="On-Site Troubleshooting and Training" />
+            <p>On-Site Troubleshooting & Training</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Info Grid Section */}
+      <section className="info-section">
+        <div className="info-grid">
+
+          <div className="info-card">
+            <h3>Client-Focused Solutions</h3>
+            <p>
+              Need help with a computer, website, or system upgrade?
+              <br />
+              <br />
+              I provide on-site visits, remote assistance, and tailored solutions built to match your needs.
+            </p>
+            <ul className="checklist">
+              <li>Fast Response</li>
+              <li>Clear Communication</li>
+              <li>Affordable, Professional</li>
+            </ul>
+          </div>
+
+          <div className="info-card">
+            <h3>About Debrah</h3>
+            <h4>Debrah Wyatt, E.I.T.</h4>
+            <p>              
+              Software Developer & Tech Consultant
+              <br />
+              <br />
+              Based in Fairview, AB
+              <br />
+              Bachelor of Software Engineering, UVic
+              <br />
+              20+ years experience in tech & automation
+            </p>
+            <br />
+            <em>“Tech made simple. right at your doorstep.”</em>
+          </div>
+
+          <div className="info-card">
+            <h3>What We Do</h3>
+            <h4>Expert Tech Help with a Human Touch</h4>
+            <ul>
+              <li>Website Design</li>
+              <li>AI Tools & Automation</li>
+              <li>Business Tech Consulting</li>
+              <li>Custom Software Development</li>
+              <li>Computer & Network Optimization</li>
+              <li>On-Site Troubleshooting and Training</li>
+            </ul>
+            <button className="info-btn btn">Learn More About Our Services</button>
+          </div>
+
+          <div className="info-card full-width">
+            <h3>Contact or Book Now</h3>
+            <p>Ready to simplify your tech? Let’s talk.</p>
+            <div className="button-row">
+              <button className="info-btn btn">Request a Service</button>
+              <button className="info-btn btn">Schedule Call</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </>
+  );
+};
+
+export default Home;

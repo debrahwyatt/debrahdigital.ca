@@ -1,0 +1,182 @@
+/* ========== Hero Section ========== */
+.hero-section {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 1rem;
+  color: white;
+  margin: 0;
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 250px;
+	max-width: 780px;
+}
+
+.hero-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.hero-text h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.ai-head {
+  width: 250px;
+}
+
+.highlight {
+  color: #00c1ee;
+}
+
+.hero-buttons {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  background-color: #002345;
+  color: #fff;
+  border: 1px solid #00c1ee;
+	padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #00c1ee;
+}
+
+/* ========== Services Section ========== */
+.services-section {
+  padding: 2rem;
+  color: white;
+  text-align: center;
+}
+
+.services-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: #ccc;
+}
+
+.services-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+	margin-top: 1rem;
+}
+
+.service-item {
+  max-width: 100px;
+  text-align: center;
+}
+
+.service-item img {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0.5rem;
+}
+
+p {
+	margin: 0;
+}
+
+.service-item p {
+  font-size: 0.9rem;
+}
+
+.learn-more {
+  color: #00c1ee;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.learn-more:hover {
+  color: #00f1fb;
+	text-decoration: underline;
+	transition: 0.2s;
+}
+
+
+/* ========== Info Grid Section ========== */
+.info-section {
+  padding: 2rem;
+  color: white;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin: 0 auto;
+}
+
+.info-card {
+  background: none;
+}
+
+.info-card h3 {
+  color: #00c1ee;
+  text-transform: uppercase;
+  font-size: 1rem;
+	font-weight: normal;
+  margin-bottom: 0.5rem;
+}
+
+.info-card h4 {
+  font-size: 1.4rem;
+  margin-bottom: 0;
+	margin-top: 0.5em;
+	font-weight: normal;
+}
+
+.info-card ul {
+  list-style-type: disc;
+  padding-left: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.info-card ul.checklist {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+.checklist li::before {
+  content: "✔";
+  color: #00c1ee;
+  margin-right: 0.5rem;
+}
+
+.info-btn {
+  padding: 0.6rem 1.2rem;
+  margin-top: 1rem;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}

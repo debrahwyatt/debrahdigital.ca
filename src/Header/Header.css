@@ -1,0 +1,50 @@
+header {
+  top: 0;
+  width: 100%;
+  padding: 1rem 1rem;
+  color: white;
+  box-sizing: border-box; /* important for proper width calculations */
+  overflow-x: hidden;     /* prevents accidental horizontal scroll */
+}
+
+header nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.banner {
+  margin-right: auto;
+  width: 200px;
+  min-width: 0; /* avoids banner stretching container */
+}
+
+header nav a {
+  font-size: 1rem;
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  margin-right: 1rem;
+
+}
+
+header nav a:hover {
+  color: #00c1ee;
+}
+
+.search-input {
+  border: none;
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin-left: 1rem;
+  border-radius: 5px;
+}
+
+.mag-glass {
+  width: 30px;
+  height: 30px;
+}
