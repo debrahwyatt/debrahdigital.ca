@@ -23,7 +23,7 @@ const Home: React.FC = () => {
           </div>
         </div>
         <div className="hero-image">
-          <img className="ai-head" src="ai-head.png" alt="AI Head" />
+          <img className="ai-head" src="../assets/ai-head.webp" alt="AI Head" />
         </div>
       </section>
 
@@ -34,23 +34,23 @@ const Home: React.FC = () => {
 
         <div className="services-grid">
           <div className="service-item">
-            <img src="icon-web.png" alt="Website Design" />
+            <img src="../assets/icon-web.webp" alt="Website Design" />
             <p>Website Design</p>
           </div>
           <div className="service-item">
-            <img src="icon-ai.png" alt="AI Tools & Automation" />
+            <img src="../assets/icon-ai.webp" alt="AI Tools & Automation" />
             <p>AI Tools & Automation</p>
           </div>
           <div className="service-item">
-            <img src="icon-consulting.png" alt="Business Tech Consulting" />
+            <img src="../assets/icon-consulting.webp" alt="Business Tech Consulting" />
             <p>Business Tech Consulting</p>
           </div>
           <div className="service-item">
-            <img src="icon-network.png" alt="Computer & Network Optimization" />
+            <img src="../assets/icon-network.webp" alt="Computer & Network Optimization" />
             <p>Computer & Network Optimization</p>
           </div>
           <div className="service-item">
-            <img src="icon-onsite.png" alt="On-Site Troubleshooting and Training" />
+            <img src="../assets/icon-onsite.webp" alt="On-Site Troubleshooting and Training" />
             <p>On-Site Troubleshooting & Training</p>
           </div>
         </div>
