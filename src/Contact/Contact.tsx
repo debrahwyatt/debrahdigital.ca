@@ -5,10 +5,10 @@ const Contact: React.FC = () => {
   return (
     <div className='contact'>
       <div className="contact-info">
-        <h2>Contact Me</h2>
+        <h2>Contact</h2>
         <p>
           Fill out the form below to send me an email.<br />
-          Or feel free to give me a call at <strong>(780) 330-9965</strong>.
+          Or feel free to give me a call at <span className="highlight">(780) 330-9965</span>.
         </p>
       </div>
 

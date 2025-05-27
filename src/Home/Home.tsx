@@ -53,6 +53,10 @@ const Home: React.FC = () => {
             <img src="../assets/icon-onsite.webp" alt="On-Site Troubleshooting and Training" />
             <p>On-Site Troubleshooting & Training</p>
           </div>
+          <div className="service-item">
+            <img src="../assets/icon-software.webp" alt="Custom Software Development" />
+            <p>Custom Software Development</p>
+          </div>          
         </div>
       </section>
 

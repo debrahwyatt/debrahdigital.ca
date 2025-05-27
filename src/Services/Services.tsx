@@ -3,43 +3,45 @@ import './Services.css';
 const Services: React.FC = () => {
 
   return (
-    <section id="services">
-      <h3>Our Services</h3>
-      <div className="services">
-        <div className="service-item">
-          <h4>Web Development</h4>
-          <p>Design and develop modern, responsive websites that align with your brand and help achieve your business objectives.</p>
-        </div>
-        <div className="service-item">
-          <h4>SEO Optimization</h4>
-          <p>Boost your website's visibility on search engines with tailored strategies, keyword optimization, and analytics-driven results.</p>
-        </div>
-        <div className="service-item">
-          <h4>Custom Software Solutions</h4>
-          <p>Create bespoke software to automate workflows, improve efficiency, and solve specific business challenges.</p>
-        </div>
-        <div className="service-item">
-          <h4>Digital Marketing Assistance</h4>
-          <p>Expand your online reach with tailored marketing strategies, including social media campaigns and content creation.</p>
-        </div>
-        <div className="service-item">
-          <h4>Computer Setup & Optimization</h4>
-          <p>Ensure your devices are running at peak performance with expert setup, troubleshooting, and system optimization.</p>
-        </div>
-        <div className="service-item">
-          <h4>Networking & Internet Services</h4>
-          <p>Set up and optimize reliable, secure networks for your home or business, tailored to your specific needs.</p>
-        </div>
-        <div className="service-item">
-          <h4>Consultation</h4>
-          <p>Get expert advice on digital solutions, technology upgrades, and strategies to drive business success.</p>
-        </div>
-        <div className="service-item">
-          <h4>Workshops & Learning</h4>
-          <p>Get expert advice on digital solutions, technology upgrades, and strategies to drive business success.</p>
-        </div>        
+    <div className="services-page">
+      <div className="services-header">
+        <h1>Our Services</h1>
+        <p>Tailored Tech Solutions for Your Needs</p>
       </div>
-    </section>
+
+      <section className="services-grid">
+        <div className="service-card">
+          <img src="../assets/icon-web.webp" alt="Website Design" />
+          <h2>Website Design</h2>
+          <p>Custom, responsive websites that are user-friendly and visually appealing.</p>
+        </div>
+        <div className="service-card">
+          <img src="../assets/icon-ai.webp" alt="AI Tools & Automation" />
+          <h2>AI Tools & Automation</h2>
+          <p>Boost your productivity with smart AI solutions and automated processes.</p>
+        </div>
+        <div className="service-card">
+          <img src="../assets/icon-software.webp" alt="Custom Software Development" />
+          <h2>Custom Software Development</h2>
+          <p>Software tailored to your specific requirements and goals.</p>
+        </div>
+        <div className="service-card">
+          <img src="../assets/icon-consulting.webp" alt="Business Tech Consulting" />
+          <h2>Business Tech Consulting</h2>
+          <p>Expert advice to align your technology with business objectives.</p>
+        </div>
+        <div className="service-card">
+          <img src="../assets/icon-network.webp" alt="Computer & Network Optimization" />
+          <h2>Computer & Network Optimization</h2>
+          <p>Speed up your systems and ensure your network runs smoothly.</p>
+        </div>
+        <div className="service-card">
+          <img src="../assets/icon-onsite.webp" alt="On-Site Troubleshooting & Training" />
+          <h2>On-Site Troubleshooting & Training</h2>
+          <p>Get direct help and training right at your location.</p>
+        </div>
+      </section>
+    </div>
   );
 };
 
