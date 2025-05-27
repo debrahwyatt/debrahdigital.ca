@@ -3,7 +3,31 @@ import './Contact.css';
 const Contact: React.FC = () => {
 
   return (
-    <></>
+    <div className='contact'>
+      <div className="contact-info">
+        <h2>Contact Me</h2>
+        <p>
+          Fill out the form below to send me an email.<br />
+          Or feel free to give me a call at <strong>(780) 330-9965</strong>.
+        </p>
+      </div>
+
+      <form action="../send-message.php" method="POST" className="contact-form">
+        <label htmlFor="name">Name</label>
+        <input type="text" name="name" id="name" required />
+
+        <label htmlFor="email">Email</label>
+        <input type="email" name="email" id="email" required />
+
+        <label htmlFor="subject">Subject</label>
+        <input type="text" name="subject" id="subject" />
+
+        <label htmlFor="message">Message</label>
+        <textarea name="message" id="message" maxLength={2048} required />
+
+        <button type="submit" className="btn">Send Message</button>
+      </form>
+    </div>
   );
 };
 

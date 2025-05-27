@@ -9,6 +9,17 @@ body {
   margin-right: 10vw;
 }
 
-main {
+.btn {
+  background-color: #002345;
+  color: #fff;
+  border: 1px solid #00c1ee;
+	padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
 
+.btn:hover {
+  background-color: #00c1ee;
 }
