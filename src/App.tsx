@@ -9,6 +9,8 @@ import Thanks from './Thanks';
 import Contact from './Contact';
 import Services from './Services';
 
+import ScrollToTop from "./ScrollToTop";
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 
@@ -16,6 +18,7 @@ const App: React.FC = () => {
 
   return (
     <Router>
+      <ScrollToTop />
       <Header/>
       <main>
         <Routes>

@@ -7,8 +7,7 @@ const Contact: React.FC = () => {
       <div className="contact-header">
         <h1>Contact</h1>
         <p>
-          Fill out the form below to send me an email.<br />
-          Or feel free to give me a call at <span className="highlight">(780) 330-9965</span>.
+          Fill out the form below to send me an email. Or feel free to give me a call at <span className="highlight">(780) 330-9965</span>
         </p>
       </div>
 

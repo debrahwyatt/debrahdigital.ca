@@ -6,7 +6,7 @@ const About: React.FC = () => {
     <div className="about-page">
       <div className="about-header">
         <h1>About Us</h1>
-        <p>Tech made simple, right at your doorstep.</p>
+        <p>Tech made simple, right at your doorstep</p>
       </div>
       <div className="about-content">
         <div className="about-text">

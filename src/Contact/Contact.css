@@ -21,6 +21,8 @@
 .contact-header p {
   font-size: 1.2rem;
   color: #ccc;
+  max-width: 500px;
+  min-width: 300px;
 }
 
 .contact-info {

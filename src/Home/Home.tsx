@@ -65,7 +65,23 @@ const Home: React.FC = () => {
       {/* Info Grid Section */}
       <section className="info-section">
         <div className="info-grid">
-
+          
+          <div className="info-card">
+            <h3>What We Do</h3>
+            <h4>Expert Tech Help with a Human Touch</h4>
+            <ul>
+              <li>Website Design</li>
+              <li>AI Tools & Automation</li>
+              <li>Business Tech Consulting</li>
+              <li>Custom Software Development</li>
+              <li>Computer & Network Optimization</li>
+              <li>On-Site Troubleshooting and Training</li>
+            </ul>
+            <Link to="/services">
+              <button className="info-btn btn">Learn More About Our Services</button>
+            </Link> 
+          </div>
+          
           <div className="info-card">
             <h3>Client-Focused Solutions</h3>
             <p>
@@ -96,22 +112,6 @@ const Home: React.FC = () => {
             </p>
             <br />
             <em>“Tech made simple. right at your doorstep.”</em>
-          </div>
-
-          <div className="info-card">
-            <h3>What We Do</h3>
-            <h4>Expert Tech Help with a Human Touch</h4>
-            <ul>
-              <li>Website Design</li>
-              <li>AI Tools & Automation</li>
-              <li>Business Tech Consulting</li>
-              <li>Custom Software Development</li>
-              <li>Computer & Network Optimization</li>
-              <li>On-Site Troubleshooting and Training</li>
-            </ul>
-            <Link to="/services">
-              <button className="info-btn btn">Learn More About Our Services</button>
-            </Link> 
           </div>
 
           <div className="info-card full-width">
