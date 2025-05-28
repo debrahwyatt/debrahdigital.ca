@@ -51,6 +51,7 @@
 .services-section h2 {
   font-size: 1.8rem;
   margin-bottom: 0.25rem;
+  color: #00c1ee;
 }
 
 .subtitle {
@@ -60,17 +61,16 @@
 }
 
 .services-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 1rem;
-	margin-top: 1rem;
+  justify-items: center;
+  align-items: start;
+  margin-top: 1rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .service-item {
-  max-width: 100px;
-  text-align: center;
+  max-width: 150px;
 }
 
 .service-item img {
@@ -79,24 +79,8 @@
   margin-bottom: 0.5rem;
 }
 
-p {
-	margin: 0;
-}
-
 .service-item p {
   font-size: 0.9rem;
-}
-
-.learn-more {
-  color: #00c1ee;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.learn-more:hover {
-  color: #00f1fb;
-	text-decoration: underline;
-	transition: 0.2s;
 }
 
 

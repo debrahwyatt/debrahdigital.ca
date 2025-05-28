@@ -1,12 +1,26 @@
-body {
+html, body {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  color: #FFFFFF;
+  overflow: hidden; /* Prevent body from scrolling */
   font-family: 'Arial', sans-serif;
   background-color: #00142c;
-  margin-left: 10vw;
-  margin-right: 10vw;
+}
+
+main {
+  overflow-y: auto; /* Scroll only here */
+  padding-left: 10vw;
+  padding-right: 10vw;
+  box-sizing: border-box;
+  height: calc(100vh - 75.75px - 1rem); /* vh - header */
+}
+
+p {
+	margin: 0;
+  color: #FFF;
+}
+
+label {
+  color: #FFF;
 }
 
 .btn {

@@ -25,8 +25,8 @@ const App: React.FC = () => {
           <Route path="/Contact" element={<Contact />} />
           <Route path="/Thanks" element={<Thanks />} />
         </Routes>
+        <Footer/>
       </main>
-      <Footer/>
     </Router>
   );
 };

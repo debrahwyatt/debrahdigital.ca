@@ -29,7 +29,7 @@ const Home: React.FC = () => {
 
       {/* Services Icons Grid */}
       <section className="services-section">
-        <h2>What We Do</h2>
+        <h2>Our Services</h2>
         <p className="subtitle">Expert Tech Help with a Human Touch</p>
 
         <div className="services-grid">

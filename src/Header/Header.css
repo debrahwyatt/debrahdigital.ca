@@ -1,10 +1,13 @@
 header {
   top: 0;
-  width: 100%;
-  padding: 1rem 1rem;
+  padding: 0.5rem 10vw 0.5rem 10vw;
   color: white;
   box-sizing: border-box; /* important for proper width calculations */
-  overflow-x: hidden;     /* prevents accidental horizontal scroll */
+  width: 100%;
+  position: sticky;
+  z-index: 1000; /* ensure it stays on top */
+  background-color: #001a35; /* match your theme */
+  border-bottom: 1px solid #002345;
 }
 
 header nav {
@@ -29,7 +32,6 @@ header nav a {
   text-decoration: none;
   transition: color 0.3s ease;
   margin-right: 1rem;
-
 }
 
 header nav a:hover {
