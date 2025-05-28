@@ -4,7 +4,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 2rem;
-  padding: 1rem;
+  padding-top: 2rem;
   color: white;
   margin: 0;
 }
@@ -39,7 +39,7 @@
 
 /* ========== Services Section ========== */
 .services-section {
-  padding: 2rem;
+  padding-top: 2rem;
   color: white;
   text-align: center;
 }
@@ -81,7 +81,7 @@
 
 /* ========== Info Grid Section ========== */
 .info-section {
-  padding: 2rem;
+  padding-top: 2rem;
   color: white;
 }
 

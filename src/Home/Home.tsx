@@ -18,8 +18,10 @@ const Home: React.FC = () => {
             Serving Fairview, Alberta and surrounding areas.
           </p>
           <div className="hero-buttons">
-            <button className="quote-btn btn">Request a Quote</button>
-            <button className="call-btn btn">Call Now: (780) 330-9965</button>
+            <Link to="/contact">
+              <button className="quote-btn btn">Request a Quote</button>
+            </Link>
+            <a href="tel:7803309965"><button className="call-btn btn">Call Now: (780) 330-9965</button></a>
           </div>
         </div>
         <div className="hero-image">
@@ -107,15 +109,18 @@ const Home: React.FC = () => {
               <li>Computer & Network Optimization</li>
               <li>On-Site Troubleshooting and Training</li>
             </ul>
-            <button className="info-btn btn">Learn More About Our Services</button>
+            <Link to="/services">
+              <button className="info-btn btn">Learn More About Our Services</button>
+            </Link> 
           </div>
 
           <div className="info-card full-width">
             <h3>Contact or Book Now</h3>
             <p>Ready to simplify your tech? Let’s talk.</p>
             <div className="button-row">
-              <button className="info-btn btn">Request a Service</button>
-              <button className="info-btn btn">Schedule Call</button>
+              <Link to="/contact">
+                <button className="info-btn btn">Contact or Book Now</button>
+              </Link>
             </div>
           </div>
 

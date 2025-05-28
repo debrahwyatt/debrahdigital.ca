@@ -5,7 +5,7 @@ const Contact: React.FC = () => {
   return (
     <div className='contact-page'>
       <div className="contact-header">
-        <h2>Contact</h2>
+        <h1>Contact</h1>
         <p>
           Fill out the form below to send me an email.<br />
           Or feel free to give me a call at <span className="highlight">(780) 330-9965</span>.

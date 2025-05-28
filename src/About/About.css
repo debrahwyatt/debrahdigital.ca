@@ -14,6 +14,11 @@
   margin-bottom: 0;
 }
 
+.about-header p {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
 .about-content {
   display: flex;
   flex-wrap: wrap;

@@ -8,8 +8,8 @@ html, body {
 
 main {
   overflow-y: auto; /* Scroll only here */
-  padding-left: 10vw;
-  padding-right: 10vw;
+  padding-left: 15vw;
+  padding-right: 15vw;
   box-sizing: border-box;
   height: calc(100vh - 75.75px - 1rem); /* vh - header */
 }

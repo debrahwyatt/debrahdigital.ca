@@ -7,12 +7,13 @@ const Header: React.FC = () => {
   return (
     <header>      
       <nav>
-        <img className='banner' src="../assets/banner.webp" alt="Banner"></img>
+        <Link className="banner-link" to="/">
+          <img className="banner" src="../assets/banner.webp" alt="Banner" />
+        </Link>        
         <Link to="/">Home</Link>
         <Link to="/services">Services</Link>
         <Link to="/about">About</Link>
         <Link to="/contact">Contact</Link>
-        <img className='mag-glass' src="../assets/mag-glass.webp" alt="Search"></img>
       </nav>
     </header>
   );
