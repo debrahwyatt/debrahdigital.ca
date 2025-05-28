@@ -1,12 +1,49 @@
-#about {  
-  padding: "2rem"; 
-  background-color: "#f9f9f9"; 
-  color: "#333"; 
-  text-align: "center" ;
+.about-page {
+  color: white;
+  padding-top: 2rem;
 }
 
-.about-p { 
-  max-width: "800px"; 
-  margin: "1rem auto"; 
-  line-height: "1.6" ;
+.about-header {
+  margin-bottom: 2rem;;
+  text-align: center;
+}
+
+.about-header h1 {
+  font-size: 2.5rem;
+  color: #00f1fb;
+  margin-bottom: 0;
+}
+
+.about-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+
+.about-text {
+  flex: 1;
+  min-width: 300px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.about-text p {
+  margin-bottom: 1.2rem;
+}
+
+.about-image {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-image img {
+  max-width: 280px;
+  height: auto;
 }

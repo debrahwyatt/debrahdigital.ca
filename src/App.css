@@ -23,6 +23,10 @@ label {
   color: #FFF;
 }
 
+.highlight {
+  color: #00c1ee;
+}
+
 .btn {
   background-color: #002345;
   color: #fff;

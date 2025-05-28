@@ -3,8 +3,8 @@ import './Contact.css';
 const Contact: React.FC = () => {
 
   return (
-    <div className='contact'>
-      <div className="contact-info">
+    <div className='contact-page'>
+      <div className="contact-header">
         <h2>Contact</h2>
         <p>
           Fill out the form below to send me an email.<br />

@@ -1,7 +1,11 @@
 .services-page {
   text-align: center;
-  padding: 2rem;
+  padding-top: 2rem;
   color: white;
+}
+
+.services-header {
+  margin-bottom: 2rem;
 }
 
 .services-header h1 {
@@ -13,7 +17,6 @@
 .services-header p {
   font-size: 1.2rem;
   color: #ccc;
-  margin-bottom: 1.5rem;
 }
 
 .services-grid {
@@ -38,3 +41,4 @@
   color: #ccc;
   font-size: 0.95rem;
 }
+

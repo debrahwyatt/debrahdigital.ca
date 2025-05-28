@@ -31,10 +31,6 @@
   width: 250px;
 }
 
-.highlight {
-  color: #00c1ee;
-}
-
 .hero-buttons {
   margin-top: 1rem;
   display: flex;
@@ -82,7 +78,6 @@
 .service-item p {
   font-size: 0.9rem;
 }
-
 
 /* ========== Info Grid Section ========== */
 .info-section {

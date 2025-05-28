@@ -3,18 +3,31 @@ import './About.css';
 const About: React.FC = () => {
 
   return (
-    <section id="about">
-      <h2>About Debrah's Digital Solutions</h2>
-      <p className='about-p'>
-        At <strong>Debrah's Digital Solutions</strong>, we believe in empowering businesses with cutting-edge technology and personalized service. Based in Fairview, Alberta, our mission is to help small and medium-sized businesses thrive in the digital age with tailored solutions that fit their unique needs.
-      </p>
-      <p className='about-p'>
-        From professional website design and SEO optimization to custom software and digital marketing support, we deliver reliable and affordable solutions with a local touch. Our experienced team combines technical expertise with a passion for helping our clients succeed. Whether you're looking to establish an online presence, optimize your digital operations, or grow your audience, we're here to make it happen.
-      </p>
-      <p className='about-p'>
-        Let's build something great together. Contact us today to take the first step towards your digital transformation.
-      </p>
-    </section>
+    <div className="about-page">
+      <div className="about-header">
+        <h1>About Us</h1>
+        <p>Tech made simple, right at your doorstep.</p>
+      </div>
+      <div className="about-content">
+        <div className="about-text">
+          <p>
+            Hi, I’m <strong>Debrah Wyatt</strong> — a software engineer-in-training, automation specialist and founder of 
+            <span className="highlight"> Debrah’s Digital Solutions</span>.
+          </p>
+          <p>
+            With over 20 years of experience in tech, I help individuals and businesses in Fairview and surrounding 
+            areas simplify their digital needs. From streamlining operations with smart automation to building clean, 
+            responsive websites, I bring a human touch to modern tech.
+          </p>
+          <p>
+            Let’s make your <span className="highlight">tech simple, efficient, and tailored to your needs.</span>
+          </p>
+        </div>
+        <div className="about-image">
+          <img src="../assets/debrah.webp" alt="Debrah Portrait" />
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,8 +1,21 @@
-.contact {
+
+.contact-page {
+  padding-top: 2rem;
   display: flex;
   align-items: center;     /* vertical */
-  flex-direction: column;  /* stack children vertically */
-  padding: 2rem;
+  flex-direction: column;  /* stack children vertically */  
+  color: white;
+}
+
+.contact-header {
+  margin-bottom: 2rem;;
+  text-align: center;
+}
+
+.contact-header h2 {
+  font-size: 2.5rem;
+  color: #00f1fb;
+  margin-bottom: 0;
 }
 
 .contact-info {
@@ -11,12 +24,9 @@
 }
 
 .contact-info h2 {
-  color: #00c1ee;
-  margin-bottom: 0.5rem;
-}
-
-.contact-info p {
-  font-size: 1rem;
+  font-size: 2.5rem;
+  color: #00f1fb;
+  margin-bottom: 0;
 }
 
 .contact-form {
@@ -51,11 +61,11 @@
 }
 
 .contact-form label {
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
   font-size: larger;
 }
 
 #message {
   resize: none;
-  height: 100px;
+  height: 6rem;
 }
