@@ -1,7 +1,58 @@
 import './Home.css';
+
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const Home: React.FC = () => {
+
+  useEffect(() => {
+    document.title = "Debrah's Digital Solutions | Fairview Tech Help";
+
+    // Standard meta description
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) {
+      desc.setAttribute("content", "Personalized IT, automation, and software solutions for homes, farms, and businesses in Fairview.");
+    }
+
+    // Open Graph metadata
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+      ogTitle.setAttribute("content", "Debrah's Digital Solutions");
+    }
+
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) {
+      ogDesc.setAttribute("content", "Tech Help at Your Doorstep – Fast, Friendly, Local.");
+    }
+
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage) {
+      ogImage.setAttribute("content", "https://www.debrahdigital.ca/assets/preview.png");
+    }
+
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) {
+      ogUrl.setAttribute("content", "https://www.debrahdigital.ca");
+    }
+
+    // Twitter metadata
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitle) {
+      twitterTitle.setAttribute("content", "Debrah's Digital Solutions");
+    }
+
+    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDesc) {
+      twitterDesc.setAttribute("content", "Tailored tech help and automation for businesses and homes in Alberta.");
+    }
+
+    const twitterImage = document.querySelector('meta[name="twitter:image"]');
+    if (twitterImage) {
+      twitterImage.setAttribute("content", "https://www.debrahdigital.ca/assets/preview.png");
+    }
+
+  }, []);  
+
   return (
     <>
       {/* Hero Section */}

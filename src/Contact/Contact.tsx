@@ -1,6 +1,45 @@
 import './Contact.css';
+import { useEffect } from 'react';
 
 const Contact: React.FC = () => {
+
+  useEffect(() => {
+    document.title = "Contact Debrah's Digital Solutions | Local Tech Help";
+
+    // Standard meta description
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) {
+      desc.setAttribute("content", "Get in touch with Debrah's Digital Solutions for personalized IT support, troubleshooting, or a quick tech consultation.");
+    }
+
+    // Open Graph metadata
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+      ogTitle.setAttribute("content", "Contact Debrah's Digital Solutions");
+    }
+
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) {
+      ogDesc.setAttribute("content", "Reach out for fast, friendly, and expert tech help in Fairview and surrounding areas.");
+    }
+
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) {
+      ogUrl.setAttribute("content", "https://www.debrahdigital.ca/contact");
+    }
+
+    // Twitter metadata
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitle) {
+      twitterTitle.setAttribute("content", "Contact Debrah's Digital Solutions");
+    }
+
+    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDesc) {
+      twitterDesc.setAttribute("content", "Request help, book a visit, or talk to Debrah directly about your tech needs.");
+    }
+
+  }, []);
 
   return (
     <div className='contact-page'>
