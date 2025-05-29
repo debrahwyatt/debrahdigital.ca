@@ -10,10 +10,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $headers = "From: " . $_POST["email"];
 
     if (mail($to, $subject, $message, $headers)) {
-        header("Location: https://www.debrahdigital.ca/thank-you");
+        header("Location: https://www.debrahdigital.ca/success");
         exit();
     } else {
-        header("Location: https://www.debrahdigital.ca/sorry");
+        header("Location: https://www.debrahdigital.ca/error");
         exit();
     }
 } else {
