@@ -163,6 +163,7 @@ const Home: React.FC = () => {
             </p>
             <br />
             <em>“Tech made simple. right at your doorstep.”</em>
+            <br />
             <Link to="/about">
               <button className="info-btn btn">More About Us</button>
             </Link>

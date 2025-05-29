@@ -9,11 +9,13 @@ const Header: React.FC = () => {
       <nav>
         <Link className="banner-link" to="/">
           <img className="banner" src="../assets/banner.webp" alt="Banner" />
-        </Link>        
-        <Link to="/">Home</Link>
-        <Link to="/services">Services</Link>
-        <Link to="/about">About</Link>
-        <Link to="/contact">Contact</Link>
+        </Link>     
+        <span className='nav-links'>
+          <Link to="/">Home</Link>
+          <Link to="/services">Services</Link>
+          <Link to="/about">About</Link>
+          <Link to="/contact">Contact</Link>
+        </span>   
       </nav>
     </header>
   );

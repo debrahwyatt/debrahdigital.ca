@@ -52,3 +52,30 @@ header nav a:hover {
   width: 30px;
   height: 30px;
 }
+
+
+@media (max-width: 768px) {
+  header nav {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .banner-link {
+    margin: 0 auto;
+  }
+
+  /* New: wrap nav links in a flex row under the banner */
+  header nav .nav-links {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  header nav a {
+    margin: 0;
+  }
+}
+

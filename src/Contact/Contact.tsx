@@ -44,12 +44,17 @@ const Contact: React.FC = () => {
   return (
     <div className='contact-page'>
       <div className="contact-header">
-        <h1>Contact</h1>
+        <h1>Contact Us</h1>
+        <p className="contact-hours">
+          Monday to Friday, 10 AM – 3 PM
+        </p>   
+      </div>     
+      <div className='contact-text'>
         <p>
-          Fill out the form below to send me an email. Or feel free to give me a call at <span className="highlight">(780) 330-9965</span>
+          Fill out the form below to send an email. Or feel free to give us a call at <span className="highlight">(780) 330-9965</span>
         </p>
+        <br />
       </div>
-
       <form action="../send-message.php" method="POST" className="contact-form">
         <label htmlFor="name">Name</label>
         <input type="text" name="name" id="name" required />

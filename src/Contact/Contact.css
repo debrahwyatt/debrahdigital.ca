@@ -70,3 +70,8 @@
   resize: none;
   height: 6rem;
 }
+
+
+.contact-text {
+  min-width: 300px;
+}

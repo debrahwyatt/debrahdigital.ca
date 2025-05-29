@@ -41,3 +41,11 @@ label {
 .btn:hover {
   background-color: #00c1ee;
 }
+
+@media (max-width: 768px) {
+
+  main {
+  height: calc(100vh - 75.75px - 4rem); /* vh - header */
+  }
+
+}
