@@ -1,40 +1,22 @@
 import './About.css';
 
 import { useEffect } from 'react';
+import { updateMetadata } from '../updateMetadata';
 
 
 const About: React.FC = () => {
-
   useEffect(() => {
-    document.title = "About – Debrah's Digital Solutions";
-
-    // Standard meta description
-    const desc = document.querySelector('meta[name="description"]');
-    if (desc) desc.setAttribute("content", "Meet Debrah Wyatt – a software engineer bringing personalized tech support, automation, and IT services to Fairview, Alberta.");
-
-    // Open Graph metadata
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute("content", "About – Debrah's Digital Solutions");
-
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute("content", "Learn more about Debrah Wyatt's mission to simplify technology and provide human-centered IT support to rural Alberta.");
-
-    const ogImage = document.querySelector('meta[property="og:image"]');
-    if (ogImage) ogImage.setAttribute("content", "https://www.debrahdigital.ca/assets/about-preview.webp");
-
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) ogUrl.setAttribute("content", "https://www.debrahdigital.ca/about");
-
-    // Twitter metadata
-    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twitterTitle) twitterTitle.setAttribute("content", "About – Debrah's Digital Solutions");
-
-    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
-    if (twitterDesc) twitterDesc.setAttribute("content", "Get to know Debrah Wyatt and the story behind Fairview's friendliest tech support and automation business.");
-
-    const twitterImage = document.querySelector('meta[name="twitter:image"]');
-    if (twitterImage) twitterImage.setAttribute("content", "https://www.debrahdigital.ca/assets/about-preview.webp");
-
+    updateMetadata({
+      title: "About - Debrah's Digital Solutions",
+      ogUrl: "https://www.debrahdigital.ca/contact",
+      ogTitle: "About - Debrah's Digital Solutions",
+      twitterTitle: "About - Debrah's Digital Solutions",
+      ogImage: "https://www.debrahdigital.ca/assets/about-preview.webp",
+      twitterImage: "https://www.debrahdigital.ca/assets/about-preview.webp",        
+      twitterDescription: "Get to know Debrah Wyatt and the story behind Fairview's friendliest tech support and automation business.",
+      ogDescription: "Learn more about Debrah Wyatt's mission to simplify technology and provide human-centered IT support to rural Alberta.",
+      description: "Meet Debrah Wyatt - a software engineer bringing personalized tech support, automation, and IT services to Fairview, Alberta.",
+    });
   }, []);
 
 

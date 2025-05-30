@@ -1,33 +1,20 @@
 import './Contact.css';
 
 import { useEffect } from 'react';
+import { updateMetadata } from '../updateMetadata';
 
 const Contact: React.FC = () => {
 
   useEffect(() => {
-    document.title = "Contact Debrah's Digital Solutions | Local Tech Help";
-
-    // Standard meta description
-    const desc = document.querySelector('meta[name="description"]');
-    if (desc) desc.setAttribute("content", "Get in touch with Debrah's Digital Solutions for personalized IT support, troubleshooting, or a quick tech consultation.");
-
-    // Open Graph metadata
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute("content", "Contact Debrah's Digital Solutions");
-
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute("content", "Reach out for fast, friendly, and expert tech help in Fairview and surrounding areas.");
-
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) ogUrl.setAttribute("content", "https://www.debrahdigital.ca/contact");
-
-    // Twitter metadata
-    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twitterTitle) twitterTitle.setAttribute("content", "Contact Debrah's Digital Solutions");
-
-    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
-    if (twitterDesc) twitterDesc.setAttribute("content", "Request help, book a visit, or talk to Debrah directly about your tech needs.");
-
+    updateMetadata({
+      ogUrl: "https://www.debrahdigital.ca/contact",
+      ogTitle: "Contact Debrah's Digital Solutions",
+      twitterTitle: "Contact Debrah's Digital Solutions",
+      title: "Contact Debrah's Digital Solutions | Local Tech Help",
+      twitterDescription: "Request help, book a visit, or talk to Debrah directly about your tech needs.",
+      ogDescription: "Reach out for fast, friendly, and expert tech help in Fairview and surrounding areas.",
+      description: "Get in touch with Debrah's Digital Solutions for personalized IT support, troubleshooting, or a quick tech consultation.",      
+    });
   }, []);
 
   return (
@@ -36,7 +23,7 @@ const Contact: React.FC = () => {
       <div className="contact-header">
         <h1>Contact Us</h1>
         <p className="contact-hours">
-          Monday to Friday, 10 AM – 3 PM
+          Monday to Friday, 10 AM - 3 PM
         </p>   
       </div>     
 
