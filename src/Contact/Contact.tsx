@@ -1,4 +1,5 @@
 import './Contact.css';
+
 import { useEffect } from 'react';
 
 const Contact: React.FC = () => {
@@ -8,53 +9,44 @@ const Contact: React.FC = () => {
 
     // Standard meta description
     const desc = document.querySelector('meta[name="description"]');
-    if (desc) {
-      desc.setAttribute("content", "Get in touch with Debrah's Digital Solutions for personalized IT support, troubleshooting, or a quick tech consultation.");
-    }
+    if (desc) desc.setAttribute("content", "Get in touch with Debrah's Digital Solutions for personalized IT support, troubleshooting, or a quick tech consultation.");
 
     // Open Graph metadata
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-      ogTitle.setAttribute("content", "Contact Debrah's Digital Solutions");
-    }
+    if (ogTitle) ogTitle.setAttribute("content", "Contact Debrah's Digital Solutions");
 
     const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) {
-      ogDesc.setAttribute("content", "Reach out for fast, friendly, and expert tech help in Fairview and surrounding areas.");
-    }
+    if (ogDesc) ogDesc.setAttribute("content", "Reach out for fast, friendly, and expert tech help in Fairview and surrounding areas.");
 
     const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) {
-      ogUrl.setAttribute("content", "https://www.debrahdigital.ca/contact");
-    }
+    if (ogUrl) ogUrl.setAttribute("content", "https://www.debrahdigital.ca/contact");
 
     // Twitter metadata
     const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twitterTitle) {
-      twitterTitle.setAttribute("content", "Contact Debrah's Digital Solutions");
-    }
+    if (twitterTitle) twitterTitle.setAttribute("content", "Contact Debrah's Digital Solutions");
 
     const twitterDesc = document.querySelector('meta[name="twitter:description"]');
-    if (twitterDesc) {
-      twitterDesc.setAttribute("content", "Request help, book a visit, or talk to Debrah directly about your tech needs.");
-    }
+    if (twitterDesc) twitterDesc.setAttribute("content", "Request help, book a visit, or talk to Debrah directly about your tech needs.");
 
   }, []);
 
   return (
     <div className='contact-page'>
+
       <div className="contact-header">
         <h1>Contact Us</h1>
         <p className="contact-hours">
           Monday to Friday, 10 AM – 3 PM
         </p>   
       </div>     
+
       <div className='contact-text'>
         <p>
           Fill out the form below to send an email. Or feel free to give us a call at <span className="highlight">(780) 330-9965</span>
         </p>
         <br />
       </div>
+
       <form action="../send-message.php" method="POST" className="contact-form">
         <label htmlFor="name">Name</label>
         <input type="text" name="name" id="name" required />
@@ -70,6 +62,7 @@ const Contact: React.FC = () => {
 
         <button type="submit" className="btn">Send Message</button>
       </form>
+      
     </div>
   );
 };

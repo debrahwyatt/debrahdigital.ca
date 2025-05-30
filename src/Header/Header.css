@@ -1,23 +1,23 @@
 header {
   top: 0;
-  padding: 0.5rem 15vw 0.5rem 15vw;
-  color: white;
-  box-sizing: border-box; /* important for proper width calculations */
   width: 100%;
+  z-index: 1000;
+  color: white;
   position: sticky;
-  z-index: 1000; /* ensure it stays on top */
-  background-color: #001a35; /* match your theme */
+  box-sizing: border-box;
+  background-color: #001a35;
+  padding: 0.5rem 15vw 0.5rem 15vw;
   border-bottom: 1px solid #002345;
 }
 
 header nav {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
   gap: 1rem;
   width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   box-sizing: border-box;
+  justify-content: flex-start;
 }
 
 .banner-link {
@@ -29,11 +29,11 @@ header nav {
 }
 
 header nav a {
-  font-size: 1rem;
   color: white;
+  font-size: 1rem;
+  margin-right: 1rem;
   text-decoration: none;
   transition: color 0.3s ease;
-  margin-right: 1rem;
 }
 
 header nav a:hover {
@@ -53,29 +53,29 @@ header nav a:hover {
   height: 30px;
 }
 
-
+/* For phone users */
 @media (max-width: 768px) {
+
   header nav {
-    flex-direction: column;
     align-items: center;
+    flex-direction: column;
   }
 
   .banner-link {
     margin: 0 auto;
   }
 
-  /* New: wrap nav links in a flex row under the banner */
   header nav .nav-links {
+    gap: 1rem;
     display: flex;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;    
     flex-direction: row;
     justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 0.5rem;
   }
 
   header nav a {
     margin: 0;
   }
-}
 
+}

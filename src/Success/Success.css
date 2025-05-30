@@ -1,12 +1,12 @@
 .thank-you-wrapper {
   display: flex;
+  color: white;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  max-width: 350px;
+  padding-top: 3rem;
   align-items: center;
   justify-content: space-between;
-  padding-top: 3rem;
-  color: white;
-  max-width: 350px;
-  margin: 0 auto;
-  flex-wrap: wrap; /* allows responsiveness */
 }
 
 .thank-you-message {

@@ -1,21 +1,24 @@
-// import React, { useState } from 'react';
 import './Header.css';
+
 import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {
 
   return (
-    <header>      
+    <header>    
       <nav>
+        
         <Link className="banner-link" to="/">
           <img className="banner" src="../assets/banner.webp" alt="Banner" />
         </Link>     
+
         <span className='nav-links'>
           <Link to="/">Home</Link>
           <Link to="/services">Services</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
         </span>   
+
       </nav>
     </header>
   );

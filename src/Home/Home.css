@@ -1,12 +1,12 @@
 /* ========== Hero Section ========== */
 .hero-section {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
   gap: 2rem;
-  padding-top: 2rem;
-  color: white;
   margin: 0;
+  display: flex;
+  color: white;
+  flex-wrap: wrap;
+  padding-top: 2rem;
+  align-items: center;
 }
 
 .hero-text {
@@ -16,10 +16,10 @@
 }
 
 .hero-image {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hero-text h1 {
@@ -32,37 +32,37 @@
 }
 
 .hero-buttons {
-  margin-top: 1rem;
-  display: flex;
   gap: 1rem;
+  display: flex;
+  margin-top: 1rem;
 }
 
 /* ========== Services Section ========== */
 .services-section {
-  padding-top: 2rem;
   color: white;
+  padding-top: 2rem;
   text-align: center;
 }
 
 .services-section h2 {
+  color: #00c1ee;
   font-size: 1.8rem;
   margin-bottom: 0.25rem;
-  color: #00c1ee;
 }
 
 .subtitle {
+  color: #ccc;
   font-size: 1rem;
   margin-bottom: 1.5rem;
-  color: #ccc;
 }
 
 .services-grid {
-  justify-items: center;
-  align-items: start;
   margin-top: 1rem;
   max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
+  align-items: start;
+  justify-items: center;
 }
 
 .service-item {
@@ -81,15 +81,15 @@
 
 /* ========== Info Grid Section ========== */
 .info-section {
-  padding-top: 2rem;
   color: white;
+  padding-top: 2rem;
 }
 
 .info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
+  display: grid;
   margin: 0 auto;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .info-card {
@@ -97,30 +97,30 @@
 }
 
 .info-card h3 {
-  color: #00c1ee;
-  text-transform: uppercase;
   font-size: 1rem;
+  color: #00c1ee;
 	font-weight: normal;
   margin-bottom: 0.5rem;
+  text-transform: uppercase;
 }
 
 .info-card h4 {
-  font-size: 1.4rem;
   margin-bottom: 0;
+  font-size: 1.4rem;
 	margin-top: 0.5em;
 	font-weight: normal;
 }
 
 .info-card ul {
-  list-style-type: disc;
-  padding-left: 1.2rem;
   margin-bottom: 1rem;
+  padding-left: 1.2rem;
+  list-style-type: disc;
 }
 
 .info-card ul.checklist {
-  list-style: none;
-  padding-left: 0;
   margin-left: 0;
+  padding-left: 0;
+  list-style: none;
 }
 
 li {
@@ -134,13 +134,13 @@ li {
 }
 
 .info-btn {
-  padding: 0.6rem 1.2rem;
   margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
 }
 
 .button-row {
+  gap: 1rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
   margin-top: 1rem;
 }

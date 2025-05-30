@@ -1,7 +1,7 @@
 .services-page {
-  text-align: center;
-  padding-top: 2rem;
   color: white;
+  padding-top: 2rem;
+  text-align: center;
 }
 
 .services-header {
@@ -9,21 +9,21 @@
 }
 
 .services-header h1 {
-  font-size: 2.5rem;
   color: #00f1fb;
   margin-bottom: 0;
+  font-size: 2.5rem;
 }
 
 .services-header p {
-  font-size: 1.2rem;
   color: #ccc;
+  font-size: 1.2rem;
 }
 
 .services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 2rem;
+  display: grid;
   margin-bottom: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .service-card img {

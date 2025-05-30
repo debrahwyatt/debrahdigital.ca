@@ -3,6 +3,7 @@ import './Home.css';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+
 const Home: React.FC = () => {
 
   useEffect(() => {
@@ -10,46 +11,30 @@ const Home: React.FC = () => {
 
     // Standard meta description
     const desc = document.querySelector('meta[name="description"]');
-    if (desc) {
-      desc.setAttribute("content", "Personalized IT, automation, and software solutions for homes, farms, and businesses in Fairview.");
-    }
+    if (desc) desc.setAttribute("content", "Personalized IT, automation, and software solutions for homes, farms, and businesses in Fairview.");
 
     // Open Graph metadata
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-      ogTitle.setAttribute("content", "Debrah's Digital Solutions");
-    }
+    if (ogTitle) ogTitle.setAttribute("content", "Debrah's Digital Solutions");
 
     const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) {
-      ogDesc.setAttribute("content", "Tech Help at Your Doorstep – Fast, Friendly, Local.");
-    }
+    if (ogDesc) ogDesc.setAttribute("content", "Tech Help at Your Doorstep – Fast, Friendly, Local.");
 
     const ogImage = document.querySelector('meta[property="og:image"]');
-    if (ogImage) {
-      ogImage.setAttribute("content", "https://www.debrahdigital.ca/assets/preview.png");
-    }
+    if (ogImage) ogImage.setAttribute("content", "https://www.debrahdigital.ca/assets/preview.png");
 
     const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) {
-      ogUrl.setAttribute("content", "https://www.debrahdigital.ca");
-    }
+    if (ogUrl) ogUrl.setAttribute("content", "https://www.debrahdigital.ca");
 
     // Twitter metadata
     const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twitterTitle) {
-      twitterTitle.setAttribute("content", "Debrah's Digital Solutions");
-    }
+    if (twitterTitle) twitterTitle.setAttribute("content", "Debrah's Digital Solutions");
 
     const twitterDesc = document.querySelector('meta[name="twitter:description"]');
-    if (twitterDesc) {
-      twitterDesc.setAttribute("content", "Tailored tech help and automation for businesses and homes in Alberta.");
-    }
+    if (twitterDesc) twitterDesc.setAttribute("content", "Tailored tech help and automation for businesses and homes in Alberta.");
 
     const twitterImage = document.querySelector('meta[name="twitter:image"]');
-    if (twitterImage) {
-      twitterImage.setAttribute("content", "https://www.debrahdigital.ca/assets/preview.png");
-    }
+    if (twitterImage) twitterImage.setAttribute("content", "https://www.debrahdigital.ca/assets/preview.png");
 
   }, []);  
 
@@ -57,6 +42,7 @@ const Home: React.FC = () => {
     <>
       {/* Hero Section */}
       <section className="hero-section">
+
         <div className="hero-text">
           <h1>
             Tech Help at Your Doorstep –{' '}
@@ -68,6 +54,7 @@ const Home: React.FC = () => {
             <br />
             Serving Fairview, Alberta and surrounding areas.
           </p>
+
           <div className="hero-buttons">
             <Link to="/contact">
               <button className="quote-btn btn">Request a Quote</button>
@@ -75,42 +62,53 @@ const Home: React.FC = () => {
             <a href="tel:7803309965"><button className="call-btn btn">Call Now: (780) 330-9965</button></a>
           </div>
         </div>
+
         <div className="hero-image">
           <img className="ai-head" src="../assets/ai-head.webp" alt="AI Head" />
         </div>
+
       </section>
 
       {/* Services Icons Grid */}
       <section className="services-section">
+
         <h2>Our Services</h2>
         <p className="subtitle">Expert Tech Help with a Human Touch</p>
 
         <div className="services-grid">
+          
           <div className="service-item">
             <img src="../assets/icon-web.webp" alt="Website Design" />
             <p>Website Design</p>
           </div>
+
           <div className="service-item">
             <img src="../assets/icon-ai.webp" alt="AI Tools & Automation" />
             <p>AI Tools & Automation</p>
           </div>
+
           <div className="service-item">
             <img src="../assets/icon-consulting.webp" alt="Business Tech Consulting" />
             <p>Business Tech Consulting</p>
           </div>
+
           <div className="service-item">
             <img src="../assets/icon-network.webp" alt="Computer & Network Optimization" />
             <p>Computer & Network Optimization</p>
           </div>
+
           <div className="service-item">
             <img src="../assets/icon-onsite.webp" alt="On-Site Troubleshooting and Training" />
             <p>On-Site Troubleshooting & Training</p>
           </div>
+
           <div className="service-item">
             <img src="../assets/icon-software.webp" alt="Custom Software Development" />
             <p>Custom Software Development</p>
-          </div>          
+          </div> 
+
         </div>
+
       </section>
 
       {/* Info Grid Section */}
@@ -171,7 +169,7 @@ const Home: React.FC = () => {
 
           <div className="info-card full-width">
             <h3>Contact or Book Now</h3>
-            <p>Ready to simplify your tech? Let’s talk.</p>
+            <p>Ready to simplify your tech? Let's talk.</p>
             <div className="button-row">
               <Link to="/contact">
                 <button className="info-btn btn">Contact or Book Now</button>

@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom';
 import './Success.css';
+
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const Success: React.FC = () => {
 
@@ -9,36 +10,24 @@ const Success: React.FC = () => {
 
     // Standard meta description
     const desc = document.querySelector('meta[name="description"]');
-    if (desc) {
-      desc.setAttribute("content", "Thank you for contacting Debrah's Digital Solutions. We'll get back to you shortly with personalized tech support.");
-    }
+    if (desc) desc.setAttribute("content", "Thank you for contacting Debrah's Digital Solutions. We'll get back to you shortly with personalized tech support.");
 
     // Open Graph metadata
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-      ogTitle.setAttribute("content", "Thanks for Reaching Out!");
-    }
+    if (ogTitle) ogTitle.setAttribute("content", "Thanks for Reaching Out!");
 
     const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) {
-      ogDesc.setAttribute("content", "Your message was sent successfully. Expect a prompt reply from Fairview's local tech expert.");
-    }
+    if (ogDesc) ogDesc.setAttribute("content", "Your message was sent successfully. Expect a prompt reply from Fairview's local tech expert.");
 
     const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) {
-      ogUrl.setAttribute("content", "https://www.debrahdigital.ca/success");
-    }
+    if (ogUrl) ogUrl.setAttribute("content", "https://www.debrahdigital.ca/success");
 
     // Twitter metadata
     const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twitterTitle) {
-      twitterTitle.setAttribute("content", "Message Received | Debrah's Digital Solutions");
-    }
+    if (twitterTitle) twitterTitle.setAttribute("content", "Message Received | Debrah's Digital Solutions");
 
     const twitterDesc = document.querySelector('meta[name="twitter:description"]');
-    if (twitterDesc) {
-      twitterDesc.setAttribute("content", "Thanks for contacting us! We'll be in touch soon.");
-    }
+    if (twitterDesc) twitterDesc.setAttribute("content", "Thanks for contacting us! We'll be in touch soon.");
 
   }, []);
 
