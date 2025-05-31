@@ -18,18 +18,18 @@ const App: React.FC = () => {
   return (
     <Router>
       <ScrollToTop />
-      <Header/>
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/About" element={<About />} />
-          <Route path="/Error" element={<Error />} />
-          <Route path="/Success" element={<Success />} />
-          <Route path="/Contact" element={<Contact />} />
-          <Route path="/Services" element={<Services />} />
-        </Routes>
-        <Footer/>
-      </main>
+        <Header/>
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/About" element={<About />} />
+            <Route path="/Error" element={<Error />} />
+            <Route path="/Success" element={<Success />} />
+            <Route path="/Contact" element={<Contact />} />
+            <Route path="/Services" element={<Services />} />
+          </Routes>
+        </main>
+      <Footer/>
     </Router>
   );
 };

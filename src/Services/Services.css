@@ -1,24 +1,3 @@
-.services-page {
-  color: white;
-  padding-top: 2rem;
-  text-align: center;
-}
-
-.services-header {
-  margin-bottom: 2rem;
-}
-
-.services-header h1 {
-  color: #00f1fb;
-  margin-bottom: 0;
-  font-size: 2.5rem;
-}
-
-.services-header p {
-  color: #ccc;
-  font-size: 1.2rem;
-}
-
 .services-grid {
   gap: 2rem;
   display: grid;
@@ -41,4 +20,3 @@
   color: #ccc;
   font-size: 0.95rem;
 }
-

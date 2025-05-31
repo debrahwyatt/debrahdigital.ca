@@ -23,7 +23,8 @@ const Home: React.FC = () => {
   
 
   return (
-    <>
+    <div className='home-page'>
+
       {/* Hero Section */}
       <section className="hero-section">
 
@@ -32,12 +33,9 @@ const Home: React.FC = () => {
             Tech Help at Your Doorstep -{' '}
             <span className="highlight">Fast, Friendly, Local.</span>
           </h1>
-          <p>
-            Personalized IT, automation, and software solutions for homes, farms, and businesses in Fairview.
-            <br />
-            <br />
-            Serving Fairview, Alberta and surrounding areas.
-          </p>
+          <p>Personalized IT, automation, and software solutions for homes, farms, and businesses in Fairview.</p>
+          <br />
+          <p>Serving Fairview, Alberta and surrounding areas.</p>
 
           <div className="hero-buttons">
             <Link to="/contact">
@@ -60,7 +58,6 @@ const Home: React.FC = () => {
         <p className="subtitle">Expert Tech Help with a Human Touch</p>
 
         <div className="services-grid">
-          
           <div className="service-item">
             <img src="../assets/icon-web.webp" alt="Website Design" />
             <p>Website Design</p>
@@ -90,7 +87,6 @@ const Home: React.FC = () => {
             <img src="../assets/icon-software.webp" alt="Custom Software Development" />
             <p>Custom Software Development</p>
           </div> 
-
         </div>
 
       </section>
@@ -163,7 +159,7 @@ const Home: React.FC = () => {
 
         </div>
       </section>
-    </>
+    </div>
   );
 };
 

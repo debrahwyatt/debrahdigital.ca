@@ -22,9 +22,9 @@ const Services: React.FC = () => {
   
 
   return (
-    <div className="services-page">
+    <div className="services-page page-wrapper">
 
-      <div className="services-header">
+      <div className="services-header page-header">
         <h1>Our Services</h1>
         <p>Tailored Tech Solutions for Your Needs</p>
       </div>

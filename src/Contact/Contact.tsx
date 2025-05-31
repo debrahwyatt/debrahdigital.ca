@@ -18,38 +18,35 @@ const Contact: React.FC = () => {
   }, []);
 
   return (
-    <div className='contact-page'>
+    <div className='contact-page page-wrapper'>
 
-      <div className="contact-header">
+      <div className="contact-header page-header">
         <h1>Contact Us</h1>
-        <p className="contact-hours">
-          Monday to Friday, 10 AM - 3 PM
-        </p>   
+        <p>Monday to Friday, 10 AM - 3 PM</p>   
       </div>     
 
-      <div className='contact-text'>
-        <p>
-          Fill out the form below to send an email. Or feel free to give us a call at <span className="highlight">(780) 330-9965</span>
-        </p>
-        <br />
+      <div className='contact-text page-text'>
+        <p>Fill out the form below to send an email. Or feel free to give us a call at <span className="highlight">(780) 330-9965</span></p>
       </div>
 
-      <form action="../send-message.php" method="POST" className="contact-form">
-        <label htmlFor="name">Name</label>
-        <input type="text" name="name" id="name" required />
+      <div className='contact-form-wrapper'>
+        <form action="../send-message.php" method="POST" className="contact-form">
+          <label htmlFor="name">Name</label>
+          <input type="text" name="name" id="name" required />
 
-        <label htmlFor="email">Email</label>
-        <input type="email" name="email" id="email" required />
+          <label htmlFor="email">Email</label>
+          <input type="email" name="email" id="email" required />
 
-        <label htmlFor="subject">Subject</label>
-        <input type="text" name="subject" id="subject" />
+          <label htmlFor="subject">Subject</label>
+          <input type="text" name="subject" id="subject" />
 
-        <label htmlFor="message">Message</label>
-        <textarea name="message" id="message" maxLength={2048} required />
+          <label htmlFor="message">Message</label>
+          <textarea name="message" id="message" maxLength={2048} required />
 
-        <button type="submit" className="btn">Send Message</button>
-      </form>
-      
+          <button type="submit" className="btn">Send Message</button>
+        </form>
+      </div>
+
     </div>
   );
 };
