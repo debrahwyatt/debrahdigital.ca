@@ -69,7 +69,8 @@ header nav a:hover {
     gap: 1rem;
     display: flex;
     flex-wrap: wrap;
-    margin-top: 0.5rem;    
+    margin-top: -0.75rem;    
+    margin-bottom: 0.25rem;    
     flex-direction: row;
     justify-content: center;
   }
