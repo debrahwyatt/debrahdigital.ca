@@ -10,8 +10,16 @@ const Footer: React.FC = () => {
         <div className="footer-section">
           <h3>Partners</h3>
           <ul>
-            <li><a href="https://www.fairview.ca/">Town of Fairview</a></li>
-            <li><a href="https://fairviewchamber.com/">Fairview & District Chamber of Commerce</a></li>
+          <li>
+            <a href="https://fairviewchamber.com/" target="_blank" rel="noopener noreferrer">
+              <img src="/assets/chamber-of-commerce-logo.webp" alt="Town of Fairview" />
+            </a>
+          </li>            
+          <li>
+            <a href="https://www.fairview.ca/" target="_blank" rel="noopener noreferrer">
+              <img src="/assets/town_of_fairview_logo.webp" alt="Town of Fairview" />
+            </a>
+          </li>          
           </ul>      
         </div>
 

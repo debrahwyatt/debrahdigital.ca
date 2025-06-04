@@ -6,7 +6,7 @@ const ScrollToTop = () => {
 
   const { pathname } = useLocation();
   useEffect(() => {
-    const main = document.querySelector('main');
+    const main = document.querySelector('html');
     if (main) {
       main.scrollTo({ top: 0, behavior: "auto" });
     }

@@ -61,3 +61,7 @@ footer {
   color: #aaa;
   text-decoration: underline;
 }
+
+.footer-section img {
+  height: 5rem;
+}
