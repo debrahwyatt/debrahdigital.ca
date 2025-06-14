@@ -1,0 +1,133 @@
+/* ========== Hero Section ========== */
+.heroSection {
+  gap: 2rem;
+  margin: 0;
+  display: flex;
+  color: white;
+  flex-wrap: wrap;
+  padding-top: 2rem;
+  align-items: center;
+}
+
+.heroText {
+  flex: 1;
+  min-width: 250px;
+  max-width: 780px;
+}
+
+.heroImage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroText h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.heroButtons {
+  gap: 1rem;
+  display: flex;
+  margin-top: 1rem;
+}
+
+/* ========== Services Section ========== */
+.servicesSection {
+  color: white;
+  padding-top: 2rem;
+  text-align: center;
+}
+
+.servicesSection h2 {
+  color: #00c1ee;
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  color: #ccc;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.servicesGrid {
+  margin-top: 1rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: start;
+  justify-items: center;
+}
+
+.serviceItem {
+  max-width: 150px;
+}
+
+.serviceItem p {
+  font-size: 0.9rem;
+}
+
+.servicesGrid {
+  gap: 2rem;
+  display: grid;
+  margin-bottom: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+
+/* ========== Info Grid Section ========== */
+.infoSection {
+  color: white;
+  padding-top: 2rem;
+}
+
+.infoGrid {
+  gap: 2rem;
+  display: grid;
+  margin: 0 auto;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.infoCard {
+  background: none;
+}
+
+.infoCard h3 {
+  font-size: 1rem;
+  color: #00c1ee;
+  font-weight: normal;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.infoCard h4 {
+  margin-bottom: 0;
+  font-size: 1.4rem;
+  margin-top: 0.5em;
+  font-weight: normal;
+}
+
+.infoCard ul {
+  margin-bottom: 0;
+  padding-left: 1.2rem;
+  list-style-type: disc;
+}
+
+.infoCard ul.checklist {
+  margin-left: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.checklist li::before {
+  content: "✔";
+  color: #00c1ee;
+  margin-right: 0.5rem;
+}
+
+.infoBtn {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+}

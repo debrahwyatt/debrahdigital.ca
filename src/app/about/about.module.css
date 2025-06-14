@@ -1,0 +1,26 @@
+.aboutContent {
+  gap: 2rem;
+  display: flex;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  align-items: center;
+  justify-content: center;
+}
+
+.aboutText {
+  flex: 1;
+  min-width: 300px;
+  text-align: left;
+}
+
+.aboutText p {
+  margin-bottom: 1.2rem;
+}
+
+.aboutImage {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}

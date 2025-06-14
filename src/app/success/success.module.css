@@ -1,0 +1,34 @@
+.thankYouWrapper {
+  display: flex;
+  color: white;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  max-width: 350px;
+  padding-top: 3rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.thankYouMessage {
+  flex: 1;
+  max-width: 225px;
+}
+
+.thankYouMessage h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.thankYouMessage p {
+  font-size: 1.2rem;
+}
+
+.thankYouIcon {
+  width: 100px;
+  height: auto;
+}
+
+.center {
+  padding-top: 3rem;
+  text-align: center;
+}

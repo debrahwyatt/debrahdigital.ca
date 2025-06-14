@@ -1,0 +1,17 @@
+.servicesGrid {
+  gap: 2rem;
+  display: grid;
+  margin-bottom: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.serviceCard h2 {
+  font-size: 1.2rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.serviceCard p {
+  color: #ccc;
+  font-size: 0.95rem;
+}

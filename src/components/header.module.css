@@ -1,0 +1,78 @@
+.siteHeader {
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  color: white;
+  position: sticky;
+  box-sizing: border-box;
+  background-color: #001a35;
+  padding: 0.5rem 15vw 0 15vw;
+  border-bottom: 1px solid #002345;
+}
+
+.siteHeader nav {
+  gap: 1rem;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+
+.bannerLink {
+  margin-right: auto;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+.siteHeader nav a {
+  color: white;
+  font-size: 1rem;
+  margin-right: 1rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.siteHeader nav a:hover {
+  color: #00c1ee;
+}
+
+.searchInput {
+  border: none;
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin-left: 1rem;
+  border-radius: 5px;
+}
+
+.magGlass {
+  width: 30px;
+  height: 30px;
+}
+
+/* For phone users */
+@media (max-width: 768px) {
+  .siteHeader nav {
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .bannerLink {
+    margin: 0 auto;
+  }
+
+  .siteHeader nav .navLinks {
+    gap: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: -0.75rem;
+    margin-bottom: 0.25rem;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .siteHeader nav a {
+    margin: 0;
+  }
+}
