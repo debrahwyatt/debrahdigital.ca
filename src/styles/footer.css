@@ -1,11 +1,11 @@
-.siteFooter {
+.site-footer {
   color: white;
   margin-top: 6rem;
   background-color: #001a35;
   border-top: 1px solid #002345;
 }
 
-.footerContainer {
+.footer-container {
   gap: 2rem;
   display: flex;
   margin: 0 auto;
@@ -15,48 +15,48 @@
   justify-content: center; 
 }
 
-.footerSection {
+.footer-section {
   flex: 1 1;
 }
 
-.footerSection h3 {
+.footer-section h3 {
   font-size: 1rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
-.footerSection p {
+.footer-section p {
   font-size: 1rem;
   margin: 0 0 1rem;
 }
 
-.footerSection ul {
+.footer-section ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.footerSection li {
+.footer-section li {
   margin-bottom: 0.4rem;
 }
 
-.footerSection a {
+.footer-section a {
   color: white;
   text-decoration: none;
 }
 
-.footerSection a:hover {
+.footer-section a:hover {
   text-decoration: underline;
 }
 
-.footerBottom {
+.footer-bottom {
   color: #aaa;
   margin-top: 2rem;  
   font-size: 0.8rem;
   text-align: center;
 }
 
-.footerBottom a {
+.footer-bottom a {
   color: #aaa;
   text-decoration: underline;
 }

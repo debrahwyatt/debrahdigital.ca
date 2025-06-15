@@ -1,4 +1,4 @@
-.aboutContent {
+.about-content {
   gap: 2rem;
   display: flex;
   margin: 0 auto;
@@ -8,17 +8,17 @@
   justify-content: center;
 }
 
-.aboutText {
+.about-text {
   flex: 1;
   min-width: 300px;
   text-align: left;
 }
 
-.aboutText p {
+.about-text p {
   margin-bottom: 1.2rem;
 }
 
-.aboutImage {
+.about-image {
   display: flex;
   flex-shrink: 0;
   align-items: center;

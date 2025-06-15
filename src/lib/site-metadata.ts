@@ -1,8 +1,9 @@
-export const siteMetadata = {
+const siteMetadata = {
   siteName: "Debrah's Digital Solutions",
   siteUrl: "https://www.debrahdigital.ca",
   author: "Debrah Wyatt",
-  description: "Personalized IT, automation, and software solutions for homes, farms, and businesses in Fairview, Alberta.",
+  description:
+    "Personalized IT, automation, and software solutions for homes, farms, and businesses in Fairview, Alberta.",
   keywords: [
     "IT support Fairview", "computer repair Fairview", "tech help Fairview",
     "laptop repair Fairview", "website design Fairview", "web development Alberta",
@@ -14,3 +15,5 @@ export const siteMetadata = {
   ogImage: "/favicon.ico",
   twitterHandle: "@debrahdigital",
 };
+
+export default siteMetadata;

@@ -1,0 +1,96 @@
+---
+import '../styles/index.css'
+import BaseLayout from '../layouts/base-layout.astro';
+---
+
+<BaseLayout title="Debrah's Digital Solutions">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-text">
+      <h1>
+        Tech Help at Your Doorstep – 
+        <span class="highlight">Fast, Friendly, Local.</span>
+      </h1>
+      <p>Personalized IT, automation, and software solutions for homes, farms, and businesses in Fairview.</p>
+      <br />
+      <p>Serving Fairview, Alberta and surrounding areas.</p>
+
+      <div class="hero-buttons">
+        <a href="/contact" class="btn">Request a Quote</a>
+        <a href="tel:7803309965" class="btn">Call Now: (780) 330-9965</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img class="ai-head" src="/logo.webp" alt="Logo" width="250" height="250" />
+    </div>
+  </section>
+
+  <!-- Services Icons Grid -->
+  <section class="services-section">
+    <h2>Our Services</h2>
+    <p class="subtitle">Expert Tech Help with a Human Touch</p>
+
+    <div class="services-grid">
+      <div class="service-item"><img src="/icon-web.webp" alt="Website Design" width="48" /><p>Website Design</p></div>
+      <div class="service-item"><img src="/icon-ai.webp" alt="AI Tools & Automation" width="48" /><p>AI Tools & Automation</p></div>
+      <div class="service-item"><img src="/icon-consulting.webp" alt="Business Tech Consulting" width="48" /><p>Business Tech Consulting</p></div>
+      <div class="service-item"><img src="/icon-network.webp" alt="Computer & Network Optimization" width="48" /><p>Computer & Network Optimization</p></div>
+      <div class="service-item"><img src="/icon-onsite.webp" alt="On-Site Troubleshooting and Training" width="48" /><p>On-Site Troubleshooting & Training</p></div>
+      <div class="service-item"><img src="/icon-software.webp" alt="Custom Software Development" width="48" /><p>Custom Software Development</p></div>
+    </div>
+  </section>
+
+  <!-- Info Grid Section -->
+  <section class="info-section">
+    <div class="info-grid">
+
+      <div class="info-card">
+        <h3>What We Do</h3>
+        <h4>Expert Tech Help with a Human Touch</h4>
+        <ul>
+          <li>Website Design</li>
+          <li>AI Tools & Automation</li>
+          <li>Business Tech Consulting</li>
+          <li>Custom Software Development</li>
+          <li>Computer & Network Optimization</li>
+          <li>On-Site Troubleshooting and Training</li>
+        </ul>
+        <a href="/services" class="btn info-btn">Learn More About Our Services</a>
+      </div>
+
+      <div class="info-card">
+        <h3>Client-Focused Solutions</h3>
+        <p>
+          Need help with a computer, website, or system upgrade?<br /><br />
+          I provide on-site visits, remote assistance, and tailored solutions built to match your needs.
+        </p>
+        <ul class="checklist">
+          <li>Fast Response</li>
+          <li>Clear Communication</li>
+          <li>Affordable, Professional</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>About Debrah</h3>
+        <h4>Debrah Wyatt, E.I.T.</h4>
+        <p>
+          Software Developer & Tech Consultant<br /><br />
+          Based in Fairview, AB<br />
+          Bachelor of Software Engineering, UVic<br />
+          20+ years experience in tech & automation
+        </p>
+        <br />
+        <em>“Tech made simple, right at your doorstep.”</em><br />
+        <a href="/about" class="btn info-btn">More About Us</a>
+      </div>
+
+      <div class="info-card full-width">
+        <h3>Contact or Book Now</h3>
+        <p>Ready to simplify your tech? Let’s talk.</p>
+        <a href="/contact" class="btn info-btn">Contact or Book Now</a>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>

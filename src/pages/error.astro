@@ -1,0 +1,28 @@
+---
+import '../styles/error.css';
+import BaseLayout from '../layouts/base-layout.astro';
+---
+
+<BaseLayout title="Error | Debrah's Digital Solutions">
+  <div class="page-wrapper error-wrapper">
+    <div class="page-header error-message">
+      <h1>Error</h1>
+      <p>
+        Your message has not been sent, please try again later or call us at
+        <span class="highlight"> (780) 330-9965</span>
+      </p>
+    </div>
+
+    <img
+      src="/icon-mail.webp"
+      alt="Mail icon"
+      width="100"
+      height="100"
+      class="error-icon"
+    />
+  </div>
+
+  <div class="center">
+    <a href="/" class="btn quote-btn">Return to Homepage</a>
+  </div>
+</BaseLayout>

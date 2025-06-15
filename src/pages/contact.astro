@@ -1,0 +1,40 @@
+---
+import '../styles/contact.css';
+import BaseLayout from '../layouts/base-layout.astro';
+---
+
+<BaseLayout title="Contact Us | Debrah's Digital Solutions">
+  <div class="page-wrapper contact-page">
+
+    <div class="page-header contact-header">
+      <h1>Contact Us</h1>
+      <p>Reach out — we’re here to help.</p>
+    </div>
+
+    <div class="page-text contact-text">
+      <p>
+        Fill out the form below to send an email. Or feel free to give us a call at
+        <span class="highlight"> (780) 330-9965</span>
+      </p>
+    </div>
+
+    <div class="contact-form-wrapper">
+      <form action="/send-message.php" method="POST" class="contact-form">
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" autocomplete="name" required />
+
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" autocomplete="email" required />
+
+        <label for="subject">Subject</label>
+        <input type="text" name="subject" id="subject" />
+
+        <label for="message">Message</label>
+        <textarea name="message" id="message" class="form-message" maxlength="2048" required></textarea>
+
+        <button type="submit" class="btn">Send Message</button>
+      </form>
+    </div>
+
+  </div>
+</BaseLayout>

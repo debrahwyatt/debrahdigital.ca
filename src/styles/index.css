@@ -1,5 +1,5 @@
 /* ========== Hero Section ========== */
-.heroSection {
+.hero-section {
   gap: 2rem;
   margin: 0;
   display: flex;
@@ -9,38 +9,37 @@
   align-items: center;
 }
 
-.heroText {
+.hero-text {
   flex: 1;
   min-width: 250px;
   max-width: 780px;
 }
 
-.heroImage {
+.hero-image {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.heroText h1 {
+.hero-text h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
 }
 
-.heroButtons {
+.hero-buttons {
   gap: 1rem;
   display: flex;
-  margin-top: 1rem;
 }
 
 /* ========== Services Section ========== */
-.servicesSection {
+.services-section {
   color: white;
   padding-top: 2rem;
   text-align: center;
 }
 
-.servicesSection h2 {
+.services-section h2 {
   color: #00c1ee;
   font-size: 1.8rem;
   margin-bottom: 0.25rem;
@@ -52,7 +51,7 @@
   margin-bottom: 1.5rem;
 }
 
-.servicesGrid {
+.services-grid {
   margin-top: 1rem;
   max-width: 1000px;
   margin-left: auto;
@@ -61,15 +60,15 @@
   justify-items: center;
 }
 
-.serviceItem {
+.service-item {
   max-width: 150px;
 }
 
-.serviceItem p {
+.service-item p {
   font-size: 0.9rem;
 }
 
-.servicesGrid {
+.services-grid {
   gap: 2rem;
   display: grid;
   margin-bottom: 3rem;
@@ -78,23 +77,23 @@
 
 
 /* ========== Info Grid Section ========== */
-.infoSection {
+.info-section {
   color: white;
   padding-top: 2rem;
 }
 
-.infoGrid {
+.info-grid {
   gap: 2rem;
   display: grid;
   margin: 0 auto;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
-.infoCard {
+.info-gard {
   background: none;
 }
 
-.infoCard h3 {
+.info-card h3 {
   font-size: 1rem;
   color: #00c1ee;
   font-weight: normal;
@@ -102,20 +101,20 @@
   text-transform: uppercase;
 }
 
-.infoCard h4 {
+.info-card h4 {
   margin-bottom: 0;
   font-size: 1.4rem;
   margin-top: 0.5em;
   font-weight: normal;
 }
 
-.infoCard ul {
+.info-card ul {
   margin-bottom: 0;
   padding-left: 1.2rem;
   list-style-type: disc;
 }
 
-.infoCard ul.checklist {
+.info-card ul.checklist {
   margin-left: 0;
   padding-left: 0;
   list-style: none;
@@ -127,7 +126,5 @@
   margin-right: 0.5rem;
 }
 
-.infoBtn {
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
+.info-btn {
 }
