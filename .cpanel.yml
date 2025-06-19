@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - /bin/rm -rf /home/debra512/public_html/*
-    - /bin/cp -R dist/* /home/debra512/public_html/
+    - export DEPLOYPATH=/home/debra512/public_html/
+    - /bin/cp -R dist/* $DEPLOYPATH
