@@ -60,8 +60,19 @@
   justify-items: center;
 }
 
+.services-grid a {
+  text-decoration: none;
+}
+
 .service-item {
+  padding: 1rem;
   max-width: 150px;
+  border-radius: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.service-item:hover {
+  background-color: #002345;
 }
 
 .service-item p {
@@ -72,7 +83,7 @@
   gap: 2rem;
   display: grid;
   margin-bottom: 3rem;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 
@@ -124,7 +135,4 @@
   content: "✔";
   color: #00c1ee;
   margin-right: 0.5rem;
-}
-
-.info-btn {
 }

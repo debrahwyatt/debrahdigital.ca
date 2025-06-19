@@ -2,10 +2,25 @@
   gap: 2rem;
   display: grid;
   margin-bottom: 3rem;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+.services-grid a {
+  text-decoration: none;
+}
+
+.service-card {
+  padding: 1rem;
+  border-radius: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.service-card:hover {
+  background-color: #002345;
 }
 
 .service-card h2 {
+  color: #FFF;
   font-size: 1.2rem;
   margin-top: 0.25rem;
   margin-bottom: 0.5rem;
