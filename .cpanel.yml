@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/debra512/public_html/
-    - /bin/cp -R dist/* $DEPLOYPATH
+    - /bin/cp -r * $DEPLOYPATH
