@@ -86,6 +86,12 @@
 
 /* For phone users */
 @media (max-width: 768px) {
+  .site-header {
+    padding-bottom: 0.5rem;
+    padding-left: 7.5vw;
+    padding-right: 7.5vw;    
+  }
+
   .site-header nav {
     align-items: center;
     flex-direction: column;

@@ -9,7 +9,6 @@ html body {
 main {
   padding-left: 15vw;
   padding-right: 15vw;
-  min-height: calc(100vh - 350px) ;
 }
 
 p {
@@ -47,7 +46,6 @@ label {
 .page-wrapper {
   color: white;
   padding-top: 2rem;
-  text-align: center;
 }
 
 .page-header {
@@ -81,10 +79,15 @@ li {
   text-align: center;
 }
 
-/* @media (max-width: 768px) {
+@media (max-width: 768px) {
   main {
-    height: calc(100vh - 75.75px - 4rem); 
+    padding-left: 7.5vw;
+    padding-right: 7.5vw;
   }
-} */
+
+  .page-wrapper {
+    padding-top: 0rem;
+  }  
+}
 
 

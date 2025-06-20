@@ -2,6 +2,8 @@
   gap: 2rem;
   display: grid;
   margin-bottom: 3rem;
+  text-align: center;
+  justify-content: center;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
 }
 

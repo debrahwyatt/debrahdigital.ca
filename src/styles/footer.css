@@ -1,6 +1,7 @@
 .site-footer {
   color: white;
   margin-top: 6rem;
+  padding-bottom: 0.5rem;
   background-color: #001a35;
   border-top: 1px solid #002345;
 }
@@ -59,4 +60,15 @@
 .footer-bottom a {
   color: #aaa;
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    padding-left: 7.5vw;
+    padding-right: 7.5vw;    
+  }
+
+  .site-footer {
+    margin-top: 3rem;
+  }  
 }
