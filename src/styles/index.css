@@ -14,13 +14,6 @@
   max-width: 780px;
 }
 
-.hero-image {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .hero-text h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
@@ -30,6 +23,29 @@
   gap: 1rem;
   display: flex;
 }
+
+.hero-image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#logo-spinner {
+  perspective: 1000px;
+  display: inline-block;
+}
+
+#logo {
+  display: block;
+  transform-style: preserve-3d;
+  transition: transform 0.1s linear;
+  
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 
 /* ========== Services Section ========== */
 .services-section {

@@ -20,7 +20,9 @@ import BaseLayout from '../layouts/base-layout.astro';
         </div>
       </div>
       <div class="hero-image">
-        <img class="ai-head" src="/logo.webp" alt="Logo" width="250" height="250" />
+        <div id="logo-spinner">
+          <img id="logo" class="ai-head" src="/logo.webp" alt="Debrah's Digital Solutions Logo" width="250" height="250" />
+        </div>
       </div>
     </section>
 
@@ -83,4 +85,49 @@ import BaseLayout from '../layouts/base-layout.astro';
       </div>
     </section>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const logo = document.getElementById("logo") as HTMLElement | null;
+      if (!logo) return;
+
+      let rotation = 0;
+      let speed = 0;
+      let lastTime = performance.now();
+      let isAnimating = false;
+
+      const decayRate = 0.000074; // tuned for ~1080° spin at speed 0.4
+      const maxSpeed = 1;
+
+      const animate = (time: number) => {
+        const delta = time - lastTime;
+        lastTime = time;
+
+        if (Math.abs(speed) > 0.001) {
+          rotation += speed * delta;
+
+          const decayStep = decayRate * delta;
+          speed -= Math.sign(speed) * Math.min(Math.abs(speed), decayStep);
+
+          logo.style.transform = `rotateY(${rotation}deg)`;
+          requestAnimationFrame(animate);
+        } else {
+          speed = 0;
+          isAnimating = false;
+        }
+      };
+
+      logo.addEventListener("click", () => {
+        speed += 0.4;
+        speed = Math.min(speed, maxSpeed);
+
+        if (!isAnimating) {
+          isAnimating = true;
+          lastTime = performance.now();
+          requestAnimationFrame(animate);
+        }
+      });
+    });
+  </script>
+
 </BaseLayout>
