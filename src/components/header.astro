@@ -18,8 +18,8 @@ import '../styles/header.css'
     <span class="nav-links">
       <a href="/">Home</a>
 
-      <div class="dropdown">
-        <a href="/services">Services</a>
+      <div class="dropdown" id="services-dropdown">
+        <a href="/services" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">Services</a>
         <div class="dropdown-content">
           <a href="/services/computer-repair">Computer Repair</a>
           <a href="/services/training">Digital Skills Training</a>
@@ -38,3 +38,38 @@ import '../styles/header.css'
 
   </nav>
 </header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const dropdown = document.getElementById("services-dropdown");
+    const toggle = dropdown?.querySelector(".dropdown-toggle");
+
+    if (!dropdown || !toggle) return;
+
+    // Only apply mobile behavior
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+    if (isMobile) {
+      let open = false;
+
+      toggle.addEventListener("click", (e) => {
+        if (!open) {
+          e.preventDefault(); // block first click
+          dropdown.classList.toggle("show");
+          open = true;
+        } else {
+          // allow navigation on second click
+          dropdown.classList.remove("show");
+          open = false;
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!dropdown.contains(e.target as Node)) {
+          dropdown.classList.remove("show");
+          open = false;
+        }
+      });
+    }
+  });
+</script>
