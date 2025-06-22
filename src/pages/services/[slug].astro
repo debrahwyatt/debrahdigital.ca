@@ -1,0 +1,31 @@
+---
+import '../../styles/services-pages.css';
+import { serviceData } from '../../lib/service-pages';
+import BaseLayout from '../../layouts/base-layout.astro';
+
+type ServiceSlug = keyof typeof serviceData;
+const slug = (Astro.params.slug ?? 'computer-repair') as ServiceSlug;
+const page = serviceData[slug];
+const ServiceContent = page.component;
+
+export async function getStaticPaths() {
+  return Object.keys(serviceData).map((slug) => ({
+    params: { slug }
+  }));
+}
+---
+
+<BaseLayout title={page.title}>
+  <head>
+    <link rel="canonical" href={page.canonical} />
+  </head>
+
+  <div class="page-wrapper">
+    <div class="page-header">
+      <h1>{page.h1}</h1>
+      <p>{page.subheading}</p>
+    </div>
+
+    <ServiceContent />
+  </div>
+</BaseLayout>

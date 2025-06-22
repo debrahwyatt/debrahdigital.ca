@@ -3,7 +3,7 @@ const siteMetadata = {
   siteUrl: "https://www.debrahdigital.ca",
   author: "Debrah Wyatt",
   description:
-    "Tech help at your doorstep — fast, friendly, and local. Debrah's Digital Solutions provides expert IT support, website development, digital training, and automation services for homes, farms, and small businesses in Fairview, Alberta.",
+    "Tech help at your doorstep — fast, friendly, and local. Debrah's Digital Solutions serves Fairview and surrounding Alberta communities with expert IT support, web development, digital training, and automation services for homes, farms, and small businesses.",
   keywords: [
     "computer repair Fairview", "IT support Fairview", "laptop repair Fairview",
     "data recovery Fairview", "network optimization Fairview", "onsite tech support",
@@ -15,7 +15,7 @@ const siteMetadata = {
     "local IT expert Fairview", "Debrah Wyatt tech", "small business tech trainer",
     "digital transformation Fairview", "Fairview computer services", "affordable web design Alberta"
   ],
-  ogImage: "/favicon.ico",
+  ogImage: "/logo.webp",
   twitterHandle: "@debrahdigital",
 };
 
