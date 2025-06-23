@@ -6,30 +6,35 @@
   position: sticky;
   box-sizing: border-box;
   background-color: #001a35;
-  padding: 0.5rem 15vw 0 15vw;
+  padding: 0.5rem 15vw;
   border-bottom: 1px solid #002345;
 }
 
 .site-header nav {
-  gap: 1rem;
-  width: 100%;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  box-sizing: border-box;
   justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 1rem;
 }
 
 .banner-link {
+  padding: 0.5em 0;
   margin-right: auto;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .site-header nav a {
   color: white;
   font-size: 1rem;
-  margin-right: 1rem;
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -38,6 +43,28 @@
   color: #00c1ee;
 }
 
+/* Social media icons */
+.social-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.social-icon-link {
+  transform: translateY(-1px);  
+}
+
+.social-icons a svg {
+  display: block;
+  fill: #fff;
+  transition: fill 0.3s;
+}
+
+.social-icons a:hover svg {
+  fill: #00bfff;
+}
+
+/* Search bar (if you add one later) */
 .search-input {
   border: none;
   padding: 0.5rem;
@@ -49,69 +76,66 @@
 /* Dropdown styling */
 .dropdown {
   position: relative;
-  display: inline-block;
 }
 
 .dropdown-content {
-  left: 0;
-  top: 100%;
-  z-index: 1001;
-  display: none;
-  min-width: 220px;
   position: absolute;
+  top: 100%;
+  left: 0;
+  display: none;
   flex-direction: column;
   background-color: #001f3f;
   border: 1px solid #002345;
+  min-width: 220px;
+  z-index: 1001;
 }
 
 .dropdown-content a {
-  width: 100%;
-  color: white;  
   display: block;
-  font-size: 0.95rem;
-  white-space: nowrap;  
   padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  color: white;
   text-decoration: none;
-  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .dropdown-content a:hover {
-  color: #00c1ee;
   background-color: #003366;
+  color: #00c1ee;
 }
 
 .dropdown:hover .dropdown-content {
   display: flex;
 }
 
-/* For phone users */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .site-header {
-    padding-bottom: 0.5rem;
-    padding-left: 7.5vw;
-    padding-right: 7.5vw;    
+    padding: 0.5rem 7.5vw;
   }
 
   .site-header nav {
-    align-items: center;
     flex-direction: column;
+    align-items: center;
   }
 
   .banner-link {
     margin: 0 auto;
   }
 
-  .site-header nav .nav-links {
-    gap: 1rem;
-    display: flex;
-    flex-wrap: wrap;
+  .nav-links {
     margin-top: -0.75rem;
     margin-bottom: 0.25rem;
     flex-direction: row;
     justify-content: center;
+    gap: 1rem;
   }
 
   .site-header nav a {
     margin: 0;
+  }
+
+  .social-icons {
+    margin-top: 0.5rem;
   }
 }

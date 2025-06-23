@@ -5,6 +5,7 @@ import BaseLayout from '../layouts/base-layout.astro';
 
 <BaseLayout title="Debrah's Digital Solutions">
   <div class="page-wrapper">
+    <h1 class="sr-only">Debrah's Digital Solutions - Tech Help in Fairview, Alberta</h1>
 
     <!-- Hero Section -->
     <section class="hero-section">
@@ -32,14 +33,14 @@ import BaseLayout from '../layouts/base-layout.astro';
       <p class="subtitle">Expert Tech Help with a Human Touch</p>
 
       <div class="services-grid">
-        <a href="/services/computer-repair"><div class="service-item"><img src="/icon-repair.webp" alt="Computer Repair Services" height="48" /><p>Computer Repair Services</p></div></a>
-        <a href="/services/training"><div class="service-item"><img src="/icon-training.webp" alt="Digital Skills Training" height="48" /><p>Digital Skills Training</p></div></a>
-        <a href="/services/onsite-support"><div class="service-item"><img src="/icon-onsite.webp" alt="On-Site Support" height="48" /><p>On-Site Support</p></div></a>
-        <a href="/services/network"><div class="service-item"><img src="/icon-network.webp" alt="Network Optimization" height="48" /><p>Network Optimization</p></div></a>
-        <a href="/services/website-development"><div class="service-item"><img src="/icon-web.webp" alt="Website Development" height="48" /><p>Website Development</p></div></a>
-        <a href="/services/consulting"><div class="service-item"><img src="/icon-consulting.webp" alt="Business Tech Consulting" height="48" /><p>Business Tech Consulting</p></div></a>
-        <a href="/services/ai-automation"><div class="service-item"><img src="/icon-ai.webp" alt="AI Tools & Automation" height="48" /><p>AI Tools & Automation</p></div></a>
-        <a href="/services/custom-software"><div class="service-item"><img src="/icon-software.webp" alt="Custom Software Solutions" height="48" /><p>Custom Software Solutions</p></div></a>
+        <a href="/services/computer-repair"><div class="service-item"><img src="/icon-repair.webp" alt="Computer Repair Services" height="56" /><h3>Computer Repair Services</h3></div></a>
+        <a href="/services/training"><div class="service-item"><img src="/icon-training.webp" alt="Digital Skills Training" height="56" /><h3>Digital Skills Training</h3></div></a>
+        <a href="/services/onsite-support"><div class="service-item"><img src="/icon-onsite.webp" alt="On-Site Support" height="56" /><h3>On-Site Support</h3></div></a>
+        <a href="/services/network"><div class="service-item"><img src="/icon-network.webp" alt="Network Optimization" height="56" /><h3>Network Optimization</h3></div></a>
+        <a href="/services/website-development"><div class="service-item"><img src="/icon-web.webp" alt="Website Development" height="56" /><h3>Website Development</h3></div></a>
+        <a href="/services/consulting"><div class="service-item"><img src="/icon-consulting.webp" alt="Business Tech Consulting" height="56" /><h3>Business Tech Consulting</h3></div></a>
+        <a href="/services/ai-automation"><div class="service-item"><img src="/icon-ai.webp" alt="AI Tools & Automation" height="56" /><h3>AI Tools & Automation</h3></div></a>
+        <a href="/services/custom-software"><div class="service-item"><img src="/icon-software.webp" alt="Custom Software Solutions" height="56" /><h3>Custom Software Solutions</h3></div></a>
       </div>
     </section>
 
@@ -85,49 +86,5 @@ import BaseLayout from '../layouts/base-layout.astro';
       </div>
     </section>
   </div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const logo = document.getElementById("logo") as HTMLElement | null;
-      if (!logo) return;
-
-      let rotation = 0;
-      let speed = 0;
-      let lastTime = performance.now();
-      let isAnimating = false;
-
-      const decayRate = 0.000074; // tuned for ~1080° spin at speed 0.4
-      const maxSpeed = 1;
-
-      const animate = (time: number) => {
-        const delta = time - lastTime;
-        lastTime = time;
-
-        if (Math.abs(speed) > 0.001) {
-          rotation += speed * delta;
-
-          const decayStep = decayRate * delta;
-          speed -= Math.sign(speed) * Math.min(Math.abs(speed), decayStep);
-
-          logo.style.transform = `rotateY(${rotation}deg)`;
-          requestAnimationFrame(animate);
-        } else {
-          speed = 0;
-          isAnimating = false;
-        }
-      };
-
-      logo.addEventListener("click", () => {
-        speed += 0.4;
-        speed = Math.min(speed, maxSpeed);
-
-        if (!isAnimating) {
-          isAnimating = true;
-          lastTime = performance.now();
-          requestAnimationFrame(animate);
-        }
-      });
-    });
-  </script>
 
 </BaseLayout>

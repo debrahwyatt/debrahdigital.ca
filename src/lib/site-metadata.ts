@@ -5,17 +5,37 @@ const siteMetadata = {
   description:
     "Tech help at your doorstep — fast, friendly, and local. Debrah's Digital Solutions serves Fairview and surrounding Alberta communities with expert IT support, web development, digital training, and automation services for homes, farms, and small businesses.",
   keywords: [
-    "computer repair Fairview", "IT support Fairview", "laptop repair Fairview",
-    "data recovery Fairview", "network optimization Fairview", "onsite tech support",
-    "website development Fairview", "website design Alberta", "custom software Alberta",
-    "AI automation for business", "tech training Fairview", "digital skills workshops",
-    "cybersecurity training Alberta", "business IT solutions", "workflow automation Fairview",
-    "Fairview tech services", "AI tools for small business", "Python training Fairview",
-    "remote support Fairview", "mobile tech support", "business tech consulting Alberta",
-    "local IT expert Fairview", "Debrah Wyatt tech", "small business tech trainer",
-    "digital transformation Fairview", "Fairview computer services", "affordable web design Alberta"
+    // 🔥 High-priority local + service terms (Top 15 for SEO)
+    "computer repair Fairview",
+    "IT support Fairview",
+    "onsite tech support",
+    "laptop repair Fairview",
+    "website development Fairview",
+    "custom software development Alberta",
+    "AI automation for business",
+    "network optimization Fairview",
+    "digital skills training Fairview",
+    "remote support Fairview",
+    "business tech consulting Alberta",
+    "affordable web design Alberta",
+    "computer troubleshooting Fairview",
+    "tech support for small business Fairview",
+    "Debrah Wyatt IT services",
+
+    // 📌 Secondary/long-tail keywords (supportive, lower priority)
+    "digital skills workshops",
+    "cybersecurity training Alberta",
+    "workflow automation Fairview",
+    "Fairview tech services",
+    "AI tools for small business",
+    "Python training Fairview",
+    "mobile tech support",
+    "website design Alberta",
+    "local IT expert Fairview",
+    "digital transformation Fairview",
+    "Fairview computer services"
   ],
-  ogImage: "/logo.webp",
+  ogImage: "/ogImage.png",
   twitterHandle: "@debrahdigital",
 };
 
