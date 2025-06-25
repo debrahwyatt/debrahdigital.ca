@@ -28,7 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  logo.addEventListener("click", (event) => {
+  logo.addEventListener("mousedown", (event) => {
+    if (event.button !== 0) return;
+
     const rect = logo.getBoundingClientRect();
     const clickX = event.clientX;
     const midpoint = rect.left + rect.width / 2;
