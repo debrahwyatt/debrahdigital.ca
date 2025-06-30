@@ -62,6 +62,10 @@
   text-decoration: underline;
 }
 
+.no-space {
+  display:inline
+}
+
 @media (max-width: 768px) {
   .footer-container {
     padding-left: 7.5vw;

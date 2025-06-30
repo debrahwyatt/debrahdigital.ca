@@ -3,13 +3,16 @@ import '../styles/footer.css'
 ---
 
 <footer class="site-footer" itemscope itemtype="https://schema.org/LocalBusiness">
+  <meta itemprop="openingHours" content="Mo-Fr 09:00-17:00" />
+
   <div class="footer-container">
 
     <div class="footer-section">
       <h3>About</h3>
-      <p itemprop="name"><strong>Debrah's Digital Solutions</strong></p>
+      <p itemprop="name"><strong>Debrah's Digital Solutions Ltd.</strong></p>
       <p itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
-        <span itemprop="streetAddress">PO Box 2589</span><br />
+        <strong>Mall On Main</strong><br>
+        <span itemprop="streetAddress">Unit 4, 10308 110 St.</span><br>
         <span itemprop="addressLocality">Fairview</span>,
         <span itemprop="addressRegion">AB</span>
         <span itemprop="postalCode">T0H 1L0</span>
@@ -47,15 +50,52 @@ import '../styles/footer.css'
         </a>
       </div>
     </div>
-
+    
     <div class="footer-section">
-      <h3>Quick Links</h3>
-      <ul>
-        <li><a href="/services">Our Services</a></li>
-        <li><a href="/about">About Debrah</a></li>
-        <li><a href="/contact">Contact Us</a></li>
-        <li><a href="https://www.google.com/maps/search/Fairview+Alberta" target="_blank">Find Fairview, Alberta</a></li>
-      </ul>
+      <h3>Hours</h3>
+      <p>Monday - Friday: 9:00 AM - 5:00 PM<br />
+        Saturday: 10:00 AM - 4:00 PM<br />
+        Sunday: Closed
+      </p>
+
+      <!-- SEO Structured Data -->
+      <div style="display: none;">
+        <span itemprop="openingHoursSpecification" itemscope itemtype="https://schema.org/OpeningHoursSpecification">
+          <meta itemprop="dayOfWeek" content="Monday" />
+          <meta itemprop="opens" content="09:00" />
+          <meta itemprop="closes" content="17:00" />
+        </span>
+        <span itemprop="openingHoursSpecification" itemscope itemtype="https://schema.org/OpeningHoursSpecification">
+          <meta itemprop="dayOfWeek" content="Tuesday" />
+          <meta itemprop="opens" content="09:00" />
+          <meta itemprop="closes" content="17:00" />
+        </span>
+        <span itemprop="openingHoursSpecification" itemscope itemtype="https://schema.org/OpeningHoursSpecification">
+          <meta itemprop="dayOfWeek" content="Wednesday" />
+          <meta itemprop="opens" content="09:00" />
+          <meta itemprop="closes" content="17:00" />
+        </span>
+        <span itemprop="openingHoursSpecification" itemscope itemtype="https://schema.org/OpeningHoursSpecification">
+          <meta itemprop="dayOfWeek" content="Thursday" />
+          <meta itemprop="opens" content="09:00" />
+          <meta itemprop="closes" content="17:00" />
+        </span>
+        <span itemprop="openingHoursSpecification" itemscope itemtype="https://schema.org/OpeningHoursSpecification">
+          <meta itemprop="dayOfWeek" content="Friday" />
+          <meta itemprop="opens" content="09:00" />
+          <meta itemprop="closes" content="17:00" />
+        </span>
+        <span itemprop="openingHoursSpecification" itemscope itemtype="https://schema.org/OpeningHoursSpecification">
+          <meta itemprop="dayOfWeek" content="Saturday" />
+          <meta itemprop="opens" content="10:00" />
+          <meta itemprop="closes" content="16:00" />
+        </span>
+        <span itemprop="openingHoursSpecification" itemscope itemtype="https://schema.org/OpeningHoursSpecification">
+          <meta itemprop="dayOfWeek" content="Sunday" />
+          <meta itemprop="opens" content="Closed" />
+          <meta itemprop="closes" content="Closed" />
+        </span>
+      </div>
     </div>
 
     <div class="footer-section">
@@ -66,7 +106,7 @@ import '../styles/footer.css'
         <li><a href="https://www.canada.ca/en/services/business.html" target="_blank">Canada Business Services</a></li>
         <li><a href="https://haveibeenpwned.com/" target="_blank">Check Data Breaches</a></li>
         <li><a href="https://speedtest.net/" target="_blank">Internet Speed Test</a></li>
-      </ul>
+      </ul>      
     </div>
 
     <div class="footer-section">
@@ -93,7 +133,7 @@ import '../styles/footer.css'
   </div>
 
   <div class="footer-bottom">
-    &copy; 2025 <span itemprop="name">Debrah's Digital Solutions</span>. All rights reserved. |
+    &copy; 2025 <span itemprop="name">Debrah's Digital Solutions Ltd.</span>. All rights reserved. |
     <a href="/privacy-policy">Privacy Policy</a>
   </div>
 </footer>
