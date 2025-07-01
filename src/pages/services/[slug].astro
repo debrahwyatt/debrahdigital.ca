@@ -15,10 +15,18 @@ export async function getStaticPaths() {
 }
 ---
 
-<BaseLayout title={page.title}>
-  <head>
-    <link rel="canonical" href={page.canonical} />
-  </head>
+<BaseLayout 
+  title={page.title}
+  description={page.metaDescription}
+  keywords={page.keywords}
+  ogImage={page.ogImage}
+  canonical={page.canonical}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json">
+      {JSON.stringify(page.structuredData)}
+    </script>
+  </Fragment>
 
   <div class="page-wrapper">
     <div class="page-header">

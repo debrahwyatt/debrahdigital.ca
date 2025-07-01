@@ -15,7 +15,6 @@ const flatServices = Object.fromEntries([
     baseTitle: "Computer Repair Services | Debrah's Digital Solutions",
     baseH1: "Computer Repair",
     baseSubheading: "Fast, Reliable Fixes — Right at Your Doorstep",
-    canonical: "https://www.debrahdigital.ca/computer-repair",
     seoKey: "computer-repair"
   }),
   ...generateServiceEntries({
@@ -24,7 +23,6 @@ const flatServices = Object.fromEntries([
     baseTitle: "Network Optimization | Debrah's Digital Solutions",
     baseH1: "Network Optimization",
     baseSubheading: "Faster, More Reliable Wi-Fi for Work, Play, and Everything In Between",
-    canonical: "https://www.debrahdigital.ca/network-optimization",
     seoKey: "network-optimization"
   }),
   ...generateServiceEntries({
@@ -33,7 +31,6 @@ const flatServices = Object.fromEntries([
     baseTitle: "AI Tools & Automation | Debrah's Digital Solutions",
     baseH1: "AI Tools & Automation",
     baseSubheading: "Boost Productivity with Smart, Custom Solutions",
-    canonical: "https://www.debrahdigital.ca/ai-automation",
     seoKey: "ai-automation"
   }),
   ...generateServiceEntries({
@@ -42,7 +39,6 @@ const flatServices = Object.fromEntries([
     baseTitle: "Custom Software Solutions | Debrah's Digital Solutions",
     baseH1: "Custom Software",
     baseSubheading: "Software Tailored to Your Workflow and Goals",
-    canonical: "https://www.debrahdigital.ca/custom-software",
     seoKey: "custom-software"
   }),
   ...generateServiceEntries({
@@ -51,7 +47,6 @@ const flatServices = Object.fromEntries([
     baseTitle: "On-Site Tech Support | Debrah's Digital Solutions",
     baseH1: "On-Site Tech Support",
     baseSubheading: "Local Tech Help That Comes to You",
-    canonical: "https://www.debrahdigital.ca/onsite-tech-support",
     seoKey: "onsite-tech-support"
   }),
   ...generateServiceEntries({
@@ -60,7 +55,6 @@ const flatServices = Object.fromEntries([
     baseTitle: "Business Tech Consulting | Debrah's Digital Solutions",
     baseH1: "Business Tech Consulting",
     baseSubheading: "Smart Tech Advice That Moves Your Business Forward",
-    canonical: "https://www.debrahdigital.ca/business-tech-consulting",
     seoKey: "business-tech-consulting"
   }),
   ...generateServiceEntries({
@@ -69,7 +63,6 @@ const flatServices = Object.fromEntries([
     baseTitle: "Digital Skills Training | Debrah's Digital Solutions",
     baseH1: "Digital Skills Training",
     baseSubheading: "Upskill your team with modern digital skills — ready-to-teach, professionally delivered.",
-    canonical: "https://www.debrahdigital.ca/digital-skills-training",
     seoKey: "digital-skills-training"
   }),
   ...generateServiceEntries({
@@ -78,7 +71,6 @@ const flatServices = Object.fromEntries([
     baseTitle: "Website Development | Debrah's Digital Solutions",
     baseH1: "Website Development",
     baseSubheading: "Modern, Mobile-Friendly Websites Built for Local Business",
-    canonical: "https://www.debrahdigital.ca/website-development",
     seoKey: "website-development"
   })
 ]);

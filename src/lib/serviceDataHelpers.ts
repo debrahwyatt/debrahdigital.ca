@@ -8,7 +8,6 @@ type EntryArgs = {
   baseTitle: string;
   baseH1: string;
   baseSubheading: string;
-  canonical: string;
   seoKey: keyof typeof sharedSEO.serviceSEO;
 };
 
@@ -18,12 +17,12 @@ export function generateServiceEntries({
   baseTitle,
   baseH1,
   baseSubheading,
-  canonical,
   seoKey
 }: EntryArgs): [string, any][] {
+  const baseCanonical = `https://debrahdigital.ca/services/${baseSlug}`;
+
   return serviceCities.map(({ slugSuffix, label }) => {
     const isBase = slugSuffix === "";
-
     return [
       `${baseSlug}${slugSuffix}`,
       {
@@ -34,7 +33,7 @@ export function generateServiceEntries({
         subheading: isBase
           ? baseSubheading
           : getCitySubheading(baseSlug, label),
-        canonical,
+        canonical: baseCanonical,
         component,
         ...sharedSEO.serviceSEO[seoKey]
       }
@@ -48,9 +47,9 @@ export function getCitySubheading(serviceSlug: string, city: string): string {
     "network-optimization": `Wi-Fi and Network Help for Homes and Businesses in ${city}`,
     "ai-tools": `Automation and Smart Tools Tailored for ${city} Businesses`,
     "custom-software": `Custom Software Solutions for ${city} Entrepreneurs`,
-    "onsite-support": `We Come to You – Tech Help Across ${city}`,
-    "tech-consulting": `Smarter Tech Decisions for ${city}'s Small Businesses`,
-    "training": `Modern Digital Skills Training for ${city}`,
+    "onsite-tech-support": `We Come to You - Tech Help Across ${city}`,
+    "business-tech-consulting": `Smarter Tech Decisions for ${city}'s Small Businesses`,
+    "digital-skills-training": `Modern Digital Skills Training for ${city}`,
     "website-development": `Professional Websites Built for ${city} Small Businesses`
   };
 
