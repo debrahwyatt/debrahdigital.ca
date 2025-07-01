@@ -4,6 +4,7 @@ import '../styles/base-layout.css'
 import Header from '../components/header.astro';
 import Footer from '../components/footer.astro';
 import siteMetadata from '../lib/site-metadata.ts';
+import { schemaData } from '../data/structured-data.ts';
 
 const {
   title = siteMetadata.siteName,
@@ -48,9 +49,12 @@ const {
 
     <script src="/js/dropdown.js" defer></script>
     <script src="/js/rotate-logo.js" defer></script>
-    <script src="/js/structured-data.js" is:inline></script>
-    
+    <script type="application/ld+json" is:inline>
+      {JSON.stringify(schemaData)}
+    </script>    
+
     <slot name="head" />
+    
   </head>
   <body>
     <Header />

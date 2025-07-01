@@ -1,6 +1,4 @@
-const script = document.createElement("script");
-script.type = "application/ld+json";
-script.textContent = JSON.stringify({
+export const schemaData = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   "@id": "https://www.debrahdigital.ca#business",
@@ -31,13 +29,7 @@ script.textContent = JSON.stringify({
   "openingHoursSpecification": [
     {
       "@type": "OpeningHoursSpecification",
-      "dayOfWeek": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       "opens": "09:00",
       "closes": "17:00"
     }
@@ -127,5 +119,4 @@ script.textContent = JSON.stringify({
       }
     ]
   }
-});
-document.head.appendChild(script);
+};
