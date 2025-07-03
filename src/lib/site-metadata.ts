@@ -36,7 +36,7 @@ const siteMetadata = {
     "Fairview computer services"
   ],
   ogImage: "/ogImage.png",
-  twitterHandle: "@debrahdigital",
+  twitterHandle: "@debrahdigital"
 };
 
 export default siteMetadata;

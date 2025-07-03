@@ -9,5 +9,5 @@ export const serviceCities = [
   { slugSuffix: "-cleardale", label: "Cleardale" },
   { slugSuffix: "-grande-prairie", label: "Grande Prairie" },
   { slugSuffix: "-sexsmith", label: "Sexsmith" },
-  { slugSuffix: "-clairmont", label: "Clairmont" },
+  { slugSuffix: "-clairmont", label: "Clairmont" }
 ];
