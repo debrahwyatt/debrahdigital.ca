@@ -18,6 +18,7 @@
 
 .footer-section {
   flex: 1 1;
+  min-width: 10rem;
 }
 
 .footer-section h3 {
@@ -70,6 +71,12 @@
   margin-top: 1rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
+}
+
+.footer-section img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 @media (max-width: 768px) {

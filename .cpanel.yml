@@ -1,4 +1,6 @@
----
+application: astro
 deployment:
   tasks:
     - export DEPLOYPATH=/home/debra512/public_html/
+    - /bin/rm -rf $DEPLOYPATH/*
+    - /bin/cp -R dist/* $DEPLOYPATH/
