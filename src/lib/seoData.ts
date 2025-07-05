@@ -1,28 +1,8 @@
-const baseProvider = {
-  "@type": "LocalBusiness",
-  "name": "Debrah's Digital Solutions",
-  "url": "https://www.debrahdigital.ca",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Fairview",
-    "addressRegion": "AB",
-    "addressCountry": "CA"
-  },
-  "telephone": "+1-780-330-9965"
-};
-
-const baseAreaServed = {
-  "@type": "Place",
-  "name": "Fairview, Alberta and surrounding areas"
-};
-
 function generateStructuredData(serviceType: string, description: string) {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
     serviceType,
-    provider: baseProvider,
-    areaServed: baseAreaServed,
     description
   };
 }
