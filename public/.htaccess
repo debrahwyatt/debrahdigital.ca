@@ -38,14 +38,14 @@
 </IfModule>
 
 # -------------------------------------------------
-# Redirect HTTP to HTTPS and WWW to non-WWW
+# Redirect WWW to non-WWW and force HTTPS
 # -------------------------------------------------
 RewriteEngine On
 
-# Force HTTPS
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
-
-# Redirect www to non-www (only applies if already HTTPS)
+# Redirect www to non-www
 RewriteCond %{HTTP_HOST} ^www\.debrahdigital\.ca$ [NC]
-RewriteRule ^(.*)$ https://debrahdigital.ca/$1 [L,R=301]
+RewriteRule ^(.*)$ https://debrahdigital.ca/$1 [R=301,L]
+
+# Redirect HTTP to HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://debrahdigital.ca/$1 [R=301,L]
