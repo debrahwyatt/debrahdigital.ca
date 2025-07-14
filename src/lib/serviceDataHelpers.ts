@@ -19,7 +19,7 @@ export function generateServiceEntries({
   baseSubheading,
   seoKey
 }: EntryArgs): [string, any][] {
-  const baseCanonical = `https://debrahdigital.ca/services/${baseSlug}`;
+  const baseCanonical = `https://debrahdigital.ca/services/${baseSlug}/`;
 
   return serviceCities.map(({ slugSuffix, label }) => {
     const isBase = slugSuffix === "";

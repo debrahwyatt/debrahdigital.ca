@@ -12,6 +12,8 @@ const {
   ogImage = siteMetadata.ogImage,
   canonical = Astro.url.href,  
 } = Astro.props;
+
+const canonicalWithSlash = canonical.endsWith("/") ? canonical : canonical + "/";
 ---
 
 <html lang="en">
@@ -24,7 +26,7 @@ const {
     <meta name="keywords" content={keywords.join(', ')} />
     <meta name="author" content={siteMetadata.author} />
     <meta name="robots" content="index, follow, max-snippet:-1, max-video-preview:-1, max-image-preview:large" />
-    <link rel="canonical" href={canonical} />
+    <link rel="canonical" href={canonicalWithSlash} />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="apple-touch-icon" href="/favicon.ico" />
 
