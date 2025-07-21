@@ -3,4 +3,4 @@ Disallow:
 
 Allow: /
 
-Sitemap: https://www.debrahdigital.ca/sitemap.xml
+Sitemap: https://debrahdigital.ca/sitemap.xml

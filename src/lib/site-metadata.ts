@@ -1,6 +1,6 @@
 const siteMetadata = {
   siteName: "Debrah's Digital Solutions",
-  siteUrl: "https://www.debrahdigital.ca",
+  siteUrl: "https://debrahdigital.ca",
   author: "Debrah Wyatt",
   description:
     "Tech help at your doorstep — fast, friendly, and local. Debrah's Digital Solutions serves Fairview and surrounding Alberta communities with expert IT support, web development, digital training, and automation services for homes, farms, and small businesses.",
