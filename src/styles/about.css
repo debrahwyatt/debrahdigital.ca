@@ -24,3 +24,10 @@
   align-items: center;
   justify-content: center;
 }
+
+.page-text h2 {
+  color: #00bfff;
+  margin-top: 40px;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
