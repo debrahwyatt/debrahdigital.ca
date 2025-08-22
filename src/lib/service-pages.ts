@@ -5,10 +5,19 @@ import OnsiteSupportContent from '../components/services/OnsiteSupportContent.as
 import TechConsultingContent from '../components/services/TechConsultingContent.astro';
 import ComputerRepairContent from '../components/services/ComputerRepairContent.astro';
 import CustomSoftwareContent from '../components/services/CustomSoftwareContent.astro';
+import PhoneTabletRepairContent from '../components/services/PhoneTabletRepairContent.astro';
 import WebsiteDevelopmentContent from '../components/services/WebsiteDevelopmentContent.astro';
 import NetworkOptimizationContent from '../components/services/NetworkOptimizationContent.astro';
 
 const flatServices = Object.fromEntries([
+  ...generateServiceEntries({
+    baseSlug: "phone-tablet-repair",
+    component: PhoneTabletRepairContent,
+    baseTitle: "Phone & Tablet Repair Services | Debrah's Digital Solutions",
+    baseH1: "Phone & Tablet Repair",
+    baseSubheading: "Fast, Reliable Fixes — Right at Your Doorstep",
+    seoKey: "phone-tablet-repair"
+  }),  
   ...generateServiceEntries({
     baseSlug: "computer-repair",
     component: ComputerRepairContent,

@@ -25,6 +25,26 @@ export const serviceSEO = {
     structuredData: generateStructuredData("Computer Repair", "We provide local computer repair services, including laptop fixes, desktop upgrades, virus removal, and custom builds. Fast and friendly support at your door.")
   },
 
+  "phone-tablet-repair": {
+    metaDescription: "Professional phone and tablet repair services in Fairview. We fix cracked screens, replace batteries, repair charging ports, and restore iPhones, iPads, and Android devices quickly and affordably.",
+    keywords: [
+      "phone repair Fairview",
+      "tablet repair Fairview",
+      "iPhone screen replacement",
+      "Android repair",
+      "iPad repair",
+      "phone battery replacement",
+      "tablet charging port repair",
+      "Debrah's Digital Solutions",
+      "mobile device repair Fairview"
+    ],
+    ogImage: "/images/services/phone-tablet-repair-og.webp",
+    structuredData: generateStructuredData(
+      "Phone & Tablet Repair",
+      "We provide reliable phone and tablet repair services in Fairview, including screen replacements, battery swaps, charging port fixes, water damage treatment, and software support for iPhones, iPads, and Android devices."
+    )
+  },
+
   "network-optimization": {
     metaDescription: "Speed up your Wi-Fi and fix connection issues with local network optimization in Fairview and surrounding areas. We improve home and business networks for reliability and speed.",
     keywords: [

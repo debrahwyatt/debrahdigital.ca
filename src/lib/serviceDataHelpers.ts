@@ -50,7 +50,8 @@ export function getCitySubheading(serviceSlug: string, city: string): string {
     "onsite-tech-support": `We Come to You - Tech Help Across ${city}`,
     "business-tech-consulting": `Smarter Tech Decisions for ${city}'s Small Businesses`,
     "digital-skills-training": `Modern Digital Skills Training for ${city}`,
-    "website-development": `Professional Websites Built for ${city} Small Businesses`
+    "website-development": `Professional Websites Built for ${city} Small Businesses`,
+    "phone-tablet-repair": `Reliable Phone & Tablet Repairs for the ${city} Community`
   };
 
   return map[serviceSlug] || `Services available in ${city}`;
