@@ -48,6 +48,16 @@ const canonicalWithSlash = canonical.endsWith("/") ? canonical : canonical + "/"
     <meta name="twitter:description" content="Tailored tech help and automation for businesses and homes in Alberta." />
     <meta name="twitter:image" content={siteMetadata.siteUrl + ogImage} />
 
+    <!-- Google tag (gtag.js) -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-41XKBEBVRN"></script>
+
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ window.dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-41XKBEBVRN');
+    </script>
+
     <script src="/js/dropdown.js" defer></script>
     <script src="/js/rotate-logo.js" defer></script>
     <script type="application/ld+json">

@@ -11,13 +11,13 @@ import BaseLayout from '../layouts/base-layout.astro';
     <section class="hero-section">
       <div class="hero-text">
         <h1>
-          Tech Help at Your Doorstep - 
-          <span class="highlight">Fast, Friendly, Local.</span>
+          Tech Problems Solved - 
+          <span class="highlight">without the runaround.</span>
         </h1>
-        <p>Computer repair, training, on-site support, and smart tech solutions for homes and businesses in Fairview, Alberta.</p>
+        <p>Professional computer, network, and business tech support for homes and small businesses in Fairview.</p>
 
         <div class="hero-buttons">
-          <a href="/contact" class="btn">Connect with Us</a>
+          <a href="/contact" class="btn">Get Tech Help</a>
         </div>
       </div>
       <div class="hero-image">
@@ -37,8 +37,7 @@ import BaseLayout from '../layouts/base-layout.astro';
 
     <!-- Services Icons Grid -->
     <section class="services-section">
-      <h2>Our Services</h2>
-      <p class="subtitle">Expert Tech Help with a Human Touch</p>
+      <h2>For Homes</h2>
 
       <div class="services-grid">
         <a href="/services/computer-repair">
@@ -50,22 +49,92 @@ import BaseLayout from '../layouts/base-layout.astro';
               width="64" 
               height="64" 
             />
-            <h3>Computer Repair Services</h3>
+            <h3>Computer & Device Repair</h3>
           </div>
         </a>
 
-        <a href="/services/phone-tablet-repair">
+        <a href="/services/network-optimization">
           <div class="service-item">
             <img 
-              src="/icon-phone-tablet.webp" 
-              srcset="/icon-phone-tablet_96x96.webp 2x" 
-              alt="Phones & Tablets" 
+              src="/icon-networking.webp" 
+              srcset="/icon-networking_96x96.webp 2x" 
+              alt="Networking" 
               width="64" 
               height="64" 
             />
-            <h3>Phone & Tablet Repair Services</h3>
+            <h3>Wifi & Network Issues</h3>
           </div>
         </a>
+
+        <a href="/services/onsite-tech-support">
+          <div class="service-item">
+            <img 
+              src="/icon-onsite.webp" 
+              srcset="/icon-onsite_96x96.webp 2x" 
+              alt="Support" 
+              width="64" 
+              height="64" 
+            />
+            <h3>New Device Setup & Data Transfer</h3>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+
+    <section class="services-section">
+      <h2>For Small Businesses</h2>
+
+      <div class="services-grid">
+
+        <a href="/services/onsite-tech-support">
+          <div class="service-item">
+            <img 
+              src="/icon-onsite.webp" 
+              srcset="/icon-onsite_96x96.webp 2x" 
+              alt="Support" 
+              width="64" 
+              height="64" 
+            />
+            <h3>On-Site & Remote IT Support</h3>
+          </div>
+        </a>
+
+        <a href="/services/network-optimization">
+          <div class="service-item">
+            <img 
+              src="/icon-networking.webp" 
+              srcset="/icon-networking_96x96.webp 2x" 
+              alt="Networking" 
+              width="64" 
+              height="64" 
+            />
+            <h3>Network Optimization</h3>
+          </div>
+        </a>
+
+        <a href="/services/business-tech-consulting">
+          <div class="service-item">
+            <img 
+              src="/icon-consulting.webp" 
+              srcset="/icon-consulting_96x96.webp 2x" 
+              alt="Consulting" 
+              width="64" 
+              height="64" 
+            />
+            <h3>Security & Backup
+            </h3>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <section class="services-section">
+      <h2>Specialized Work</h2>
+
+      <div class="services-grid">
 
         <a href="/services/digital-skills-training">
           <div class="service-item">
@@ -93,19 +162,6 @@ import BaseLayout from '../layouts/base-layout.astro';
           </div>
         </a>
 
-        <a href="/services/onsite-tech-support">
-          <div class="service-item">
-            <img 
-              src="/icon-onsite.webp" 
-              srcset="/icon-onsite_96x96.webp 2x" 
-              alt="Support" 
-              width="64" 
-              height="64" 
-            />
-            <h3>On-Site Support</h3>
-          </div>
-        </a>
-
         <a href="/services/custom-software">
           <div class="service-item">
             <img 
@@ -115,72 +171,41 @@ import BaseLayout from '../layouts/base-layout.astro';
               width="64" 
               height="64" 
             />
-            <h3>Custom Software Solutions</h3>
+            <h3>Custom Software & Automation</h3>
           </div>
         </a>
-
-        <a href="/services/business-tech-consulting">
-          <div class="service-item">
-            <img 
-              src="/icon-consulting.webp" 
-              srcset="/icon-consulting_96x96.webp 2x" 
-              alt="Consulting" 
-              width="64" 
-              height="64" 
-            />
-            <h3>Business Tech Consulting</h3>
-          </div>
-        </a>
-
-        <a href="/services/network-optimization">
-          <div class="service-item">
-            <img 
-              src="/icon-networking.webp" 
-              srcset="/icon-networking_96x96.webp 2x" 
-              alt="Networking" 
-              width="64" 
-              height="64" 
-            />
-            <h3>Network Optimization</h3>
-          </div>
-        </a>
-
-        <!-- <a href="/services/ai-automation">
-          <div class="service-item">
-            <img 
-              src="/icon-ai.webp" 
-              srcset="/icon-ai_96x96.webp 2x" 
-              alt="Automation" 
-              width="64" 
-              height="64" 
-            />
-            <h3>AI Tools & Automation</h3>
-          </div>
-        </a> -->
 
       </div>
-    </section>
-
+    </section>    
+    
     <!-- Info Grid Section -->
     <section class="info-section">
-      <div class="info-grid">
 
-        <div class="info-card">
-          <h3>Client-Focused Solutions</h3>
-          <p>
-            Need help with a computer, website, or system upgrade?<br /><br />
-            I provide on-site visits, remote assistance, and tailored solutions built to match your needs.
-          </p>
-          <ul class="checklist">
-            <li>Fast Response</li>
-            <li>Clear Communication</li>
-            <li>Affordable, Professional</li>
-          </ul>
-          <a href="/services" class="btn info-btn">Learn More About Our Services</a>
-        </div>
+      <div class="info-img">
+        <img src="Client-Focused.png"/>
+      </div>
 
-        <div class="info-card">
-          <h3>About Debrah</h3>
+      <div class="info-text">
+        <h2>Client-Focused Solutions</h2>
+        <p>
+          Need help with a computer, website, or system upgrade?<br /><br />
+          I provide on-site visits, remote assistance, and tailored solutions built to match your needs.
+        </p>
+        <ul class="checklist">
+          <li>Fast Response</li>
+          <li>Clear Communication</li>
+          <li>Affordable, Professional</li>
+        </ul>
+        <a href="/services" class="btn info-btn">Learn More About Our Services</a>
+      </div>
+
+    </section>
+
+    <section class="info-section">
+      
+      <div class="info-text">
+        <div>
+          <h2>About Debrah</h2>
           <h4>Debrah Wyatt, E.I.T.</h4>
           <p>
             Software Developer & Tech Consultant<br />
@@ -193,15 +218,24 @@ import BaseLayout from '../layouts/base-layout.astro';
           <em>“Tech made simple, right at your doorstep.”</em><br />
           <a href="/about" class="btn info-btn">More About Us</a>
         </div>
+      </div>      
 
-        <div class="info-card full-width">
-          <h3>Contact or Book Now</h3>
-          <p>Ready to simplify your tech? Let's talk.</p>
-          <a href="/contact" class="btn info-btn">Contact or Book Now</a>
-        </div>
-
+      <div class="info-img">
+        <img src="About-Debrah.png"/>
       </div>
+
     </section>
+
+    <section class="info-section centre">
+
+      <div class="info-text full-width">
+        <h2>Contact or Book Now</h2>
+        <p>Ready to simplify your tech? Let's talk.</p>
+        <a href="/contact" class="btn info-btn">Contact or Book Now</a>
+      </div>
+
+    </section>
+
   </div>
 
 </BaseLayout>

@@ -71,6 +71,12 @@
   margin-bottom: 0.25rem;
 }
 
+.info-section h2 {
+  color: #00c1ee;
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
 .subtitle {
   color: #fff;
   font-size: 1rem;
@@ -121,20 +127,20 @@
 .info-section {
   color: white;
   padding-top: 2rem;
-}
-
-.info-grid {
   gap: 2rem;
-  display: grid;
-  margin: 0 auto;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  margin: 0;
+  display: flex;
+  color: white;
+  flex-wrap: wrap;
+  align-items: center;    
 }
 
-.info-card {
+.info-text {
   background: none;
+  flex: 1 1 320px;
 }
 
-.info-card h3 {
+.info-text h3 {
   font-size: 1rem;
   color: #00c1ee;
   font-weight: normal;
@@ -142,20 +148,20 @@
   text-transform: uppercase;
 }
 
-.info-card h4 {
+.info-text h4 {
   margin-bottom: 0;
   font-size: 1.4rem;
   margin-top: 0.5em;
   font-weight: normal;
 }
 
-.info-card ul {
+.info-text ul {
   margin-bottom: 0;
   padding-left: 1.2rem;
   list-style-type: disc;
 }
 
-.info-card ul.checklist {
+.info-text ul.checklist {
   margin-left: 0;
   padding-left: 0;
   list-style: none;
@@ -165,4 +171,20 @@
   content: "✔";
   color: #00c1ee;
   margin-right: 0.5rem;
+}
+
+.email {
+  height: 1.4rem !important;
+}
+
+.info-img img {
+  height: 15rem;
+}
+
+.centre {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
 }
