@@ -85,6 +85,10 @@
   display: block;
 }
 
+.email {
+  height: 1.4rem !important;
+}
+
 @media (max-width: 768px) {
   .footer-container {
     padding-left: 7.5vw;
