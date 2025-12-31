@@ -11,16 +11,23 @@
 
 /* ========== Hero Section ========== */
 .hero-section {
-  gap: 2rem;
-  margin: 0;
-  display: flex;
   color: white;
+  display: flex;
+  justify-content: center;  /* center the inner container */
+}
+
+.hero-inner {
+  width: 100%;
+  max-width: 1000px;        /* match your other sections */
+  padding: 0 1rem;          /* mobile breathing room */
+  display: flex;
+  gap: 2rem;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .hero-text {
-  flex: 1;
+  flex: 1 1 320px;
   min-width: 250px;
   max-width: 780px;
 }
@@ -36,8 +43,8 @@
 }
 
 .hero-image {
-  flex: 1;
   display: flex;
+  
   align-items: center;
   justify-content: center;
 }
@@ -49,26 +56,111 @@
 
 #logo {
   display: block;
-  transform-style: preserve-3d;
-  transition: transform 0.1s linear;
-  
   user-select: none;
   -webkit-user-drag: none;
+  transform-style: preserve-3d;
+  transition: transform 0.1s linear;
   -webkit-tap-highlight-color: transparent;
 }
 
 
 /* ========== Services Section ========== */
 .services-section {
-  color: white;
   padding-top: 2rem;
   text-align: center;
 }
 
+.services-grid {
+  display: grid;
+  gap: 1rem;
+  max-width: 1000px;
+  margin: 2.5rem auto 3rem;
+  padding: 0 1rem; /* important on mobile */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  justify-items: center; /* centers the card within its column */
+}
+
+.services-grid a {
+  display: block;     /* key */
+  width: 100%;        /* key: fill the grid column */
+  max-width: 18rem;   /* keep your “card width” */
+  text-decoration: none;
+}
+
+
 .services-section h2 {
-  color: #00c1ee;
+  color: #FFF;
   font-size: 1.8rem;
   margin-bottom: 0.25rem;
+}
+
+.services-section h3 {
+  color: #00c1ee;
+  font-size: 1.2rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.services-section p {
+  color: #ccc;
+  font-size: 0.95rem;
+}
+
+.service-item {
+  width: 100%;          /* fills the <a> */
+  box-sizing: border-box;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  text-align: center;   /* centers h3/p */
+  height: auto;
+  min-height: 12rem;    /* optional */
+}
+
+.service-item img {
+  display: block;       /* prevents inline weirdness */
+  margin: 0 auto 0.5rem;/* centers icon */
+}
+
+.service-item:hover {
+  background-color: #002345;
+}
+
+
+/* ========== Info Grid Section ========== */
+.info-section {
+  display: flex;
+  justify-content: center;
+  padding-top: 2rem;
+  color: white;
+}
+
+.info-inner {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  width: 100%;
+  justify-content: center;
+}
+
+.services-section {
+  padding-top: 2rem;
+}
+
+.services-grid {
+  gap: 1rem;
+  display: grid;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2.5rem;
+  margin-bottom: 3rem;  
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.info-text {
+  background: none;
+  flex: 1 1 320px;
 }
 
 .info-section h2 {
@@ -77,70 +169,7 @@
   margin-bottom: 0.25rem;
 }
 
-.subtitle {
-  color: #fff;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.services-grid {
-  margin-top: 2.5rem;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-  align-items: start;
-  justify-items: center;
-}
-
-.services-grid a {
-  text-decoration: none;
-}
-
-.service-item {
-  width: 12rem;
-  height: 6rem;
-  padding: 0.5rem;
-  border-radius: 1rem;
-  transition: background-color 0.2s ease;
-}
-
-.service-item:hover {
-  background-color: #002345;
-}
-
-.service-item h3 {
-  margin: 0;
-  color: #ccc;
-  font-size: 0.9rem;
-  text-decoration: none;
-}
-
-.services-grid {
-  gap: 2rem;
-  display: grid;
-  margin-bottom: 3rem;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-}
-
-
-/* ========== Info Grid Section ========== */
-.info-section {
-  color: white;
-  padding-top: 2rem;
-  gap: 2rem;
-  margin: 0;
-  display: flex;
-  color: white;
-  flex-wrap: wrap;
-  align-items: center;    
-}
-
-.info-text {
-  background: none;
-  flex: 1 1 320px;
-}
-
-.info-text h3 {
+.info-section h3 {
   font-size: 1rem;
   color: #00c1ee;
   font-weight: normal;
@@ -148,20 +177,20 @@
   text-transform: uppercase;
 }
 
-.info-text h4 {
+.info-section h4 {
   margin-bottom: 0;
   font-size: 1.4rem;
   margin-top: 0.5em;
   font-weight: normal;
 }
 
-.info-text ul {
+.info-section ul {
   margin-bottom: 0;
   padding-left: 1.2rem;
   list-style-type: disc;
 }
 
-.info-text ul.checklist {
+.info-section ul.checklist {
   margin-left: 0;
   padding-left: 0;
   list-style: none;
@@ -175,6 +204,7 @@
 
 .info-img img {
   height: 15rem;
+  margin-top: 2rem;
 }
 
 .centre {

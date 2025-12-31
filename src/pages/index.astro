@@ -9,29 +9,33 @@ import BaseLayout from '../layouts/base-layout.astro';
 
     <!-- Hero Section -->
     <section class="hero-section">
-      <div class="hero-text">
-        <h1>
-          Tech Problems Solved - 
-          <span class="highlight">without the runaround.</span>
-        </h1>
-        <p>Professional computer, network, and business tech support for homes and small businesses in Fairview.</p>
+      <div class="hero-inner">
 
-        <div class="hero-buttons">
-          <a href="/contact" class="btn">Get Tech Help</a>
+        <div class="hero-text">
+          <h1>
+            Tech Problems Solved - 
+            <span class="highlight">without the runaround.</span>
+          </h1>
+          <p>Professional computer, network, and business tech support for homes and small businesses in Fairview.</p>
+
+          <div class="hero-buttons">
+            <a href="/contact" class="btn">Get Tech Help</a>
+          </div>
         </div>
-      </div>
-      <div class="hero-image">
-        <div id="logo-spinner">
-          <img 
-            id="logo" 
-            class="ai-head" 
-            src="/logo_web.webp" 
-            srcset="/logo_web_375x375.webp 2x" 
-            alt="Debrah's Digital Solutions Logo" 
-            width="250" 
-            height="250" 
-          />
+        <div class="hero-image">
+          <div id="logo-spinner">
+            <img 
+              id="logo" 
+              class="ai-head" 
+              src="/logo_web.webp" 
+              srcset="/logo_web_375x375.webp 2x" 
+              alt="Debrah's Digital Solutions Logo" 
+              width="250" 
+              height="250" 
+            />
+          </div>
         </div>
+
       </div>
     </section>
 
@@ -50,6 +54,7 @@ import BaseLayout from '../layouts/base-layout.astro';
               height="64" 
             />
             <h3>Computer & Device Repair</h3>
+            <p>Fast, reliable repairs for desktops, laptops, and computer accessories—done right the first time.</p>
           </div>
         </a>
 
@@ -63,6 +68,7 @@ import BaseLayout from '../layouts/base-layout.astro';
               height="64" 
             />
             <h3>Wifi & Network Issues</h3>
+            <p>Boost your internet speed, improve Wi-Fi coverage, and secure your entire network system.</p>
           </div>
         </a>
 
@@ -76,6 +82,7 @@ import BaseLayout from '../layouts/base-layout.astro';
               height="64" 
             />
             <h3>New Device Setup & Data Transfer</h3>
+            <p>Screen replacements, battery swaps, charging port fixes, and more for iPhones, iPads, and Android devices.</p>
           </div>
         </a>
 
@@ -98,6 +105,7 @@ import BaseLayout from '../layouts/base-layout.astro';
               height="64" 
             />
             <h3>On-Site & Remote IT Support</h3>
+            <p>We come to your home or business for setup, troubleshooting, and hands-on tech help.</p>
           </div>
         </a>
 
@@ -111,6 +119,7 @@ import BaseLayout from '../layouts/base-layout.astro';
               height="64" 
             />
             <h3>Network Optimization</h3>
+            <p>Boost your internet speed, improve Wi-Fi coverage, and secure your entire network system.</p>
           </div>
         </a>
 
@@ -123,8 +132,8 @@ import BaseLayout from '../layouts/base-layout.astro';
               width="64" 
               height="64" 
             />
-            <h3>Security & Backup
-            </h3>
+            <h3>Security & Backup</h3>
+            <p>Get expert guidance to streamline operations and align your tech with business goals.</p>
           </div>
         </a>
 
@@ -146,6 +155,7 @@ import BaseLayout from '../layouts/base-layout.astro';
               height="64" 
             />
             <h3>Digital Skills Training</h3>
+            <p>Learn essential tech skills through personalized instruction designed for real-world needs.</p>
           </div>
         </a>
 
@@ -159,6 +169,7 @@ import BaseLayout from '../layouts/base-layout.astro';
               height="64" 
             />
             <h3>Website Development</h3>
+            <p>Modern, mobile-friendly websites built to showcase your brand and engage your customers.</p>
           </div>
         </a>
 
@@ -172,6 +183,7 @@ import BaseLayout from '../layouts/base-layout.astro';
               height="64" 
             />
             <h3>Custom Software & Automation</h3>
+            <p>Tailor-made software built from scratch to fit your exact processes and business needs.</p>
           </div>
         </a>
 
@@ -180,58 +192,56 @@ import BaseLayout from '../layouts/base-layout.astro';
     
     <!-- Info Grid Section -->
     <section class="info-section">
+      <div class="info-inner">
 
-      <div class="info-img">
-        <img src="Client-Focused.png"/>
+        <div class="info-img">
+          <img src="Client-Focused.png"/>
+        </div>
+
+        <div class="info-text">
+          <h2>Client-Focused Solutions</h2>
+          <p>
+            Need help with a computer, website, or system upgrade?<br /><br />
+            I provide on-site visits, remote assistance, and tailored solutions built to match your needs.
+          </p>
+          <ul class="checklist">
+            <li>Fast Response</li>
+            <li>Clear Communication</li>
+            <li>Affordable, Professional</li>
+          </ul>
+          <a href="/services" class="btn info-btn">Learn More About Our Services</a>
+        </div>
+
       </div>
-
-      <div class="info-text">
-        <h2>Client-Focused Solutions</h2>
-        <p>
-          Need help with a computer, website, or system upgrade?<br /><br />
-          I provide on-site visits, remote assistance, and tailored solutions built to match your needs.
-        </p>
-        <ul class="checklist">
-          <li>Fast Response</li>
-          <li>Clear Communication</li>
-          <li>Affordable, Professional</li>
-        </ul>
-        <a href="/services" class="btn info-btn">Learn More About Our Services</a>
-      </div>
-
     </section>
 
     <section class="info-section">
-      
-      <div class="info-text">
-        <div>
-          <h2>About Debrah</h2>
-          <h4>Debrah Wyatt, E.I.T.</h4>
-          <p>
-            Software Developer & Tech Consultant<br />
+      <div class="info-inner">
+
+        <div class="info-text">
+          <div>
+            <h2>About Debrah</h2>
+            <h4>Debrah Wyatt, E.I.T.</h4>
+            <p>
+              Software Developer & Tech Consultant<br />
+              <br />
+              Specialization in Artificial Intelligence<br />        
+              Bachelor of Software Engineering, UVic<br />
+              20+ years experience in tech & automation
+            </p>
             <br />
-            Specialization in Artificial Intelligence<br />        
-            Bachelor of Software Engineering, UVic<br />
-            20+ years experience in tech & automation
-          </p>
-          <br />
-          <em>“Tech made simple, right at your doorstep.”</em><br />
-          <a href="/about" class="btn info-btn">More About Us</a>
+            <em>“Tech made simple, right at your doorstep.”</em><br />
+            <a href="/about" class="btn info-btn">More About Us</a>
+          </div>
+        </div>      
+
+        <div class="info-text full-width">
+          <h2>Contact or Book Now</h2>
+          <p>Ready to simplify your tech? Let's talk.</p>
+          <a href="/contact" class="btn info-btn">Contact or Book Now</a>
         </div>
-      </div>      
-
-      <div class="info-text full-width">
-        <h2>Contact or Book Now</h2>
-        <p>Ready to simplify your tech? Let's talk.</p>
-        <a href="/contact" class="btn info-btn">Contact or Book Now</a>
+      
       </div>
-
-    </section>
-
-    <section class="info-section centre">
-
-
-
     </section>
 
   </div>
