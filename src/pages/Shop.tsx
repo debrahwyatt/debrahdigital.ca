@@ -1,0 +1,188 @@
+import { useEffect, useState } from 'react'
+import '../styles/shop.css'
+import { Link } from 'react-router-dom'
+import SEO from '../components/SEO'
+
+type Product = {
+  id: string
+  variationId: string
+  name: string
+  price: number
+  currency: string
+  sku: string | null
+  primaryImageId: string | null
+  imageUrl: string | null
+  categoryId: string | null
+  categoryName: string
+  soldOut: boolean
+  quantity: number
+  updatedAt: string
+}
+
+function Shop() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  const [sortOption, setSortOption] = useState('price-high')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const response = await fetch('http://localhost:3001/api/products')
+
+        if (!response.ok) {
+          throw new Error('Failed to load products')
+        }
+
+        const data = await response.json()
+        setProducts(data)
+      } catch (err) {
+        setError('Unable to load shop products right now.')
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadProducts()
+  }, [])
+
+  const categories = Array.from(
+    new Set(products.map((product) => product.categoryName)),
+  ).sort()
+
+  const filteredProducts = products
+    .filter((product) =>
+      selectedCategory === 'all'
+        ? true
+        : product.categoryName === selectedCategory,
+    )
+    .sort((a, b) => {
+      switch (sortOption) {
+        case 'price-low':
+          return a.price - b.price
+        case 'price-high':
+          return b.price - a.price
+        case 'za':
+          return b.name.localeCompare(a.name)
+        case 'az':
+        default:
+          return a.name.localeCompare(b.name)
+      }
+    })
+
+  return (
+    <>
+      <SEO
+        title="Debrah's Digital Solutions | Shop"
+        description="Browse available tech products, accessories, cables, storage devices, and computer equipment from Debrah's Digital Solutions in Fairview, Alberta."
+        path="/shop"
+      />
+
+      <div className="page-wrapper shop-page">
+        <div className="page-header shop-header">
+          <h1>Shop</h1>
+
+          <p>
+            Browse available products from Debrah&apos;s Digital Solutions.
+          </p>
+        </div>
+
+        <div className="shop-controls">
+          <label>
+            Category
+
+            <select
+              value={selectedCategory}
+              onChange={(event) =>
+                setSelectedCategory(event.target.value)
+              }
+            >
+              <option value="all">All Categories</option>
+
+              {categories.map((category) => (
+                <option value={category} key={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Sort
+
+            <select
+              value={sortOption}
+              onChange={(event) =>
+                setSortOption(event.target.value)
+              }
+            >
+              <option value="az">A-Z</option>
+              <option value="za">Z-A</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </label>
+        </div>
+
+        {isLoading && (
+          <p className="shop-status">
+            Loading products...
+          </p>
+        )}
+
+        {error && (
+          <p className="shop-status shop-error">
+            {error}
+          </p>
+        )}
+
+        {!isLoading && !error && (
+          <section className="shop-grid">
+            {filteredProducts.map((product) => (
+              <article
+                className="product-card"
+                key={product.variationId}
+              >
+                <div className="product-image-placeholder">
+                  {product.imageUrl ? (
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="product-image"
+                    />
+                  ) : (
+                    <span>No image</span>
+                  )}
+                </div>
+
+                <div className="product-card-body">
+                  <h2>{product.name}</h2>
+
+                  <p className="product-price">
+                    ${product.price.toFixed(2)} {product.currency}
+                  </p>
+
+                  <p className="product-meta">
+                    In stock: {product.quantity}
+                  </p>
+
+                  <Link
+                    to={`/contact?product=${encodeURIComponent(product.name)}`}
+                    className="btn product-btn"
+                  >
+                    Request Item
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </section>
+        )}
+      </div>
+    </>
+  )
+}
+
+export default Shop
