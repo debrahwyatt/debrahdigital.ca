@@ -30,7 +30,7 @@ function Shop() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        const response = await fetch('http://localhost:3001/api/products')
+        const response = await fetch('https://api.debrahdigital.ca/api/products')
 
         if (!response.ok) {
           throw new Error('Failed to load products')
