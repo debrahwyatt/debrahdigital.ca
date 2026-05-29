@@ -18,6 +18,7 @@ function Header() {
           <a href="/">Home</a>
           <a href="/services">Services</a>
           <a href="/shop">Shop</a>
+          <a href="/catalog">Catalog</a>
           <a href="/about">About</a>
           <a href="/contact">Contact</a>
 

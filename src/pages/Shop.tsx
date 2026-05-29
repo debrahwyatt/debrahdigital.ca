@@ -19,6 +19,9 @@ type Product = {
   updatedAt: string
 }
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3001'
+
 function Shop() {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -30,7 +33,7 @@ function Shop() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        const response = await fetch('https://api.debrahdigital.ca/api/products')
+        const response = await fetch(`${API_BASE_URL}/api/square/products`)
 
         if (!response.ok) {
           throw new Error('Failed to load products')
@@ -139,7 +142,13 @@ function Shop() {
           </p>
         )}
 
-        {!isLoading && !error && (
+        {!isLoading && !error && filteredProducts.length === 0 && (
+          <p className="shop-status">
+            No products are currently available in this category.
+          </p>
+        )}
+
+        {!isLoading && !error && filteredProducts.length > 0 && (
           <section className="shop-grid">
             {filteredProducts.map((product) => (
               <article

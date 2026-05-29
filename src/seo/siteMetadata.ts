@@ -28,6 +28,7 @@ const siteMetadata = {
     'computer troubleshooting Fairview',
     'tech support for small business Fairview',
     'Debrah Wyatt IT services',
+    'Computer Supplies Fairview Alberta',
 
     // Supporting keywords
     'digital skills workshops',

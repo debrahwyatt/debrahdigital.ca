@@ -10,6 +10,7 @@ import Services from './pages/Services'
 import Success from './pages/Success'
 import Error from './pages/Error'
 import Shop from './pages/Shop'
+import Catalog from './pages/Catalog'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/success" element={<Success />} />
         <Route path="/error" element={<Error />} />
         <Route path="/shop" element={<Shop />} />        
+        <Route path="/catalog" element={<Catalog />} />        
       </Routes>
 
       <Footer />
