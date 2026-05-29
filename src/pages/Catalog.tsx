@@ -3,6 +3,10 @@ import type React from 'react'
 import '../styles/shop.css'
 import { Link } from 'react-router-dom'
 import SEO from '../components/SEO'
+import {
+  catalogCategories,
+  type CatalogCategory,
+} from '../data/catalogCategories'
 
 type CatalogProduct = {
   ingramPartNumber: string | null
@@ -37,46 +41,69 @@ type PricedCatalogProduct = CatalogProduct & {
   acceptBackOrder?: boolean
 }
 
-type CatalogCategory = {
-  label: string
-  value: string
-  keyword: string
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3001'
+
+const getProductSearchText = (product: CatalogProduct): string => {
+  return [
+    product.description,
+    product.extraDescription,
+    product.vendorPartNumber,
+    product.vendorName,
+    product.category,
+    product.subCategory,
+    product.productType,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
 }
 
-const catalogCategories: CatalogCategory[] = [
-  {
-    label: 'Laptops',
-    value: 'laptops',
-    keyword: 'laptop',
-  },
-  {
-    label: 'Desktop PCs',
-    value: 'desktops',
-    keyword: 'desktop',
-  },
-  {
-    label: 'Monitors',
-    value: 'monitors',
-    keyword: 'monitor',
-  },
-  {
-    label: 'Printers',
-    value: 'printers',
-    keyword: 'printer',
-  },
-  {
-    label: 'All-in-One PCs',
-    value: 'all-in-one',
-    keyword: 'all in one',
-  },
-  {
-    label: 'Business Workstations',
-    value: 'workstations',
-    keyword: 'workstation',
-  },
-]
+const productMatchesCategory = (
+  product: CatalogProduct,
+  category: CatalogCategory,
+): boolean => {
+  const text = getProductSearchText(product)
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3001'
+  const hasRequiredTerm = category.requiredTerms.some((term) =>
+    text.includes(term.toLowerCase()),
+  )
+
+  const hasBlockedTerm = category.blockedTerms.some((term) =>
+    text.includes(term.toLowerCase()),
+  )
+
+  return hasRequiredTerm && !hasBlockedTerm
+}
+
+const productIsSafeToDisplay = (
+  product: PricedCatalogProduct,
+  category: CatalogCategory,
+): boolean => {
+  if (!product.ingramPartNumber) return false
+  if (!product.description) return false
+
+  const text = getProductSearchText(product)
+
+  if (
+    category.blockedTerms.some((term) =>
+      text.includes(term.toLowerCase()),
+    )
+  ) {
+    return false
+  }
+
+  // Keep this loose for now so we can actually see results.
+  // We can fix missing prices after the catalog/search behavior is stable.
+  if (
+    product.sellPrice != null &&
+    product.sellPrice > 0 &&
+    product.sellPrice < 100
+  ) {
+    return false
+  }
+
+  return true
+}
 
 function Catalog() {
   const [products, setProducts] = useState<PricedCatalogProduct[]>([])
@@ -99,28 +126,53 @@ function Catalog() {
     try {
       setIsLoading(true)
       setError('')
+      setProducts([])
 
-      const keyword = searchTerm.trim()
-        ? `${selectedCategoryData.keyword} ${searchTerm.trim()}`
-        : selectedCategoryData.keyword
+      const trimmedSearchTerm = searchTerm.trim()
 
-      const searchResponse = await fetch(
-        `${API_BASE_URL}/api/ingram/search-products?keyword=${encodeURIComponent(
-          keyword,
-        )}&pageSize=12`,
+      const searchWords = trimmedSearchTerm
+        ? selectedCategoryData.keywords.map(
+            (keyword) => `${keyword} ${trimmedSearchTerm}`,
+          )
+        : selectedCategoryData.keywords
+
+      const searchResponses = await Promise.all(
+        searchWords.map(async (keyword) => {
+          const response = await fetch(
+            `${API_BASE_URL}/api/ingram/search-products?keyword=${encodeURIComponent(
+              keyword,
+            )}&pageSize=25`,
+          )
+
+          if (!response.ok) {
+            throw new Error(`Failed to search catalog products for: ${keyword}`)
+          }
+
+          return response.json()
+        }),
       )
 
-      if (!searchResponse.ok) {
-        throw new Error('Failed to search catalog products')
-      }
+      const allSearchProducts: CatalogProduct[] = searchResponses.flatMap(
+        (searchData) => searchData.products ?? [],
+      )
 
-      const searchData = await searchResponse.json()
-      const searchProducts: CatalogProduct[] = searchData.products ?? []
+      const searchProductMap = new Map<string, CatalogProduct>()
+
+      allSearchProducts.forEach((product) => {
+        if (!product.ingramPartNumber) return
+        if (!productMatchesCategory(product, selectedCategoryData)) return
+
+        if (!searchProductMap.has(product.ingramPartNumber)) {
+          searchProductMap.set(product.ingramPartNumber, product)
+        }
+      })
+
+      const searchProducts = Array.from(searchProductMap.values()).slice(0, 50)
 
       const skus = searchProducts
         .map((product) => product.ingramPartNumber)
         .filter((sku): sku is string => Boolean(sku))
-        .slice(0, 12)
+        .slice(0, 50)
 
       if (skus.length === 0) {
         setProducts([])
@@ -169,18 +221,9 @@ function Catalog() {
             ...(priceInfo ?? {}),
           }
         })
-        .filter((product) => {
-          if (!product.ingramPartNumber) return false
-          if (!product.description) return false
-
-          // Keep the first version conservative.
-          // Hide tiny/low-value products from the public catalog.
-          if (product.sellPrice != null && product.sellPrice < 100) {
-            return false
-          }
-
-          return true
-        })
+        .filter((product) =>
+          productIsSafeToDisplay(product, selectedCategoryData),
+        )
 
       setProducts(mergedProducts)
     } catch (err) {

@@ -31,16 +31,32 @@ router.get('/token-test', async (_req, res) => {
 
 router.get('/search-products', async (req, res) => {
   try {
-    const keyword = String(req.query.keyword ?? 'monitor')
+    const keyword = String(req.query.keyword ?? '')
+    const category = String(req.query.category ?? '')
     const pageNumber = String(req.query.pageNumber ?? '1')
-    const pageSize = String(req.query.pageSize ?? '10')
+    const pageSize = String(req.query.pageSize ?? '25')
 
     const result = await searchIngramProducts({
       keyword,
+      category,
       pageNumber,
       pageSize,
       type: 'IM::physical',
     })
+
+    // Ingram returns 404 when a search/page has no records.
+    // For our frontend catalog, that should behave like an empty result page.
+    if (!result.success && result.status === 404) {
+      res.json({
+        success: true,
+        recordsFound: 0,
+        pageSize: Number(pageSize),
+        pageNumber: Number(pageNumber),
+        products: [],
+        raw: result.data,
+      })
+      return
+    }
 
     if (!result.success) {
       res.status(result.status ?? 500).json(result)

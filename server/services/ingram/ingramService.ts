@@ -22,6 +22,7 @@ import {
 
 export type SearchIngramProductsOptions = {
   keyword?: string
+  category?: string
   pageNumber?: string | number
   pageSize?: string | number
   type?: 'IM::physical' | 'IM::digital' | 'IM::any' | 'IM::subscription'
@@ -106,9 +107,10 @@ export const searchIngramProducts = async (
   options: SearchIngramProductsOptions = {},
 ) => {
   const {
-    keyword = 'monitor',
+    keyword = '',
+    category = '',
     pageNumber = 1,
-    pageSize = 10,
+    pageSize = 25,
     type = 'IM::physical',
   } = options
 
@@ -120,7 +122,13 @@ export const searchIngramProducts = async (
     type,
   })
 
-  params.append('keyword', keyword)
+  if (keyword.trim()) {
+    params.append('keyword', keyword.trim())
+  }
+
+  if (category.trim()) {
+    params.append('category', category.trim())
+  }
 
   const url = buildIngramUrl('/resellers/v6/catalog', params)
 
@@ -211,8 +219,6 @@ export const getIngramPriceAvailability = async (skus: string[]) => {
     products,
     raw: data,
   }
-
-  
 }
 
 export const getIngramProductDetails = async (ingramPartNumber: string) => {
