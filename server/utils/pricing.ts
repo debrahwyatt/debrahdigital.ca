@@ -2,7 +2,7 @@ export type CalculateSellPriceOptions = {
   markupMultiplier?: number
 }
 
-export const DEFAULT_MARKUP_MULTIPLIER = 1.25
+export const DEFAULT_MARKUP_MULTIPLIER = 1.175
 
 export const roundUpToCents = (value: number): number => {
   return Math.ceil(value * 100) / 100

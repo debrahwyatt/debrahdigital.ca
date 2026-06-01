@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import '../styles/shop.css'
+import '../styles/shopCatalog.css'
 import { Link } from 'react-router-dom'
 import SEO from '../components/SEO'
 
