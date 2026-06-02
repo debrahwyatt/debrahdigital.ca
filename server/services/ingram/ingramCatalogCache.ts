@@ -1,250 +1,342 @@
-import { getIngramToken } from './ingramAuth'
+import fs from 'fs/promises'
+import path from 'path'
 import {
-  buildIngramUrl,
-  getIngramHeaders,
-  parseIngramResponse,
-} from './ingramClient'
+  getIngramPriceAvailability,
+  searchIngramProducts,
+} from './ingramService'
+import { catalogTerms, CatalogTerms } from './catalogTerms'
 
-import type {
-  IngramCatalogSearchItem,
-  IngramPriceAvailabilityItem,
-  IngramPriceAvailabilityResponse,
-  IngramSearchResponse,
-  NormalizedIngramProduct,
-  NormalizedIngramSearchProduct,
-} from '../../types/ingram'
 
-import { toNumber } from '../../utils/numbers'
-import {
-  calculateSellPrice,
-  DEFAULT_MARKUP_MULTIPLIER,
-} from '../../utils/pricing'
+type CachedCatalogProduct = {
+  ingramPartNumber: string | null
+  vendorPartNumber: string | null
+  upc: string | null
 
-export type SearchIngramProductsOptions = {
-  keyword?: string
-  category?: string
-  pageNumber?: string | number
-  pageSize?: string | number
-  type?: 'IM::physical' | 'IM::digital' | 'IM::any' | 'IM::subscription'
+  vendorName: string | null
+  description: string | null
+  extraDescription: string | null
+
+  category: string | null
+  subCategory: string | null
+  productType: string | null
+  catalogCategory: string | null
+
+  currency?: string
+  cost?: number
+  msrp?: number | null
+  sellPrice?: number
+  available?: boolean
+  totalAvailability?: number
+
+  authorized?: boolean
+  returnable?: boolean
+  acceptBackOrder?: boolean
+
+  imageUrl?: string | null
+  fullDescription?: string | null
+  features?: string[]
+  specifications?: {
+    name: string
+    value: string
+  }[]
+
+  lastSyncedAt: string
+  visible: boolean
 }
 
-export const normalizeIngramSearchProduct = (
-  item: IngramCatalogSearchItem,
-): NormalizedIngramSearchProduct => {
-  return {
-    ingramPartNumber: item.ingramPartNumber ?? null,
-    vendorPartNumber: item.vendorPartNumber ?? null,
-    upc: item.upcCode ?? item.upc ?? null,
+type CachedCatalogFile = {
+  lastSyncedAt: string
+  productCount: number
+  products: CachedCatalogProduct[]
+}
 
-    vendorName: item.vendorName ?? null,
-    description: item.description ?? null,
-    extraDescription: item.extraDescription ?? null,
+const CATALOG_DATA_DIR = path.resolve(process.cwd(), 'data')
 
-    category: item.category ?? null,
-    subCategory: item.subCategory ?? null,
-    productType: item.productType ?? null,
+export const CATALOG_FILE_PATH = path.join(
+  CATALOG_DATA_DIR,
+  'catalog-products.json',
+)
 
-    authorizedToPurchase:
-      item.authorizedToPurchase === true ||
-      item.authorizedToPurchase === 'True',
+const TEMP_CATALOG_FILE_PATH = path.join(
+  CATALOG_DATA_DIR,
+  'catalog-products.tmp.json',
+)
 
-    hasDiscounts:
-      item.hasDiscounts === true ||
-      item.hasDiscounts === 'True',
+const MAX_SEARCH_RESULTS_PER_KEYWORD = Number(
+  process.env.MAX_SEARCH_RESULTS_PER_KEYWORD ?? 50,
+)
 
-    isPriceVisible: Boolean(item.isPriceVisible),
-    customerAuthorization: Boolean(item.customerAuthorization),
+const MAX_SEARCH_PAGES_PER_KEYWORD = Number(
+  process.env.MAX_SEARCH_PAGES_PER_KEYWORD ?? 5,
+)
 
-    links: item.links ?? [],
+const MAX_PRICE_SKUS = Number(process.env.MAX_PRICE_SKUS ?? 450)
+
+const MAX_PRODUCTS_PER_CATEGORY = Number(
+  process.env.MAX_PRODUCTS_PER_CATEGORY ?? 75,
+)
+
+const PRICE_AVAILABILITY_BATCH_SIZE = Number(
+  process.env.PRICE_AVAILABILITY_BATCH_SIZE ?? 50,
+)
+
+const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms))
+
+const chunkArray = <T>(items: T[], chunkSize: number): T[][] => {
+  const chunks: T[][] = []
+
+  for (let index = 0; index < items.length; index += chunkSize) {
+    chunks.push(items.slice(index, index + chunkSize))
   }
+
+  return chunks
 }
 
-export const normalizePriceAvailabilityItem = (
-  item: IngramPriceAvailabilityItem,
-): NormalizedIngramProduct => {
-  const cost = toNumber(item.pricing?.customerPrice)
-
-  const msrp =
-    item.pricing?.retailPrice != null
-      ? toNumber(item.pricing.retailPrice)
-      : null
-
-  const sellPrice = calculateSellPrice(cost, msrp)
-
-  return {
-    ingramPartNumber: item.ingramPartNumber ?? null,
-    vendorPartNumber: item.vendorPartNumber ?? null,
-    extendedVendorPartNumber: item.extendedVendorPartNumber ?? null,
-    upc: item.upc ?? null,
-
-    vendorName: item.vendorName ?? null,
-    description: item.description ?? null,
-
-    productStatusCode: item.productStatusCode ?? null,
-    productStatusMessage: item.productStatusMessage ?? null,
-    productClass: item.productClass ?? null,
-    unitOfMeasure: item.uom ?? null,
-
-    currency: item.pricing?.currencyCode ?? 'CAD',
-
-    cost,
-    msrp,
-    sellPrice,
-    markupMultiplier: DEFAULT_MARKUP_MULTIPLIER,
-
-    available: Boolean(item.availability?.available),
-    totalAvailability: toNumber(item.availability?.totalAvailability),
-
-    authorized: Boolean(item.productAuthorized),
-    returnable: Boolean(item.returnableProduct),
-    acceptBackOrder: Boolean(item.acceptBackOrder),
-    endUserInfoRequired: Boolean(item.endUserInfoRequired),
-    specialBidPricingAvailable: Boolean(item.pricing?.specialBidPricingAvailable),
-  }
+const getProductSearchText = (product: CachedCatalogProduct): string => {
+  return [
+    product.description,
+    product.extraDescription,
+    product.vendorPartNumber,
+    product.category,
+    product.subCategory,
+    product.productType,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
 }
 
-export const searchIngramProducts = async (
-  options: SearchIngramProductsOptions = {},
-) => {
-  const {
-    keyword = '',
-    category = '',
-    pageNumber = 1,
-    pageSize = 25,
-    type = 'IM::physical',
-  } = options
+const productMatchesCategory = (
+  product: CachedCatalogProduct,
+  category: CatalogTerms,
+): boolean => {
+  const text = getProductSearchText(product)
 
-  const token = await getIngramToken()
+  const hasRequiredTerm = category.requiredTerms.some((term: string) =>
+    text.includes(term.toLowerCase()),
+  )
 
-  const params = new URLSearchParams({
-    pageNumber: String(pageNumber),
-    pageSize: String(pageSize),
-    type,
+  const hasBlockedTerm = category.blockedTerms.some((term: string) =>
+    text.includes(term.toLowerCase()),
+  )
+
+  return hasRequiredTerm && !hasBlockedTerm
+}
+
+const productIsWorthCaching = (product: CachedCatalogProduct): boolean => {
+  if (!product.ingramPartNumber) return false
+  if (!product.description) return false
+  if (product.sellPrice == null || product.sellPrice <= 0) return false
+
+  return true
+}
+
+const dedupeProducts = (
+  products: CachedCatalogProduct[],
+): CachedCatalogProduct[] => {
+  const productMap = new Map<string, CachedCatalogProduct>()
+
+  products.forEach((product) => {
+    if (!product.ingramPartNumber) return
+
+    if (!productMap.has(product.ingramPartNumber)) {
+      productMap.set(product.ingramPartNumber, product)
+    }
   })
 
-  if (keyword.trim()) {
-    params.append('keyword', keyword.trim())
-  }
+  return Array.from(productMap.values())
+}
 
-  if (category.trim()) {
-    params.append('category', category.trim())
-  }
+const fetchCatalogPagesForCategory = async (
+  category: CatalogTerms,
+): Promise<CachedCatalogProduct[]> => {
+  const products: CachedCatalogProduct[] = []
+  const lastSyncedAt = new Date().toISOString()
 
-  const url = buildIngramUrl('/resellers/v6/catalog', params)
+  for (const keyword of category.keywords) {
+    console.log(`Searching Ingram catalog for: ${keyword}`)
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: getIngramHeaders(token),
-  })
+    for (
+      let pageNumber = 1;
+      pageNumber <= MAX_SEARCH_PAGES_PER_KEYWORD;
+      pageNumber += 1
+    ) {
+      const searchResult = await searchIngramProducts({
+        keyword,
+        pageNumber,
+        pageSize: MAX_SEARCH_RESULTS_PER_KEYWORD,
+      })
 
-  const data = await parseIngramResponse<IngramSearchResponse>(response)
+      if (!searchResult.success || !searchResult.products) {
+        console.warn(
+          `Ingram search failed for keyword ${keyword}, page ${pageNumber}`,
+          JSON.stringify(searchResult, null, 2),
+        )
+        break
+      }
 
-  if (!response.ok) {
-    return {
-      success: false,
-      status: response.status,
-      data,
+      if (searchResult.products.length === 0) {
+        break
+      }
+
+      const filteredProducts = searchResult.products
+        .map((product) => ({
+          ...product,
+          catalogCategory: category.value,
+          imageUrl: null,
+          fullDescription: null,
+          features: [],
+          specifications: [],
+          lastSyncedAt,
+          visible: true,
+        }))
+        .filter((product) => productMatchesCategory(product, category))
+
+      products.push(...filteredProducts)
+
+      console.log(
+        `Keyword ${keyword}, page ${pageNumber}: found ${searchResult.products.length}, kept ${filteredProducts.length}`,
+      )
+
+      if (searchResult.products.length < MAX_SEARCH_RESULTS_PER_KEYWORD) {
+        break
+      }
+
+      await sleep(300)
     }
   }
 
-  if (typeof data === 'string') {
-    return {
-      success: false,
-      status: response.status,
-      data,
-    }
+  return products
+}
+
+export const readCatalogCache = async (): Promise<CachedCatalogFile | null> => {
+  try {
+    const fileContents = await fs.readFile(CATALOG_FILE_PATH, 'utf-8')
+    return JSON.parse(fileContents) as CachedCatalogFile
+  } catch {
+    return null
+  }
+}
+
+export const syncIngramCatalogCache = async (): Promise<CachedCatalogFile> => {
+  console.log('Starting Ingram catalog cache sync...')
+
+  await fs.mkdir(CATALOG_DATA_DIR, {
+    recursive: true,
+  })
+
+  const candidateProducts: CachedCatalogProduct[] = []
+
+  for (const category of catalogTerms as CatalogTerms[]) {
+    console.log(`Searching category: ${category.label}`)
+
+    const categoryProducts = await fetchCatalogPagesForCategory(category)
+
+    candidateProducts.push(...categoryProducts)
+
+    console.log(
+      `Finished category ${category.label}. Kept ${categoryProducts.length} candidates.`,
+    )
   }
 
-  const catalog = Array.isArray(data.catalog) ? data.catalog : []
-  const products = catalog.map(normalizeIngramSearchProduct)
+  const uniqueProductsByCategory = catalogTerms.flatMap(
+    (category: CatalogTerms) => {
+      const categoryProducts = candidateProducts.filter(
+        (product) => product.catalogCategory === category.value,
+      )
 
-  return {
-    success: true,
-    recordsFound: data.recordsFound ?? products.length,
-    pageSize: data.pageSize ?? Number(pageSize),
-    pageNumber: data.pageNumber ?? Number(pageNumber),
+      return dedupeProducts(categoryProducts).slice(
+        0,
+        MAX_PRODUCTS_PER_CATEGORY,
+      )
+    },
+  )
+
+  const uniqueProducts = dedupeProducts(uniqueProductsByCategory).slice(
+    0,
+    MAX_PRICE_SKUS,
+  )
+
+  console.log('Products selected for pricing by category:')
+
+  catalogTerms.forEach((category: CatalogTerms) => {
+    const count = uniqueProducts.filter(
+      (product) => product.catalogCategory === category.value,
+    ).length
+
+    console.log(`${category.label}: ${count}`)
+  })
+
+  const skus = uniqueProducts
+    .map((product) => product.ingramPartNumber)
+    .filter((sku): sku is string => Boolean(sku))
+
+  console.log(`Requesting price/availability for ${skus.length} SKUs...`)
+
+  const priceMap = new Map<string, Partial<CachedCatalogProduct>>()
+  const skuBatches = chunkArray(skus, PRICE_AVAILABILITY_BATCH_SIZE)
+
+  for (const [batchIndex, skuBatch] of skuBatches.entries()) {
+    console.log(
+      `Requesting price batch ${batchIndex + 1}/${skuBatches.length} for ${skuBatch.length} SKUs...`,
+    )
+
+    const priceResult = await getIngramPriceAvailability(skuBatch)
+
+    if (priceResult.success && priceResult.products) {
+      priceResult.products.forEach((product) => {
+        if (!product.ingramPartNumber) return
+        priceMap.set(product.ingramPartNumber, product)
+      })
+
+      console.log(
+        `Price batch ${batchIndex + 1} returned ${priceResult.products.length} products.`,
+      )
+    } else {
+      console.warn(
+        `Ingram price availability failed for batch ${batchIndex + 1}:`,
+        JSON.stringify(priceResult, null, 2),
+      )
+    }
+
+    await sleep(300)
+  }
+
+  const lastSyncedAt = new Date().toISOString()
+
+  const joinedProducts = uniqueProducts.map((product) => {
+    const priceInfo = product.ingramPartNumber
+      ? priceMap.get(product.ingramPartNumber)
+      : undefined
+
+    return {
+      ...product,
+      ...(priceInfo ?? {}),
+      lastSyncedAt,
+      visible: true,
+    }
+  })
+
+  const products = joinedProducts.filter(productIsWorthCaching)
+
+  const catalogFile: CachedCatalogFile = {
+    lastSyncedAt,
+    productCount: products.length,
     products,
-    raw: data,
   }
-}
 
-export const getIngramPriceAvailability = async (skus: string[]) => {
-  const token = await getIngramToken()
-
-  const params = new URLSearchParams({
-    includeAvailability: 'true',
-    includePricing: 'true',
-    includeProductAttributes: 'true',
-  })
-
-  const url = buildIngramUrl(
-    '/resellers/v6/catalog/priceandavailability',
-    params,
+  await fs.writeFile(
+    TEMP_CATALOG_FILE_PATH,
+    JSON.stringify(catalogFile, null, 2),
+    'utf-8',
   )
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: getIngramHeaders(token),
-    body: JSON.stringify({
-      products: skus.map((sku) => ({
-        ingramPartNumber: sku,
-      })),
-    }),
-  })
+  await fs.rename(TEMP_CATALOG_FILE_PATH, CATALOG_FILE_PATH)
 
-  const data = await parseIngramResponse<IngramPriceAvailabilityResponse>(
-    response,
+  console.log(
+    `Finished Ingram catalog cache sync. Saved ${products.length} products.`,
   )
 
-  if (!response.ok) {
-    return {
-      success: false,
-      status: response.status,
-      data,
-    }
-  }
-
-  if (!Array.isArray(data)) {
-    return {
-      success: false,
-      status: response.status,
-      data,
-    }
-  }
-
-  const products = data.map(normalizePriceAvailabilityItem)
-
-  return {
-    success: true,
-    products,
-    raw: data,
-  }
-}
-
-export const getIngramProductDetails = async (ingramPartNumber: string) => {
-  const token = await getIngramToken()
-
-  const url = buildIngramUrl(
-    `/resellers/v6/catalog/details/${encodeURIComponent(ingramPartNumber)}`,
-  )
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: getIngramHeaders(token),
-  })
-
-  const data = await parseIngramResponse<any>(response)
-
-  if (!response.ok) {
-    return {
-      success: false,
-      status: response.status,
-      data,
-    }
-  }
-
-  return {
-    success: true,
-    data,
-  }
+  return catalogFile
 }

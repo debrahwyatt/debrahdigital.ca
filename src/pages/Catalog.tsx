@@ -12,6 +12,15 @@ function Catalog() {
   const {
     catalogCategories,
     sortedProducts,
+    paginatedProducts,
+
+    currentPage,
+    totalPages,
+    productsPerPage,
+    totalProductCount,
+
+    goToPreviousPage,
+    goToNextPage,
 
     isLoading,
     error,
@@ -27,6 +36,16 @@ function Catalog() {
 
     handleSearchSubmit,
   } = useCatalog()
+
+  const firstProductNumber =
+    totalProductCount === 0
+      ? 0
+      : (currentPage - 1) * productsPerPage + 1
+
+  const lastProductNumber = Math.min(
+    currentPage * productsPerPage,
+    totalProductCount,
+  )
 
   return (
     <>
@@ -89,7 +108,7 @@ function Catalog() {
           </label>
 
           <button type="submit" className="btn">
-            Search Catalog
+            Apply Filters
           </button>
         </form>
 
@@ -112,87 +131,153 @@ function Catalog() {
         )}
 
         {!isLoading && !error && sortedProducts.length > 0 && (
-          <section className="shop-grid">
-            {sortedProducts.map((product) => {
-              const rawProductName =
-                product.description ?? product.vendorPartNumber ?? 'Product'
+          <>
+            <div className="catalog-pagination-summary">
+              <p>
+                Showing {firstProductNumber} - {lastProductNumber} of{' '}
+                {totalProductCount} products
+              </p>
 
-              const productName = cleanProductName(rawProductName)
-
-              return (
-                <article
-                  className="product-card"
-                  key={product.ingramPartNumber ?? productName}
+              <div className="catalog-pagination">
+                <button
+                  type="button"
+                  className="btn pagination-btn"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
                 >
-                  <Link
-                    to={`/catalog/${encodeURIComponent(product.ingramPartNumber ?? '')}`}
-                    className="product-image-wrap product-image-link"
-                  >                    
-                    <img
-                      src={getProductImage(product)}
-                      alt={productName}
-                      className="product-image"
-                      loading="lazy"
-                      onError={(event) => {
-                        event.currentTarget.src = getPlaceholderImage(product)
-                      }}
-                    />
+                  Previous
+                </button>
 
-                    {!product.imageUrl}
-                  </Link>
+                <span className="pagination-page-count">
+                  Page {currentPage} of {totalPages}
+                </span>
 
-                  <div className="product-card-body">
-                    <h2>
-                      <Link
-                        to={`/catalog/${encodeURIComponent(product.ingramPartNumber ?? '')}`}
-                        className="product-title-link"
-                      >
-                        {productName}
-                      </Link>
-                    </h2>
+                <button
+                  type="button"
+                  className="btn pagination-btn"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
 
-                    {product.vendorName && (
-                      <p className="product-meta">
-                        Brand: {product.vendorName}
-                      </p>
-                    )}
+            <section className="shop-grid">
+              {paginatedProducts.map((product) => {
+                const rawProductName =
+                  product.description ?? product.vendorPartNumber ?? 'Product'
 
-                    {product.sellPrice != null && product.sellPrice > 0 ? (
-                      <p className="product-price">
-                        ${product.sellPrice.toFixed(2)}{' '}
-                        {product.currency ?? 'CAD'}
-                      </p>
-                    ) : (
-                      <p className="product-price">
-                        Price confirmed before payment
-                      </p>
-                    )}
+                const productName = cleanProductName(rawProductName)
 
-                    <p className="product-meta">
-                      Availability confirmed before payment
-                    </p>
+                const productUrl = `/catalog/${encodeURIComponent(
+                  product.ingramPartNumber ?? '',
+                )}`
 
-                    {product.ingramPartNumber && (
-                      <p className="product-meta">
-                        Item #: {product.ingramPartNumber}
-                      </p>
-                    )}
+                const contactUrl = `/contact?product=${encodeURIComponent(
+                  productName,
+                )}&sku=${encodeURIComponent(product.ingramPartNumber ?? '')}`
 
+                return (
+                  <article
+                    className="product-card"
+                    key={product.ingramPartNumber ?? productName}
+                  >
                     <Link
-                      to={`/contact?product=${encodeURIComponent(
-                        productName,
-                      )}&sku=${encodeURIComponent(
-                        product.ingramPartNumber ?? '',
-                      )}`}
-                      className="btn product-btn"
+                      to={productUrl}
+                      className="product-image-wrap product-image-link"
+                      aria-label={`View details for ${productName}`}
                     >
-                      Request Special Order
+                      <img
+                        src={getProductImage(product)}
+                        alt={productName}
+                        className="product-image"
+                        loading="lazy"
+                        onError={(event) => {
+                          event.currentTarget.onerror = null
+                          event.currentTarget.src = getPlaceholderImage()
+                        }}
+                      />
                     </Link>
-                  </div>
-                </article>
-              )
-            })}
-          </section>
+
+                    <div className="product-card-body">
+                      <h2>
+                        <Link
+                          to={productUrl}
+                          className="product-title-link"
+                        >
+                          {productName}
+                        </Link>
+                      </h2>
+
+                      <p className="product-meta product-brand">
+                        {product.vendorName
+                          ? `Brand: ${product.vendorName}`
+                          : '\u00A0'}
+                      </p>
+
+                      {product.sellPrice != null && product.sellPrice > 0 ? (
+                        <p className="product-price">
+                          ${product.sellPrice.toFixed(2)}{' '}
+                          {product.currency ?? 'CAD'}
+                        </p>
+                      ) : (
+                        <p className="product-price">
+                          Price confirmed before payment
+                        </p>
+                      )}
+
+                      <p className="product-meta product-availability">
+                        {product.totalAvailability != null &&
+                        product.totalAvailability > 0
+                          ? `Supplier stock: ${product.totalAvailability}`
+                          : 'Availability confirmed before payment'}
+                      </p>
+
+                      <p className="product-meta product-item-number">
+                        {product.ingramPartNumber
+                          ? `Item #: ${product.ingramPartNumber}`
+                          : '\u00A0'}
+                      </p>
+
+                      <Link
+                        to={contactUrl}
+                        className="btn product-btn"
+                      >
+                        Request Item
+                      </Link>
+                    </div>
+                  </article>
+                )
+              })}
+            </section>
+
+            {totalPages > 1 && (
+              <div className="catalog-pagination catalog-pagination-bottom">
+                <button
+                  type="button"
+                  className="btn pagination-btn"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+
+                <span className="pagination-page-count">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  className="btn pagination-btn"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </>

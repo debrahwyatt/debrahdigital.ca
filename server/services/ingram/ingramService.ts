@@ -1,6 +1,7 @@
 import { getIngramToken } from './ingramAuth'
 import {
   buildIngramUrl,
+  fetchIngramWithRetry,
   getIngramHeaders,
   parseIngramResponse,
 } from './ingramClient'
@@ -99,7 +100,9 @@ export const normalizePriceAvailabilityItem = (
     returnable: Boolean(item.returnableProduct),
     acceptBackOrder: Boolean(item.acceptBackOrder),
     endUserInfoRequired: Boolean(item.endUserInfoRequired),
-    specialBidPricingAvailable: Boolean(item.pricing?.specialBidPricingAvailable),
+    specialBidPricingAvailable: Boolean(
+      item.pricing?.specialBidPricingAvailable,
+    ),
   }
 }
 
@@ -132,7 +135,7 @@ export const searchIngramProducts = async (
 
   const url = buildIngramUrl('/resellers/v6/catalog', params)
 
-  const response = await fetch(url, {
+  const response = await fetchIngramWithRetry(url, {
     method: 'GET',
     headers: getIngramHeaders(token),
   })
@@ -182,7 +185,7 @@ export const getIngramPriceAvailability = async (skus: string[]) => {
     params,
   )
 
-  const response = await fetch(url, {
+  const response = await fetchIngramWithRetry(url, {
     method: 'POST',
     headers: getIngramHeaders(token),
     body: JSON.stringify({
@@ -228,7 +231,7 @@ export const getIngramProductDetails = async (ingramPartNumber: string) => {
     `/resellers/v6/catalog/details/${encodeURIComponent(ingramPartNumber)}`,
   )
 
-  const response = await fetch(url, {
+  const response = await fetchIngramWithRetry(url, {
     method: 'GET',
     headers: getIngramHeaders(token),
   })

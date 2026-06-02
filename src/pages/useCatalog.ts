@@ -8,7 +8,6 @@ import type {
 } from 'react'
 import {
   catalogCategories,
-  type CatalogCategory,
 } from '../data/catalogCategories'
 
 export type CatalogProduct = {
@@ -24,9 +23,7 @@ export type CatalogProduct = {
   category: string | null
   subCategory: string | null
   productType: string | null
-
-  manufacturer?: string | null
-  manufacturerPartNumber?: string | null
+  catalogCategory?: string | null
 
   currency?: string
   cost?: number
@@ -37,9 +34,6 @@ export type CatalogProduct = {
 
   imageUrl?: string | null
   lastSyncedAt?: string | null
-
-  weight?: string | null
-  dimensions?: string | null
 
   features?: string[]
   specifications?: {
@@ -53,10 +47,14 @@ export type CatalogProduct = {
 type CatalogJsonResponse = {
   products?: CatalogProduct[]
   lastSyncedAt?: string
+  productCount?: number
 }
 
 const CATALOG_DATA_URL =
-  import.meta.env.VITE_CATALOG_DATA_URL ?? '/data/catalog-products.json'
+  import.meta.env.VITE_CATALOG_DATA_URL ??
+  'http://localhost:3001/api/catalog/products'
+
+const PRODUCTS_PER_PAGE = 24
 
 const getProductSearchText = (product: CatalogProduct): string => {
   return [
@@ -67,27 +65,11 @@ const getProductSearchText = (product: CatalogProduct): string => {
     product.category,
     product.subCategory,
     product.productType,
+    product.catalogCategory,
   ]
     .filter(Boolean)
     .join(' ')
     .toLowerCase()
-}
-
-const productMatchesCategory = (
-  product: CatalogProduct,
-  category: CatalogCategory,
-): boolean => {
-  const text = getProductSearchText(product)
-
-  const hasRequiredTerm = category.requiredTerms.some((term) =>
-    text.includes(term.toLowerCase()),
-  )
-
-  const hasBlockedTerm = category.blockedTerms.some((term) =>
-    text.includes(term.toLowerCase()),
-  )
-
-  return hasRequiredTerm && !hasBlockedTerm
 }
 
 const productMatchesSearch = (
@@ -103,29 +85,12 @@ const productMatchesSearch = (
   return getProductSearchText(product).includes(trimmedSearchTerm)
 }
 
-const productIsSafeToDisplay = (
-  product: CatalogProduct,
-  category: CatalogCategory,
-): boolean => {
+const productIsSafeToDisplay = (product: CatalogProduct): boolean => {
   if (product.visible === false) return false
   if (!product.ingramPartNumber) return false
   if (!product.description) return false
 
-  const text = getProductSearchText(product)
-
-  if (
-    category.blockedTerms.some((term) =>
-      text.includes(term.toLowerCase()),
-    )
-  ) {
-    return false
-  }
-
   if (product.sellPrice == null || product.sellPrice <= 0) {
-    return false
-  }
-
-  if (product.sellPrice < 100) {
     return false
   }
 
@@ -167,50 +132,12 @@ export const cleanProductName = (name: string): string => {
     .trim()
 }
 
-export const getPlaceholderImage = (product: CatalogProduct): string => {
-  const text = getProductSearchText(product)
-
-//   if (text.includes('ink') || text.includes('toner')) {
-//     return '/images/placeholders/ink-toner.webp'
-//   }
-
-//   if (
-//     text.includes('laptop') ||
-//     text.includes('notebook') ||
-//     text.includes('computer')
-//   ) {
-//     return '/images/placeholders/laptop.webp'
-//   }
-
-//   if (text.includes('desktop') || text.includes('workstation')) {
-//     return '/images/placeholders/desktop.webp'
-//   }
-
-//   if (text.includes('monitor') || text.includes('display')) {
-//     return '/images/placeholders/monitor.webp'
-//   }
-
-//   if (text.includes('printer')) {
-//     return '/images/placeholders/printer.webp'
-//   }
-
-//   if (text.includes('cable')) {
-//     return '/images/placeholders/cable.webp'
-//   }
-
-//   if (text.includes('adapter') || text.includes('adaptor')) {
-//     return '/images/placeholders/adapter.webp'
-//   }
-
-//   if (text.includes('mouse') || text.includes('keyboard')) {
-//     return '/images/placeholders/peripheral.webp'
-//   }
-
+export const getPlaceholderImage = (): string => {
   return '/product-coming-soon.webp'
 }
 
 export const getProductImage = (product: CatalogProduct): string => {
-  return product.imageUrl || getPlaceholderImage(product)
+  return product.imageUrl || getPlaceholderImage()
 }
 
 const fetchCatalogProducts = async (): Promise<CatalogProduct[]> => {
@@ -232,6 +159,13 @@ const fetchCatalogProducts = async (): Promise<CatalogProduct[]> => {
   return catalogData.products ?? []
 }
 
+// const scrollToCatalogTop = () => {
+//   window.scrollTo({
+//     top: 0,
+//     behavior: 'smooth',
+//   })
+// }
+
 export const useCatalog = () => {
   const [allProducts, setAllProducts] = useState<CatalogProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -240,10 +174,7 @@ export const useCatalog = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('laptops')
   const [sortOption, setSortOption] = useState('price-low')
-
-  const selectedCategoryData =
-    catalogCategories.find((category) => category.value === selectedCategory) ??
-    catalogCategories[0]
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     let isMounted = true
@@ -259,24 +190,7 @@ export const useCatalog = () => {
 
         setAllProducts(products)
 
-        console.table(
-          products.map((product) => ({
-            ingramPartNumber: product.ingramPartNumber,
-            vendorPartNumber: product.vendorPartNumber,
-            vendorName: product.vendorName,
-            description: product.description,
-            category: product.category,
-            subCategory: product.subCategory,
-            productType: product.productType,
-            sellPrice: product.sellPrice,
-            currency: product.currency,
-            available: product.available,
-            totalAvailability: product.totalAvailability,
-            imageUrl: product.imageUrl,
-            lastSyncedAt: product.lastSyncedAt,
-            visible: product.visible,
-          })),
-        )
+        console.log('Loaded cached catalog products:', products.length)
       } catch (err) {
         console.error(err)
 
@@ -299,11 +213,11 @@ export const useCatalog = () => {
 
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
-      if (!productMatchesCategory(product, selectedCategoryData)) {
+      if (product.catalogCategory !== selectedCategory) {
         return false
       }
 
-      if (!productIsSafeToDisplay(product, selectedCategoryData)) {
+      if (!productIsSafeToDisplay(product)) {
         return false
       }
 
@@ -313,19 +227,74 @@ export const useCatalog = () => {
 
       return true
     })
-  }, [allProducts, selectedCategoryData, searchTerm])
+  }, [allProducts, selectedCategory, searchTerm])
 
   const sortedProducts = useMemo(() => {
     return sortCatalogProducts(filteredProducts, sortOption)
   }, [filteredProducts, sortOption])
 
+  const totalProductCount = sortedProducts.length
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalProductCount / PRODUCTS_PER_PAGE),
+  )
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE
+    const endIndex = startIndex + PRODUCTS_PER_PAGE
+
+    return sortedProducts.slice(startIndex, endIndex)
+  }, [sortedProducts, currentPage])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory, searchTerm, sortOption])
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages)
+    }
+  }, [currentPage, totalPages])
+
+  const goToPage = (page: number) => {
+    const safePage = Math.min(Math.max(page, 1), totalPages)
+
+    if (safePage === currentPage) {
+      return
+    }
+
+    setCurrentPage(safePage)
+    // scrollToCatalogTop()
+  }
+
+  const goToPreviousPage = () => {
+    goToPage(currentPage - 1)
+  }
+
+  const goToNextPage = () => {
+    goToPage(currentPage + 1)
+  }
+
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setCurrentPage(1)
+    // scrollToCatalogTop()
   }
 
   return {
     catalogCategories,
     sortedProducts,
+    paginatedProducts,
+
+    currentPage,
+    totalPages,
+    productsPerPage: PRODUCTS_PER_PAGE,
+    totalProductCount,
+
+    goToPage,
+    goToPreviousPage,
+    goToNextPage,
 
     isLoading,
     error,

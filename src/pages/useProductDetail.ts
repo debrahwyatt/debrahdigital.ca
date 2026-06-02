@@ -15,7 +15,8 @@ type CatalogJsonResponse = {
 }
 
 const CATALOG_DATA_URL =
-  import.meta.env.VITE_CATALOG_DATA_URL ?? '/data/catalog-products.json'
+  import.meta.env.VITE_CATALOG_DATA_URL ??
+  'http://localhost:3001/api/catalog/products'
 
 const fetchCatalogProducts = async (): Promise<CatalogProduct[]> => {
   const response = await fetch(CATALOG_DATA_URL, {
