@@ -3,6 +3,9 @@ import express from 'express'
 
 import { getIngramToken } from '../services/ingram/ingramAuth'
 import {
+  syncIngramCatalogCache,
+} from '../services/ingram/ingramCatalogCache'
+import {
   getIngramPriceAvailability,
   getIngramProductDetails,
   searchIngramProducts,
@@ -21,6 +24,25 @@ router.get('/token-test', async (_req, res) => {
     })
   } catch (error) {
     console.error('INGRAM TOKEN ERROR:', error)
+
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown Ingram error',
+    })
+  }
+})
+
+router.post('/catalog/sync', async (_req, res) => {
+  try {
+    const result = await syncIngramCatalogCache()
+
+    res.json({
+      success: true,
+      lastSyncedAt: result.lastSyncedAt,
+      productCount: result.productCount,
+    })
+  } catch (error) {
+    console.error('INGRAM CATALOG SYNC ERROR:', error)
 
     res.status(500).json({
       success: false,
