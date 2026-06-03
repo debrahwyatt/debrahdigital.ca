@@ -150,12 +150,16 @@
   -webkit-line-clamp: 7;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  white-space: pre-line;
 }
 
-.product-detail-description-expanded {
+.product-detail-description.product-detail-description-expanded {
   display: block;
-  -webkit-line-clamp: unset;
+  -webkit-line-clamp: initial;
+  -webkit-box-orient: initial;
   overflow: visible;
+  max-height: none;
+  white-space: pre-line;
 }
 
 .product-detail-description-toggle {

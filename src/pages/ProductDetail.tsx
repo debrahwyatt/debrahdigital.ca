@@ -31,6 +31,36 @@ const getUniqueImages = (images: (string | null | undefined)[]): string[] => {
   )
 }
 
+const normalizeDescriptionText = (description?: string | null): string => {
+  return String(description ?? '')
+    .replace(/\\r\\n/g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\n')
+    .replace(/\\t/g, ' ')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim()
+}
+
+const getCombinedProductDescription = (
+  extraDescription?: string | null,
+  fullDescription?: string | null,
+): string => {
+  return [
+    extraDescription,
+    fullDescription,
+  ]
+    .map(normalizeDescriptionText)
+    .filter(Boolean)
+    .filter((description, index, descriptions) => {
+      // Avoid showing duplicate text if both fields are effectively the same.
+      return descriptions.indexOf(description) === index
+    })
+    .join('\n\n')
+}
+
 function ProductDetail() {
   const {
     product,
@@ -63,16 +93,20 @@ function ProductDetail() {
     product?.thumbnailUrl ??
     (product ? getProductImage(product) : getPlaceholderImage())
 
-  const productDescription =
-    product?.fullDescription ?? product?.extraDescription ?? ''
+  const combinedProductDescription = getCombinedProductDescription(
+    product?.extraDescription,
+    product?.fullDescription,
+  )
 
   const hasLongDescription =
-    productDescription.length > DESCRIPTION_PREVIEW_LENGTH
+    combinedProductDescription.length > DESCRIPTION_PREVIEW_LENGTH
 
   const seoDescription =
-    product?.fullDescription ??
-    product?.extraDescription ??
-    `View details for ${productName} from Debrah's Digital Solutions.`
+    normalizeDescriptionText(
+      product?.extraDescription ??
+        product?.fullDescription ??
+        `View details for ${productName} from Debrah's Digital Solutions.`,
+    )
 
   return (
     <>
@@ -194,7 +228,7 @@ function ProductDetail() {
                   </p>
                 )}
 
-                {productDescription && (
+                {combinedProductDescription && (
                   <section className="product-detail-section">
                     <h2>Description</h2>
 
@@ -205,7 +239,7 @@ function ProductDetail() {
                           : 'product-detail-description'
                       }
                     >
-                      {productDescription}
+                      {combinedProductDescription}
                     </p>
 
                     {hasLongDescription && (
