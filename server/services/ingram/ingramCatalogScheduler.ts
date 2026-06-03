@@ -6,9 +6,9 @@ import {
   buildIcecatCatalogCache,
 } from '../icecat/icecatCatalogCache'
 
-// import {
-//   buildCatalogProductsCache,
-// } from '../catalog/catalogProductsCache'
+import {
+  buildProductCatalogCache,
+} from '../catalog/productCatalogCache'
 
 let isCatalogSyncRunning = false
 let dailyCatalogSyncTimeout: NodeJS.Timeout | null = null
@@ -123,23 +123,33 @@ export const runCatalogSyncSafely = async (
   try {
     console.log(`Starting full catalog sync. Reason: ${reason}`)
 
-    console.log('Step 1/2: Syncing Ingram products...')
+    console.log('Step 1/3: Syncing Ingram products...')
     const ingramStartedAt = Date.now()
     const ingramResult = await syncIngramCatalogCache()
 
     console.log(
-      `Step 1/2 complete. Saved ${ingramResult.productCount} Ingram products in ${formatDuration(
+      `Step 1/3 complete. Saved ${ingramResult.productCount} Ingram products in ${formatDuration(
         Date.now() - ingramStartedAt,
       )}.`,
     )
 
-    console.log('Step 2/2: Syncing Icecat product content/images...')
+    console.log('Step 2/3: Syncing Icecat product content/images...')
     const icecatStartedAt = Date.now()
     const icecatResult = await buildIcecatCatalogCache()
 
     console.log(
-      `Step 2/2 complete. Checked ${icecatResult.checkedProductCount} Icecat products, matched ${icecatResult.matchedProductCount}, with images ${icecatResult.withImageCount}, in ${formatDuration(
+      `Step 2/3 complete. Checked ${icecatResult.checkedProductCount} Icecat products, matched ${icecatResult.matchedProductCount}, with images ${icecatResult.withImageCount}, in ${formatDuration(
         Date.now() - icecatStartedAt,
+      )}.`,
+    )
+
+    console.log('Step 3/3: Building public product catalog...')
+    const productCatalogStartedAt = Date.now()
+    const productCatalogResult = await buildProductCatalogCache()
+
+    console.log(
+      `Step 3/3 complete. Built ${productCatalogResult.productCount} public catalog products in ${formatDuration(
+        Date.now() - productCatalogStartedAt,
       )}.`,
     )
 
