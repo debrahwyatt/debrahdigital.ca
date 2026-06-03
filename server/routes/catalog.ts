@@ -1,55 +1,37 @@
-import express from 'express'
-import {
-  readCatalogCache,
-  syncIngramCatalogCache,
-} from '../services/ingram/ingramCatalogCache'
+// server/routes/catalog.ts
 
-const router = express.Router()
+import fs from 'fs/promises'
+import path from 'path'
+import { Router } from 'express'
+
+const router = Router()
+
+const DATA_DIR = path.resolve(process.cwd(), 'data')
+const PRODUCT_CATALOG_PATH = path.join(DATA_DIR, 'product-catalog.json')
 
 router.get('/products', async (_req, res) => {
   try {
-    const catalogCache = await readCatalogCache()
+    console.log('Serving website product catalog from:', PRODUCT_CATALOG_PATH)
 
-    if (!catalogCache) {
-      return res.status(503).json({
-        error: 'Catalog cache has not been generated yet.',
-        products: [],
-      })
-    }
+    const raw = await fs.readFile(PRODUCT_CATALOG_PATH, 'utf-8')
+    const catalog = JSON.parse(raw)
 
-    res.json(catalogCache)
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
+    res.setHeader('Pragma', 'no-cache')
+    res.setHeader('Expires', '0')
+
+    res.json(catalog)
   } catch (error) {
-    console.error('Failed to read catalog cache:', error)
+    console.error('Failed to read website product catalog:', error)
 
     res.status(500).json({
-      error: 'Failed to read catalog cache.',
+      lastSyncedAt: null,
+      productCount: 0,
       products: [],
-    })
-  }
-})
-
-router.post('/sync', async (req, res) => {
-  try {
-    const adminToken = req.headers['x-admin-token']
-
-    if (adminToken !== process.env.ADMIN_SYNC_TOKEN) {
-      return res.status(401).json({
-        error: 'Unauthorized',
-      })
-    }
-
-    const catalogCache = await syncIngramCatalogCache()
-
-    res.json({
-      message: 'Catalog sync complete.',
-      lastSyncedAt: catalogCache.lastSyncedAt,
-      productCount: catalogCache.productCount,
-    })
-  } catch (error) {
-    console.error('Failed to sync catalog cache:', error)
-
-    res.status(500).json({
-      error: 'Failed to sync catalog cache.',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to read website product catalog',
     })
   }
 })

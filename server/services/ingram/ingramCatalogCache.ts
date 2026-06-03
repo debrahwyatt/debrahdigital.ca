@@ -58,7 +58,7 @@ const CATALOG_DATA_DIR = path.resolve(process.cwd(), 'data')
 
 export const CATALOG_FILE_PATH = path.join(
   CATALOG_DATA_DIR,
-  'catalog-products.json',
+  'ingram-products.json',
 )
 
 const TEMP_CATALOG_FILE_PATH = path.join(

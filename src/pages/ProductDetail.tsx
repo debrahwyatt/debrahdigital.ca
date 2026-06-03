@@ -67,7 +67,7 @@ function ProductDetail() {
                   className="product-detail-image"
                   onError={(event) => {
                     event.currentTarget.onerror = null
-                    event.currentTarget.src = getPlaceholderImage(product)
+                    event.currentTarget.src = "getPlaceholderImage()"
                   }}
                 />
               </div>

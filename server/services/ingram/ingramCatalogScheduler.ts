@@ -2,6 +2,14 @@ import {
   syncIngramCatalogCache,
 } from './ingramCatalogCache'
 
+import {
+  buildIcecatCatalogCache,
+} from '../icecat/icecatCatalogCache'
+
+// import {
+//   buildCatalogProductsCache,
+// } from '../catalog/catalogProductsCache'
+
 let isCatalogSyncRunning = false
 let dailyCatalogSyncTimeout: NodeJS.Timeout | null = null
 
@@ -113,22 +121,38 @@ export const runCatalogSyncSafely = async (
   const syncStartedAt = Date.now()
 
   try {
-    console.log(`Starting catalog sync. Reason: ${reason}`)
+    console.log(`Starting full catalog sync. Reason: ${reason}`)
 
-    const result = await syncIngramCatalogCache()
+    console.log('Step 1/2: Syncing Ingram products...')
+    const ingramStartedAt = Date.now()
+    const ingramResult = await syncIngramCatalogCache()
+
+    console.log(
+      `Step 1/2 complete. Saved ${ingramResult.productCount} Ingram products in ${formatDuration(
+        Date.now() - ingramStartedAt,
+      )}.`,
+    )
+
+    console.log('Step 2/2: Syncing Icecat product content/images...')
+    const icecatStartedAt = Date.now()
+    const icecatResult = await buildIcecatCatalogCache()
+
+    console.log(
+      `Step 2/2 complete. Checked ${icecatResult.checkedProductCount} Icecat products, matched ${icecatResult.matchedProductCount}, with images ${icecatResult.withImageCount}, in ${formatDuration(
+        Date.now() - icecatStartedAt,
+      )}.`,
+    )
 
     const durationMs = Date.now() - syncStartedAt
 
     console.log(
-      `Catalog sync complete. Saved ${result.productCount} products in ${formatDuration(
-        durationMs,
-      )}.`,
+      `Full catalog sync complete in ${formatDuration(durationMs)}.`,
     )
   } catch (error) {
     const durationMs = Date.now() - syncStartedAt
 
     console.error(
-      `Catalog sync failed after ${formatDuration(durationMs)}:`,
+      `Full catalog sync failed after ${formatDuration(durationMs)}:`,
       error,
     )
   } finally {

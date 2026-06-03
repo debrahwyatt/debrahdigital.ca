@@ -33,6 +33,10 @@ export type CatalogProduct = {
   totalAvailability?: number
 
   imageUrl?: string | null
+  thumbnailUrl?: string | null
+  brandLogoUrl?: string | null
+  galleryUrls?: string[]
+
   lastSyncedAt?: string | null
 
   features?: string[]
@@ -42,6 +46,11 @@ export type CatalogProduct = {
   }[]
 
   visible?: boolean
+
+  icecatId?: number | string
+  icecatMatched?: boolean
+  icecatMatchedBy?: string
+  icecatLastCheckedAt?: string | null
 }
 
 type CatalogJsonResponse = {
@@ -137,7 +146,13 @@ export const getPlaceholderImage = (): string => {
 }
 
 export const getProductImage = (product: CatalogProduct): string => {
-  return product.imageUrl || getPlaceholderImage()
+  return (
+    product.imageUrl ||
+    product.thumbnailUrl ||
+    product.galleryUrls?.[0] ||
+    product.brandLogoUrl ||
+    getPlaceholderImage()
+  )
 }
 
 const fetchCatalogProducts = async (): Promise<CatalogProduct[]> => {
@@ -191,6 +206,24 @@ export const useCatalog = () => {
         setAllProducts(products)
 
         console.log('Loaded cached catalog products:', products.length)
+
+        console.log('Catalog image debug:', {
+          totalProducts: products.length,
+          withImageUrl: products.filter((product) => Boolean(product.imageUrl))
+            .length,
+          withThumbnailUrl: products.filter((product) =>
+            Boolean(product.thumbnailUrl),
+          ).length,
+          withGalleryUrls: products.filter(
+            (product) =>
+              Array.isArray(product.galleryUrls) &&
+              product.galleryUrls.length > 0,
+          ).length,
+          firstProduct: products[0],
+          firstResolvedImage: products[0]
+            ? getProductImage(products[0])
+            : null,
+        })
       } catch (err) {
         console.error(err)
 
