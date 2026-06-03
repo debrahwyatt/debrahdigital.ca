@@ -1,5 +1,9 @@
 import '../styles/productDetail.css'
 import {
+  useMemo,
+  useState,
+} from 'react'
+import {
   Link,
 } from 'react-router-dom'
 import SEO from '../components/SEO'
@@ -12,6 +16,21 @@ import {
   useProductDetail,
 } from './useProductDetail'
 
+const DESCRIPTION_PREVIEW_LENGTH = 450
+
+const getUniqueImages = (images: (string | null | undefined)[]): string[] => {
+  return Array.from(
+    new Set(
+      images
+        .filter((image): image is string => Boolean(image))
+        .map((image) => image.trim())
+        .filter(Boolean)
+        .filter((image) => !image.includes('/gallery_thumbs/'))
+        .filter((image) => !image.includes('/gallery_lows/')),
+    ),
+  )
+}
+
 function ProductDetail() {
   const {
     product,
@@ -19,20 +38,47 @@ function ProductDetail() {
     error,
   } = useProductDetail()
 
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [showFullDescription, setShowFullDescription] = useState(false)
+
   const rawProductName =
     product?.description ?? product?.vendorPartNumber ?? 'Product'
 
   const productName = cleanProductName(rawProductName)
 
+  const productImages = useMemo(() => {
+    if (!product) {
+      return []
+    }
+
+    return getUniqueImages([
+      product.imageUrl,
+      ...(product.galleryUrls ?? []),
+    ])
+  }, [product])
+
+  const mainImage =
+    selectedImage ??
+    productImages[0] ??
+    product?.thumbnailUrl ??
+    (product ? getProductImage(product) : getPlaceholderImage())
+
+  const productDescription =
+    product?.fullDescription ?? product?.extraDescription ?? ''
+
+  const hasLongDescription =
+    productDescription.length > DESCRIPTION_PREVIEW_LENGTH
+
+  const seoDescription =
+    product?.fullDescription ??
+    product?.extraDescription ??
+    `View details for ${productName} from Debrah's Digital Solutions.`
+
   return (
     <>
       <SEO
         title={`${productName} | Debrah's Digital Solutions`}
-        description={
-          product?.extraDescription ??
-          product?.fullDescription ??
-          `View details for ${productName} from Debrah's Digital Solutions.`
-        }
+        description={seoDescription}
         path={
           product?.ingramPartNumber
             ? `/catalog/${product.ingramPartNumber}`
@@ -60,16 +106,44 @@ function ProductDetail() {
 
           {!isLoading && !error && product && (
             <article className="product-detail">
-              <div className="product-detail-image-wrap">
-                <img
-                  src={getProductImage(product)}
-                  alt={productName}
-                  className="product-detail-image"
-                  onError={(event) => {
-                    event.currentTarget.onerror = null
-                    event.currentTarget.src = "getPlaceholderImage()"
-                  }}
-                />
+              <div className="product-detail-media">
+                <div className="product-detail-image-wrap">
+                  <img
+                    src={mainImage}
+                    alt={productName}
+                    className="product-detail-image"
+                    onError={(event) => {
+                      event.currentTarget.onerror = null
+                      event.currentTarget.src = getPlaceholderImage()
+                    }}
+                  />
+                </div>
+
+                {productImages.length > 1 && (
+                  <div className="product-detail-thumbnails">
+                    {productImages.slice(0, 7).map((imageUrl, index) => (
+                      <button
+                        type="button"
+                        className={
+                          imageUrl === mainImage
+                            ? 'product-detail-thumbnail product-detail-thumbnail-active'
+                            : 'product-detail-thumbnail'
+                        }
+                        key={imageUrl}
+                        onClick={() => setSelectedImage(imageUrl)}
+                        aria-label={`View product image ${index + 1}`}
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={`${productName} thumbnail ${index + 1}`}
+                          onError={(event) => {
+                            event.currentTarget.style.display = 'none'
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="product-detail-content">
@@ -80,23 +154,25 @@ function ProductDetail() {
 
                 <h1>{productName}</h1>
 
-                {product.vendorName && (
-                  <p className="product-detail-meta">
-                    Brand: {product.vendorName}
-                  </p>
-                )}
+                <div className="product-detail-meta-group">
+                  {product.vendorName && (
+                    <p className="product-detail-meta">
+                      Brand: {product.vendorName}
+                    </p>
+                  )}
 
-                {product.vendorPartNumber && (
-                  <p className="product-detail-meta">
-                    Manufacturer Part #: {product.vendorPartNumber}
-                  </p>
-                )}
+                  {product.vendorPartNumber && (
+                    <p className="product-detail-meta">
+                      Manufacturer Part #: {product.vendorPartNumber}
+                    </p>
+                  )}
 
-                {product.ingramPartNumber && (
-                  <p className="product-detail-meta">
-                    Item #: {product.ingramPartNumber}
-                  </p>
-                )}
+                  {product.ingramPartNumber && (
+                    <p className="product-detail-meta">
+                      Item #: {product.ingramPartNumber}
+                    </p>
+                  )}
+                </div>
 
                 {product.sellPrice != null && product.sellPrice > 0 ? (
                   <p className="product-detail-price">
@@ -118,13 +194,33 @@ function ProductDetail() {
                   </p>
                 )}
 
-                {(product.fullDescription || product.extraDescription) && (
+                {productDescription && (
                   <section className="product-detail-section">
                     <h2>Description</h2>
 
-                    <p>
-                      {product.fullDescription ?? product.extraDescription}
+                    <p
+                      className={
+                        showFullDescription
+                          ? 'product-detail-description product-detail-description-expanded'
+                          : 'product-detail-description'
+                      }
+                    >
+                      {productDescription}
                     </p>
+
+                    {hasLongDescription && (
+                      <button
+                        type="button"
+                        className="product-detail-description-toggle"
+                        onClick={() =>
+                          setShowFullDescription((current) => !current)
+                        }
+                      >
+                        {showFullDescription
+                          ? 'Show less'
+                          : 'Show full description'}
+                      </button>
+                    )}
                   </section>
                 )}
 
