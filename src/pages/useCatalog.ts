@@ -53,15 +53,16 @@ export type CatalogProduct = {
   icecatLastCheckedAt?: string | null
 }
 
-type CatalogJsonResponse = {
+type CatalogApiResponse = {
   products?: CatalogProduct[]
-  lastSyncedAt?: string
-  productCount?: number
+  page?: number
+  pageSize?: number
+  total?: number
+  totalPages?: number
 }
 
 const CATALOG_DATA_URL =
-  import.meta.env.VITE_CATALOG_DATA_URL ??
-  'http://localhost:3001/api/catalog/products'
+  import.meta.env.VITE_CATALOG_DATA_URL ?? '/api/catalog-products.php'
 
 const PRODUCTS_PER_PAGE = 24
 
@@ -169,23 +170,69 @@ export const getProductImage = (product: CatalogProduct): string => {
   )
 }
 
-const fetchCatalogProducts = async (): Promise<CatalogProduct[]> => {
-  const response = await fetch(CATALOG_DATA_URL, {
+const normalizeCatalogProduct = (product: CatalogProduct): CatalogProduct => {
+  return {
+    ...product,
+    sellPrice:
+      product.sellPrice == null
+        ? undefined
+        : Number(product.sellPrice),
+    available: Boolean(product.available),
+    totalAvailability:
+      product.totalAvailability == null
+        ? 0
+        : Number(product.totalAvailability),
+    galleryUrls: Array.isArray(product.galleryUrls)
+      ? product.galleryUrls
+      : [],
+  }
+}
+
+const fetchCatalogProducts = async ({
+  selectedCategory,
+  searchTerm,
+  sortOption,
+  currentPage,
+}: {
+  selectedCategory: string
+  searchTerm: string
+  sortOption: string
+  currentPage: number
+}): Promise<CatalogApiResponse> => {
+  const params = new URLSearchParams({
+    category: selectedCategory,
+    search: searchTerm.trim(),
+    sort: sortOption,
+    page: String(currentPage),
+    pageSize: String(PRODUCTS_PER_PAGE),
+  })
+
+  const response = await fetch(`${CATALOG_DATA_URL}?${params.toString()}`, {
     cache: 'no-store',
   })
 
   if (!response.ok) {
-    throw new Error('Failed to load cached catalog products')
+    throw new Error('Failed to load catalog products from database')
   }
 
-  const catalogData: CatalogJsonResponse | CatalogProduct[] =
+  const catalogData: CatalogApiResponse | CatalogProduct[] =
     await response.json()
 
+  // Backward compatibility in case the endpoint ever returns a raw array.
   if (Array.isArray(catalogData)) {
-    return catalogData
+    return {
+      products: catalogData,
+      page: currentPage,
+      pageSize: PRODUCTS_PER_PAGE,
+      total: catalogData.length,
+      totalPages: Math.max(
+        1,
+        Math.ceil(catalogData.length / PRODUCTS_PER_PAGE),
+      ),
+    }
   }
 
-  return catalogData.products ?? []
+  return catalogData
 }
 
 // export const scrollToCatalogTop = () => {
@@ -205,6 +252,9 @@ export const useCatalog = () => {
   const [sortOption, setSortOption] = useState('price-low')
   const [currentPage, setCurrentPage] = useState(1)
 
+  const [totalProductCount, setTotalProductCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+
   useEffect(() => {
     let isMounted = true
 
@@ -213,16 +263,34 @@ export const useCatalog = () => {
         setIsLoading(true)
         setError('')
 
-        const products = await fetchCatalogProducts()
+        const catalogData = await fetchCatalogProducts({
+          selectedCategory,
+          searchTerm,
+          sortOption,
+          currentPage,
+        })
 
         if (!isMounted) return
 
-        setAllProducts(products)
+        const products = (catalogData.products ?? []).map(normalizeCatalogProduct)
 
-        console.log('Loaded cached catalog products:', products.length)
+        setAllProducts(products)
+        setTotalProductCount(catalogData.total ?? products.length)
+        setTotalPages(Math.max(1, catalogData.totalPages ?? 1))
+
+        console.log('Loaded catalog products from database:', {
+          productsOnPage: products.length,
+          total: catalogData.total ?? products.length,
+          page: catalogData.page ?? currentPage,
+          pageSize: catalogData.pageSize ?? PRODUCTS_PER_PAGE,
+          totalPages: catalogData.totalPages ?? 1,
+          category: selectedCategory,
+          search: searchTerm,
+          sort: sortOption,
+        })
 
         console.log('Catalog availability debug:', {
-          totalProducts: products.length,
+          productsOnPage: products.length,
           displayableProducts: products.filter(productIsSafeToDisplay).length,
           withAvailability: products.filter(
             (product) => getProductAvailabilityCount(product) > 0,
@@ -237,7 +305,7 @@ export const useCatalog = () => {
         })
 
         console.log('Catalog image debug:', {
-          totalProducts: products.length,
+          productsOnPage: products.length,
           withImageUrl: products.filter((product) => Boolean(product.imageUrl))
             .length,
           withThumbnailUrl: products.filter((product) =>
@@ -258,6 +326,9 @@ export const useCatalog = () => {
 
         if (isMounted) {
           setError('Unable to load the special-order catalog right now.')
+          setAllProducts([])
+          setTotalProductCount(0)
+          setTotalPages(1)
         }
       } finally {
         if (isMounted) {
@@ -271,8 +342,24 @@ export const useCatalog = () => {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [
+    selectedCategory,
+    searchTerm,
+    sortOption,
+    currentPage,
+  ])
 
+  /*
+    The PHP/database endpoint already filters by:
+    - selectedCategory
+    - searchTerm
+    - visible
+    - available
+    - sellPrice > 0
+
+    This client-side filter is intentionally kept as a safety net so bad API
+    data does not accidentally render.
+  */
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
       if (product.catalogCategory !== selectedCategory) {
@@ -289,35 +376,48 @@ export const useCatalog = () => {
 
       return true
     })
-  }, [allProducts, selectedCategory, searchTerm])
+  }, [
+    allProducts,
+    selectedCategory,
+    searchTerm,
+  ])
 
+  /*
+    The PHP/database endpoint should already sort the full result set before
+    pagination. This local sort only sorts the current returned page as a
+    fallback.
+  */
   const sortedProducts = useMemo(() => {
     return sortCatalogProducts(filteredProducts, sortOption)
-  }, [filteredProducts, sortOption])
+  }, [
+    filteredProducts,
+    sortOption,
+  ])
 
-  const totalProductCount = sortedProducts.length
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(totalProductCount / PRODUCTS_PER_PAGE),
-  )
-
+  /*
+    Products are already paginated by the PHP/database endpoint.
+    Keep this variable name so Catalog.tsx does not need to change.
+  */
   const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE
-    const endIndex = startIndex + PRODUCTS_PER_PAGE
-
-    return sortedProducts.slice(startIndex, endIndex)
-  }, [sortedProducts, currentPage])
+    return sortedProducts
+  }, [sortedProducts])
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [selectedCategory, searchTerm, sortOption])
+  }, [
+    selectedCategory,
+    searchTerm,
+    sortOption,
+  ])
 
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages)
     }
-  }, [currentPage, totalPages])
+  }, [
+    currentPage,
+    totalPages,
+  ])
 
   const goToPage = (page: number) => {
     const safePage = Math.min(Math.max(page, 1), totalPages)
