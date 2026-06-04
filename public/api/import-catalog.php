@@ -30,7 +30,7 @@ if (!is_array($data) || !isset($data['products']) || !is_array($data['products']
 }
 
 $dsn = 'mysql:host=localhost;dbname=debra512_catalog;charset=utf8mb4';
-$dbUser = 'debra512_catalog';
+$dbUser = 'debra512_catalog_user';
 $dbPass = 'Xxth$k(NrSn*B8t2';
 
 function mysqlDate(?string $iso): ?string {
