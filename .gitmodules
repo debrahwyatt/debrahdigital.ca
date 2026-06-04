@@ -1,0 +1,3 @@
+[submodule "dds-api"]
+	path = dds-api
+	url = https://github.com/debrahwyatt/dds-api.git
