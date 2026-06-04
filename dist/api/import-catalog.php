@@ -29,9 +29,9 @@ if (!is_array($data) || !isset($data['products']) || !is_array($data['products']
     exit;
 }
 
-$dsn = 'mysql:host=localhost;dbname=YOUR_CPANEL_DB_NAME;charset=utf8mb4';
-$dbUser = 'YOUR_CPANEL_DB_USER';
-$dbPass = 'YOUR_CPANEL_DB_PASSWORD';
+$dsn = 'mysql:host=localhost;dbname=debra512_catalog;charset=utf8mb4';
+$dbUser = 'debra512_catalog';
+$dbPass = 'Xxth$k(NrSn*B8t2';
 
 function mysqlDate(?string $iso): ?string {
     if (!$iso) {
