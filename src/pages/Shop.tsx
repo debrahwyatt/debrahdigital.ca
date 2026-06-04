@@ -152,10 +152,10 @@ function Shop() {
           <section className="shop-grid">
             {filteredProducts.map((product) => (
               <article
-                className="product-card"
+                className="product-card shop-product-card"
                 key={product.variationId}
               >
-                <div className="product-image-placeholder">
+                <div className="product-image-placeholder shop-product-image-placeholder">
                   {product.imageUrl ? (
                     <img
                       src={product.imageUrl}

@@ -55,6 +55,7 @@ export const catalogTerms: CatalogTerms[] = [
     ],
     requiredTerms: [
       'monitor',
+      'display'
     ],
     blockedTerms: [],
   },  
@@ -66,6 +67,20 @@ export const catalogTerms: CatalogTerms[] = [
     ],
     requiredTerms: [
       'workstation',
+    ],
+    blockedTerms: [],
+  },
+  {
+    label: 'All-in-One PCs',
+    value: 'all-in-one',
+    keywords: [
+      'all in one',
+    ],
+    requiredTerms: [
+      'all-in-one',
+      'optiplex',
+      'thinkcentre',
+      'ideacentre'
     ],
     blockedTerms: [],
   },

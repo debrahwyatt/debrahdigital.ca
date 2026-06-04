@@ -118,10 +118,6 @@ function Catalog() {
               <option value="price-high">Price: High to Low</option>
             </select>
           </label>
-
-          <button type="submit" className="btn">
-            Apply Filters
-          </button>
         </form>
 
         {isLoading && (

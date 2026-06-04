@@ -188,7 +188,7 @@ const fetchCatalogProducts = async (): Promise<CatalogProduct[]> => {
   return catalogData.products ?? []
 }
 
-// const scrollToCatalogTop = () => {
+// export const scrollToCatalogTop = () => {
 //   window.scrollTo({
 //     top: 0,
 //     behavior: 'smooth',
