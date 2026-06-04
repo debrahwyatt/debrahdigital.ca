@@ -30,7 +30,7 @@ export type CatalogProduct = {
   msrp?: number | null
   sellPrice?: number
   available?: boolean
-  totalAvailability?: number
+  totalAvailability?: number | string | null
 
   imageUrl?: string | null
   thumbnailUrl?: string | null
@@ -94,12 +94,26 @@ const productMatchesSearch = (
   return getProductSearchText(product).includes(trimmedSearchTerm)
 }
 
+const getProductAvailabilityCount = (product: CatalogProduct): number => {
+  const totalAvailability = Number(product.totalAvailability ?? 0)
+
+  if (Number.isFinite(totalAvailability)) {
+    return totalAvailability
+  }
+
+  return 0
+}
+
 const productIsSafeToDisplay = (product: CatalogProduct): boolean => {
   if (product.visible === false) return false
   if (!product.ingramPartNumber) return false
   if (!product.description) return false
 
   if (product.sellPrice == null || product.sellPrice <= 0) {
+    return false
+  }
+
+  if (getProductAvailabilityCount(product) <= 0) {
     return false
   }
 
@@ -206,6 +220,21 @@ export const useCatalog = () => {
         setAllProducts(products)
 
         console.log('Loaded cached catalog products:', products.length)
+
+        console.log('Catalog availability debug:', {
+          totalProducts: products.length,
+          displayableProducts: products.filter(productIsSafeToDisplay).length,
+          withAvailability: products.filter(
+            (product) => getProductAvailabilityCount(product) > 0,
+          ).length,
+          zeroAvailability: products.filter(
+            (product) => getProductAvailabilityCount(product) <= 0,
+          ).length,
+          firstProduct: products[0],
+          firstAvailability: products[0]
+            ? getProductAvailabilityCount(products[0])
+            : null,
+        })
 
         console.log('Catalog image debug:', {
           totalProducts: products.length,

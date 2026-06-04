@@ -117,6 +117,16 @@ function hasBasicLookupData(product: IngramCatalogProduct): boolean {
   return hasUpc || hasBrandAndPart;
 }
 
+function hasSellablePrice(product: IngramCatalogProduct): boolean {
+  const price = getProductPrice(product);
+
+  return Number.isFinite(price) && price > 0;
+}
+
+function isAvailableForCatalog(product: IngramCatalogProduct): boolean {
+  return product.available === true && getAvailabilityCount(product) > 0;
+}
+
 function shouldCheckProduct(product: IngramCatalogProduct): boolean {
   if (!hasBasicLookupData(product)) {
     return false;
@@ -130,17 +140,13 @@ function shouldCheckProduct(product: IngramCatalogProduct): boolean {
     return false;
   }
 
-  if (product.customerAuthorization === false) {
+  if (!hasSellablePrice(product)) {
     return false;
   }
 
-  if (product.isPriceVisible === false) {
-    return false;
-  }
-
-  const price = getProductPrice(product);
-
-  if (!Number.isFinite(price) || price <= 0) {
+  // Production catalog rule:
+  // Do not spend Icecat calls on products we do not want to offer publicly.
+  if (!isAvailableForCatalog(product)) {
     return false;
   }
 
@@ -227,18 +233,12 @@ function logCandidateStats(sourceProducts: IngramCatalogProduct[]): void {
 
   console.log(
     "Products with sellable price:",
-    sourceProducts.filter((product) => {
-      const price = getProductPrice(product);
-      return Number.isFinite(price) && price > 0;
-    }).length,
+    sourceProducts.filter(hasSellablePrice).length,
   );
 
   console.log(
     "Products available:",
-    sourceProducts.filter(
-      (product) =>
-        product.available === true && getAvailabilityCount(product) > 0,
-    ).length,
+    sourceProducts.filter(isAvailableForCatalog).length,
   );
 
   console.log(

@@ -8,6 +8,18 @@ import {
   useCatalog,
 } from './useCatalog'
 
+const getAvailabilityCount = (
+  totalAvailability: number | string | null | undefined,
+): number => {
+  const availabilityCount = Number(totalAvailability ?? 0)
+
+  if (!Number.isFinite(availabilityCount)) {
+    return 0
+  }
+
+  return availabilityCount
+}
+
 function Catalog() {
   const {
     catalogCategories,
@@ -178,6 +190,10 @@ function Catalog() {
                   productName,
                 )}&sku=${encodeURIComponent(product.ingramPartNumber ?? '')}`
 
+                const availabilityCount = getAvailabilityCount(
+                  product.totalAvailability,
+                )
+
                 return (
                   <article
                     className="product-card"
@@ -228,9 +244,8 @@ function Catalog() {
                       )}
 
                       <p className="product-meta product-availability">
-                        {product.totalAvailability != null &&
-                        product.totalAvailability > 0
-                          ? `Supplier stock: ${product.totalAvailability}`
+                        {availabilityCount > 0
+                          ? `Supplier stock: ${availabilityCount}`
                           : 'Availability confirmed before payment'}
                       </p>
 

@@ -174,7 +174,14 @@ function getProductPrice(product: IngramProduct): number {
   return Number(product.sellPrice ?? product.msrp ?? product.cost ?? 0);
 }
 
-function normalizeVendorName(ingram: IngramProduct, icecat?: IcecatProduct): string | null {
+function getAvailabilityCount(product: IngramProduct): number {
+  return Number(product.totalAvailability ?? 0);
+}
+
+function normalizeVendorName(
+  ingram: IngramProduct,
+  icecat?: IcecatProduct,
+): string | null {
   const icecatBrand = cleanString(icecat?.brand);
 
   if (icecatBrand) {
@@ -189,14 +196,20 @@ function normalizeVendorName(ingram: IngramProduct, icecat?: IcecatProduct): str
 
   const upperVendorName = vendorName.toUpperCase();
 
-  if (upperVendorName.includes("HP INC") || upperVendorName === "HEWLETT PACKARD") {
+  if (
+    upperVendorName.includes("HP INC") ||
+    upperVendorName === "HEWLETT PACKARD"
+  ) {
     return "HP";
   }
 
   return vendorName;
 }
 
-function getDisplayName(ingram: IngramProduct, icecat?: IcecatProduct): string | null {
+function getDisplayName(
+  ingram: IngramProduct,
+  icecat?: IcecatProduct,
+): string | null {
   return (
     cleanString(icecat?.title) ||
     cleanString(ingram.extraDescription) ||
@@ -207,7 +220,10 @@ function getDisplayName(ingram: IngramProduct, icecat?: IcecatProduct): string |
   );
 }
 
-function getExtraDescription(ingram: IngramProduct, icecat?: IcecatProduct): string | null {
+function getExtraDescription(
+  ingram: IngramProduct,
+  icecat?: IcecatProduct,
+): string | null {
   return (
     cleanString(ingram.extraDescription) ||
     cleanString(icecat?.title) ||
@@ -216,7 +232,10 @@ function getExtraDescription(ingram: IngramProduct, icecat?: IcecatProduct): str
   );
 }
 
-function getFullDescription(ingram: IngramProduct, icecat?: IcecatProduct): string | null {
+function getFullDescription(
+  ingram: IngramProduct,
+  icecat?: IcecatProduct,
+): string | null {
   const icecatDescription = cleanHtml(icecat?.description);
 
   return (
@@ -232,7 +251,14 @@ function hasValidImage(icecat?: IcecatProduct): boolean {
   return Boolean(icecat?.matched && icecat?.imageUrl);
 }
 
-function shouldIncludeProduct(ingram: IngramProduct, icecat?: IcecatProduct): boolean {
+function isAvailableForCatalog(ingram: IngramProduct): boolean {
+  return ingram.available === true && getAvailabilityCount(ingram) > 0;
+}
+
+function shouldIncludeProduct(
+  ingram: IngramProduct,
+  icecat?: IcecatProduct,
+): boolean {
   if (!cleanString(ingram.ingramPartNumber)) {
     return false;
   }
@@ -245,17 +271,15 @@ function shouldIncludeProduct(ingram: IngramProduct, icecat?: IcecatProduct): bo
     return false;
   }
 
-  if (ingram.customerAuthorization === false) {
-    return false;
-  }
-
-  if (ingram.isPriceVisible === false) {
-    return false;
-  }
-
   const price = getProductPrice(ingram);
 
   if (!Number.isFinite(price) || price <= 0) {
+    return false;
+  }
+
+  // Production public catalog rule:
+  // only list products that Ingram currently reports as available.
+  if (!isAvailableForCatalog(ingram)) {
     return false;
   }
 
@@ -348,7 +372,7 @@ export async function buildProductCatalogCache(): Promise<ProductCatalogFile> {
       sellPrice,
 
       available: ingram.available === true,
-      totalAvailability: Number(ingram.totalAvailability ?? 0),
+      totalAvailability: getAvailabilityCount(ingram),
 
       imageUrl: icecat?.imageUrl ?? null,
       thumbnailUrl: icecat?.thumbnailUrl ?? null,
@@ -398,8 +422,11 @@ export async function buildProductCatalogCache(): Promise<ProductCatalogFile> {
 
     ingramProductCount: ingramProducts.length,
     icecatProductCount: icecatProducts.length,
-    icecatMatchedCount: icecatProducts.filter((product) => product.matched).length,
-    icecatWithImageCount: icecatProducts.filter((product) => Boolean(product.imageUrl)).length,
+    icecatMatchedCount: icecatProducts.filter((product) => product.matched)
+      .length,
+    icecatWithImageCount: icecatProducts.filter((product) =>
+      Boolean(product.imageUrl),
+    ).length,
 
     products,
   };
