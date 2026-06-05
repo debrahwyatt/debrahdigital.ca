@@ -32,7 +32,7 @@ $dbName = 'debra512_shop_user';
 $dbUser = 'debra512_shop';
 $dbPass = 'l(LwCA6=SeeWt;n[';
 
-$expectedToken = 'SQUARE_IMPORT_TOKEN=pHghAEdP6jOYjp79X6xDcJ5fBqOfQUwb09rIfeGYhe75ff8c29fMFGYHPcYemDLa';
+$expectedToken = 'pHghAEdP6jOYjp79X6xDcJ5fBqOfQUwb09rIfeGYhe75ff8c29fMFGYHPcYemDLa';
 
 $headers = getallheaders();
 
