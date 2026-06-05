@@ -28,9 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
  * Update these to match your existing catalog DB connection.
  */
 $dbHost = 'localhost';
-$dbName = 'YOUR_DATABASE_NAME';
-$dbUser = 'YOUR_DATABASE_USER';
-$dbPass = 'YOUR_DATABASE_PASSWORD';
+$dbName = 'debra512_shop_user';
+$dbUser = 'debra512_shop';
+$dbPass = 'l(LwCA6=SeeWt;n[';
 
 $expectedToken = 'YOUR_SQUARE_IMPORT_TOKEN';
 

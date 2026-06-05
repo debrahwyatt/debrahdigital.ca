@@ -26,9 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
  * Update these to match your existing catalog DB connection.
  */
 $dbHost = 'localhost';
-$dbName = 'YOUR_DATABASE_NAME';
-$dbUser = 'YOUR_DATABASE_USER';
-$dbPass = 'YOUR_DATABASE_PASSWORD';
+$dbName = 'debra512_shop';
+$dbUser = 'debra512_shop_user';
+$dbPass = 'l(LwCA6=SeeWt;n[';
 
 try {
     $pdo = new PDO(
