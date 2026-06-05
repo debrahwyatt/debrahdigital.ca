@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 header('Content-Type: application/json');
 
-$IMPORT_TOKEN = 'CKrMI9uKpeA9pwLsyIPJekYJUbb67cOXcjM5Lr3gz1PIGedqPXCLHvIvXzHzXfCO';
+$IMPORT_TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
 $providedToken = $_SERVER['HTTP_X_CATALOG_IMPORT_TOKEN'] ?? '';
 
@@ -29,9 +29,9 @@ if (!is_array($data) || !isset($data['products']) || !is_array($data['products']
     exit;
 }
 
-$dsn = 'mysql:host=localhost;dbname=debra512_catalog;charset=utf8mb4';
-$dbUser = 'debra512_catalog_user';
-$dbPass = 'Xxth$k(NrSn*B8t2';
+$dsn = 'mysql:host=localhost;dbname=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX;charset=utf8mb4';
+$dbUser = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+$dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
 function mysqlDate(?string $iso): ?string {
     if (!$iso) {

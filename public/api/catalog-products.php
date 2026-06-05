@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 header('Content-Type: application/json');
 
-$dsn = 'mysql:host=localhost;dbname=debra512_catalog;charset=utf8mb4';
-$dbUser = 'debra512_catalog_user';
-$dbPass = 'Xxth$k(NrSn*B8t2';
+$dsn = 'mysql:host=localhost;dbname=XXXXXXXXXXXXXXXX;charset=utf8mb4';
+$dbUser = 'XXXXXXXXXXXXXXXXXX';
+$dbPass = 'XXXXXXXXXXXXXX';
 
 $category = $_GET['category'] ?? null;
 $search = trim($_GET['search'] ?? '');

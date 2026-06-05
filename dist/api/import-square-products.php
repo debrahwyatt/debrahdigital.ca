@@ -28,11 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
  * Update these to match your existing catalog DB connection.
  */
 $dbHost = 'localhost';
-$dbName = 'debra512_shop';
-$dbUser = 'debra512_shop_user';
-$dbPass = 'l(LwCA6=SeeWt;n[';
+$dbName = 'XXXXXXXXXXXXXXXXXXXX';
+$dbUser = 'XXXXXXXXXXXXXXXXXXXXXXXX';
+$dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXX';
 
-$expectedToken = 'pHghAEdP6jOYjp79X6xDcJ5fBqOfQUwb09rIfeGYhe75ff8c29fMFGYHPcYemDLa';
+$expectedToken = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
 $headers = getallheaders();
 
