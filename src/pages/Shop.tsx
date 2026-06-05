@@ -19,8 +19,8 @@ type Product = {
   updatedAt: string
 }
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3001'
+const SHOP_PRODUCTS_URL =
+  import.meta.env.VITE_SHOP_PRODUCTS_URL ?? '/api/square-products.php'
 
 function Shop() {
   const [products, setProducts] = useState<Product[]>([])
@@ -33,13 +33,21 @@ function Shop() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/square/products`)
+        setIsLoading(true)
+        setError('')
+
+        const response = await fetch(SHOP_PRODUCTS_URL)
 
         if (!response.ok) {
-          throw new Error('Failed to load products')
+          throw new Error(`Failed to load products: ${response.status}`)
         }
 
         const data = await response.json()
+
+        if (!Array.isArray(data)) {
+          throw new Error('Product API did not return an array')
+        }
+
         setProducts(data)
       } catch (err) {
         setError('Unable to load shop products right now.')
@@ -53,7 +61,11 @@ function Shop() {
   }, [])
 
   const categories = Array.from(
-    new Set(products.map((product) => product.categoryName)),
+    new Set(
+      products
+        .map((product) => product.categoryName)
+        .filter((category): category is string => Boolean(category)),
+    ),
   ).sort()
 
   const filteredProducts = products
