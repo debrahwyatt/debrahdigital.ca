@@ -59,7 +59,7 @@ function getImportEnvironment(): string {
 function getShopDatabaseName(): string {
     return getImportEnvironment() === 'development'
         ? 'debra512_shop_dev'
-        : 'debrah512_shop';
+        : 'debra512_shop';
 }
 
 function mysqlDate(?string $value): ?string {

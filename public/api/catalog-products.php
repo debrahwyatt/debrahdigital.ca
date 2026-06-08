@@ -37,7 +37,7 @@ function getCatalogDatabaseName(): string {
         return 'debra512_catalog_dev';
     }
 
-    return 'debrah512_catalog';
+    return 'debra512_catalog';
 }
 
 $dbName = getCatalogDatabaseName();

@@ -37,7 +37,7 @@ function getShopDatabaseName(): string {
         return 'debra512_shop_dev';
     }
 
-    return 'debrah512_shop';
+    return 'debra512_shop';
 }
 
 function getEnvironmentFromDatabaseName(string $dbName): string {
