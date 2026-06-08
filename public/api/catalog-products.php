@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 header('Content-Type: application/json');
 
-$dbUser = 'XXXXXXXXXXXXXXXXXX';
+$dbUser = 'debrah512_catalog_user';
 $dbPass = 'XXXXXXXXXXXXXX';
 
 function getCatalogDatabaseName(): string {
@@ -14,10 +14,10 @@ function getCatalogDatabaseName(): string {
         str_contains($host, 'localhost') ||
         str_contains($host, '127.0.0.1')
     ) {
-        return 'catalog_dev';
+        return 'debrah512_catalog_dev';
     }
 
-    return 'catalog';
+    return 'debrah512_catalog';
 }
 
 $dbName = getCatalogDatabaseName();

@@ -29,7 +29,7 @@ if (!is_array($data) || !isset($data['products']) || !is_array($data['products']
     exit;
 }
 
-$dbUser = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+$dbUser = 'debrah512_catalog_user';
 $dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
 function getImportEnvironment(): string {
@@ -44,7 +44,7 @@ function getImportEnvironment(): string {
 
 function getCatalogDatabaseName(): string {
     return getImportEnvironment() === 'development'
-        ? 'catalog_dev'
+        ? 'debrah512_catalog_dev'
         : 'catalog';
 }
 

@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $dbHost = 'localhost';
-$dbUser = 'XXXXXXXXXXXXXXXXXXXXXXXX';
+$dbUser = 'debra512_shop_user';
 $dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXX';
 
 $expectedToken = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
@@ -58,8 +58,8 @@ function getImportEnvironment(): string {
 
 function getCatalogDatabaseName(): string {
     return getImportEnvironment() === 'development'
-        ? 'catalog_dev'
-        : 'catalog';
+        ? 'debra512_shop_dev'
+        : 'debrah512_shop';
 }
 
 function mysqlDate(?string $value): ?string {

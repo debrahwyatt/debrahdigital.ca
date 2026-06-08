@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 $dbHost = 'localhost';
-$dbUser = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+$dbUser = 'debra512_shop_user';
 $dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
 function getCatalogDatabaseName(): string {
@@ -34,10 +34,10 @@ function getCatalogDatabaseName(): string {
         str_contains($host, 'localhost') ||
         str_contains($host, '127.0.0.1')
     ) {
-        return 'catalog_dev';
+        return 'debra512_shop_dev';
     }
 
-    return 'catalog';
+    return 'debrah512_shop';
 }
 
 $dbName = getCatalogDatabaseName();
