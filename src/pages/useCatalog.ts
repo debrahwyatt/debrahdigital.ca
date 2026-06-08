@@ -66,35 +66,6 @@ const CATALOG_DATA_URL =
 
 const PRODUCTS_PER_PAGE = 24
 
-const getProductSearchText = (product: CatalogProduct): string => {
-  return [
-    product.description,
-    product.extraDescription,
-    product.vendorPartNumber,
-    product.vendorName,
-    product.category,
-    product.subCategory,
-    product.productType,
-    product.catalogCategory,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase()
-}
-
-const productMatchesSearch = (
-  product: CatalogProduct,
-  searchTerm: string,
-): boolean => {
-  const trimmedSearchTerm = searchTerm.trim().toLowerCase()
-
-  if (!trimmedSearchTerm) {
-    return true
-  }
-
-  return getProductSearchText(product).includes(trimmedSearchTerm)
-}
-
 const getProductAvailabilityCount = (product: CatalogProduct): number => {
   const totalAvailability = Number(product.totalAvailability ?? 0)
 
@@ -362,15 +333,7 @@ export const useCatalog = () => {
   */
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
-      if (product.catalogCategory !== selectedCategory) {
-        return false
-      }
-
       if (!productIsSafeToDisplay(product)) {
-        return false
-      }
-
-      if (!productMatchesSearch(product, searchTerm)) {
         return false
       }
 
@@ -378,8 +341,6 @@ export const useCatalog = () => {
     })
   }, [
     allProducts,
-    selectedCategory,
-    searchTerm,
   ])
 
   /*

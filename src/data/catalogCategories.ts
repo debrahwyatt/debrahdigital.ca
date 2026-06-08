@@ -9,16 +9,8 @@ export const catalogCategories: CatalogCategory[] = [
     value: 'all',
   },
   {
-    label: 'Cables',
-    value: 'cables',
-  },
-  {
     label: 'Accessories',
     value: 'accessories',
-  },
-  {
-    label: 'Supplies & Media',
-    value: 'supplies-and-media',
   },
   {
     label: 'Power Protection / UPS',
@@ -27,10 +19,6 @@ export const catalogCategories: CatalogCategory[] = [
   {
     label: 'Network Devices',
     value: 'network-devices',
-  },
-  {
-    label: 'Storage Devices',
-    value: 'storage-devices',
   },
   {
     label: 'Input/Output Devices',
@@ -71,13 +59,5 @@ export const catalogCategories: CatalogCategory[] = [
   {
     label: 'Presentation Devices',
     value: 'presentation-devices',
-  },
-  {
-    label: 'Software',
-    value: 'software',
-  },
-  {
-    label: 'Professional Sound',
-    value: 'professional-sound',
   },
 ]
