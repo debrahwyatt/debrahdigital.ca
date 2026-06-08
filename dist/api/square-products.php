@@ -26,7 +26,7 @@ $dbHost = 'localhost';
 $dbUser = 'debra512_shop_user';
 $dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
-function getCatalogDatabaseName(): string {
+function getShopDatabaseName(): string {
     $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
 
     if (
@@ -40,7 +40,11 @@ function getCatalogDatabaseName(): string {
     return 'debrah512_shop';
 }
 
-$dbName = getCatalogDatabaseName();
+function getEnvironmentFromDatabaseName(string $dbName): string {
+    return str_ends_with($dbName, '_dev') ? 'development' : 'production';
+}
+
+$dbName = getShopDatabaseName();
 
 try {
     $pdo = new PDO(
@@ -146,7 +150,7 @@ try {
     echo json_encode([
         'products' => $products,
         'total' => count($products),
-        'environment' => $dbName === 'catalog_dev' ? 'development' : 'production',
+        'environment' => getEnvironmentFromDatabaseName($dbName),
     ]);
 } catch (Throwable $error) {
     http_response_code(500);

@@ -56,7 +56,7 @@ function getImportEnvironment(): string {
     return 'production';
 }
 
-function getCatalogDatabaseName(): string {
+function getShopDatabaseName(): string {
     return getImportEnvironment() === 'development'
         ? 'debra512_shop_dev'
         : 'debrah512_shop';
@@ -75,158 +75,6 @@ function mysqlDate(?string $value): ?string {
     } catch (Exception $e) {
         return null;
     }
-}
-
-function safeFilePart(string $value): string {
-    $value = preg_replace('/[^A-Za-z0-9_-]+/', '-', $value);
-    $value = trim((string)$value, '-');
-
-    return $value !== '' ? $value : 'image';
-}
-
-function getImageExtensionFromContentType(?string $contentType): string {
-    $contentType = strtolower(trim((string)$contentType));
-
-    if (str_contains($contentType, 'image/png')) {
-        return 'png';
-    }
-
-    if (str_contains($contentType, 'image/webp')) {
-        return 'webp';
-    }
-
-    if (str_contains($contentType, 'image/gif')) {
-        return 'gif';
-    }
-
-    return 'jpg';
-}
-
-function downloadUrl(string $url): array {
-    if (function_exists('curl_init')) {
-        $ch = curl_init($url);
-
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_CONNECTTIMEOUT => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_USERAGENT => 'DebrahsDigitalSolutionsSquareImporter/1.0',
-            CURLOPT_HEADER => true,
-        ]);
-
-        $response = curl_exec($ch);
-
-        if ($response === false) {
-            $error = curl_error($ch);
-            curl_close($ch);
-
-            return [
-                'ok' => false,
-                'body' => null,
-                'contentType' => null,
-                'error' => $error,
-            ];
-        }
-
-        $statusCode = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        $headerSize = (int)curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-
-        curl_close($ch);
-
-        $body = substr((string)$response, $headerSize);
-
-        return [
-            'ok' => $statusCode >= 200 && $statusCode < 300 && $body !== '',
-            'body' => $body,
-            'contentType' => is_string($contentType) ? $contentType : null,
-            'error' => null,
-        ];
-    }
-
-    $context = stream_context_create([
-        'http' => [
-            'method' => 'GET',
-            'timeout' => 30,
-            'header' => "User-Agent: DebrahsDigitalSolutionsSquareImporter/1.0\r\n",
-        ],
-    ]);
-
-    $body = @file_get_contents($url, false, $context);
-
-    if ($body === false || $body === '') {
-        return [
-            'ok' => false,
-            'body' => null,
-            'contentType' => null,
-            'error' => 'file_get_contents failed',
-        ];
-    }
-
-    $contentType = null;
-
-    if (isset($http_response_header) && is_array($http_response_header)) {
-        foreach ($http_response_header as $header) {
-            if (stripos($header, 'Content-Type:') === 0) {
-                $contentType = trim(substr($header, strlen('Content-Type:')));
-                break;
-            }
-        }
-    }
-
-    return [
-        'ok' => true,
-        'body' => $body,
-        'contentType' => $contentType,
-        'error' => null,
-    ];
-}
-
-function cacheSquareImage(?string $variationId, ?string $imageUrl): ?string {
-    $imageUrl = trim((string)$imageUrl);
-
-    if ($imageUrl === '') {
-        return null;
-    }
-
-    if (str_starts_with($imageUrl, '/uploads/')) {
-        return $imageUrl;
-    }
-
-    if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-        return $imageUrl;
-    }
-
-    $publicRoot = dirname(__DIR__);
-    $uploadDir = $publicRoot . '/uploads/square-images';
-    $publicBasePath = '/uploads/square-images';
-
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-
-    $baseName = safeFilePart((string)$variationId);
-
-    $existing = glob($uploadDir . '/' . $baseName . '.*');
-
-    if (is_array($existing) && count($existing) > 0) {
-        return $publicBasePath . '/' . basename($existing[0]);
-    }
-
-    $download = downloadUrl($imageUrl);
-
-    if (!$download['ok'] || !is_string($download['body'])) {
-        return $imageUrl;
-    }
-
-    $extension = getImageExtensionFromContentType($download['contentType']);
-    $filename = $baseName . '.' . $extension;
-    $filePath = $uploadDir . '/' . $filename;
-
-    file_put_contents($filePath, $download['body']);
-
-    return $publicBasePath . '/' . $filename;
 }
 
 $rawBody = file_get_contents('php://input');
@@ -263,7 +111,7 @@ if (!is_array($products)) {
     exit;
 }
 
-$dbName = getCatalogDatabaseName();
+$dbName = getShopDatabaseName();
 
 try {
     $pdo = new PDO(
@@ -378,7 +226,6 @@ try {
     ");
 
     $activeVariationIds = [];
-    $cachedImages = 0;
 
     foreach ($products as $product) {
         if (!is_array($product)) {
@@ -401,16 +248,6 @@ try {
             $imageIds = [];
         }
 
-        $originalImageUrl = isset($product['imageUrl']) && $product['imageUrl'] !== ''
-            ? (string)$product['imageUrl']
-            : null;
-
-        $imageUrl = cacheSquareImage($variationId, $originalImageUrl);
-
-        if ($imageUrl !== null && $imageUrl !== $originalImageUrl) {
-            $cachedImages++;
-        }
-
         $stmt->execute([
             ':variation_id' => $variationId,
             ':square_id' => (string)($product['id'] ?? ''),
@@ -430,7 +267,9 @@ try {
             ':primary_image_id' => isset($product['primaryImageId']) && $product['primaryImageId'] !== ''
                 ? (string)$product['primaryImageId']
                 : null,
-            ':image_url' => $imageUrl ?? $originalImageUrl,
+            ':image_url' => isset($product['imageUrl']) && $product['imageUrl'] !== ''
+                ? (string)$product['imageUrl']
+                : null,
 
             ':category_id' => (string)($product['categoryId'] ?? ''),
             ':category_name' => (string)($product['categoryName'] ?? 'Uncategorized'),
@@ -473,7 +312,6 @@ try {
         'database' => $dbName,
         'receivedCount' => count($products),
         'importedCount' => count($activeVariationIds),
-        'cachedImages' => $cachedImages,
         'exportedAt' => $exportedAt,
     ]);
 } catch (Throwable $error) {
