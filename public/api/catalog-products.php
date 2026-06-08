@@ -40,7 +40,87 @@ function getCatalogDatabaseName(): string {
     return 'debra512_catalog';
 }
 
+function getEnvironmentFromDatabaseName(string $dbName): string {
+    return str_ends_with($dbName, '_dev') ? 'development' : 'production';
+}
+
 $dbName = getCatalogDatabaseName();
+
+$category = $_GET['category'] ?? null;
+$search = trim((string)($_GET['search'] ?? ''));
+$sort = $_GET['sort'] ?? 'price-low';
+$ingramPartNumber = trim((string)($_GET['ingramPartNumber'] ?? ''));
+
+$page = max(1, (int)($_GET['page'] ?? 1));
+$pageSize = min(100, max(1, (int)($_GET['pageSize'] ?? 24)));
+
+if ($ingramPartNumber !== '') {
+    $page = 1;
+    $pageSize = 1;
+}
+
+$offset = ($page - 1) * $pageSize;
+
+$where = [
+    'visible = 1',
+    'available = 1',
+    'sell_price > 0',
+];
+
+$params = [];
+
+if ($ingramPartNumber !== '') {
+    $where[] = 'ingram_part_number = :ingram_part_number';
+    $params[':ingram_part_number'] = $ingramPartNumber;
+} else {
+    if ($category && $category !== 'all') {
+        $where[] = 'catalog_category = :category';
+        $params[':category'] = $category;
+    }
+
+    if ($search !== '') {
+        $where[] = '(
+            description LIKE :search
+            OR extra_description LIKE :search
+            OR full_description LIKE :search
+            OR vendor_name LIKE :search
+            OR vendor_part_number LIKE :search
+            OR ingram_part_number LIKE :search
+            OR upc LIKE :search
+            OR category LIKE :search
+            OR sub_category LIKE :search
+            OR product_type LIKE :search
+            OR catalog_category LIKE :search
+        )';
+
+        $params[':search'] = '%' . $search . '%';
+    }
+}
+
+$whereSql = implode(' AND ', $where);
+
+switch ($sort) {
+    case 'price-high':
+        $orderSql = 'sell_price DESC, description ASC';
+        break;
+
+    case 'za':
+        $orderSql = 'description DESC';
+        break;
+
+    case 'az':
+        $orderSql = 'description ASC';
+        break;
+
+    case 'availability':
+        $orderSql = 'total_availability DESC, sell_price ASC, description ASC';
+        break;
+
+    case 'price-low':
+    default:
+        $orderSql = 'sell_price ASC, description ASC';
+        break;
+}
 
 try {
     $pdo = new PDO(
@@ -53,107 +133,117 @@ try {
         ],
     );
 
-    $stmt = $pdo->query("
-        SELECT
-            variation_id,
-            square_id,
-
-            name,
-            description,
-
-            price_cents,
-            price,
-            currency,
-
-            sku,
-
-            image_ids_json,
-            primary_image_id,
-            image_url,
-
-            category_id,
-            category_name,
-
-            track_inventory,
-            stockable,
-            sellable,
-            sold_out,
-
-            inventory_alert_threshold,
-
-            quantity,
-
-            square_updated_at,
-            exported_at,
-            imported_at
-        FROM square_products
-        WHERE sellable = 1
-          AND sold_out = 0
-          AND quantity > 0
-        ORDER BY name ASC
+    $countStmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM catalog_products
+        WHERE {$whereSql}
     ");
 
-    $rows = $stmt->fetchAll();
+    $countStmt->execute($params);
+    $total = (int)$countStmt->fetchColumn();
 
-    $products = array_map(function (array $row): array {
-        $imageIds = json_decode((string)$row['image_ids_json'], true);
+    $stmt = $pdo->prepare("
+        SELECT
+            ingram_part_number AS ingramPartNumber,
+            vendor_part_number AS vendorPartNumber,
+            upc,
 
-        if (!is_array($imageIds)) {
-            $imageIds = [];
+            vendor_name AS vendorName,
+            description,
+            extra_description AS extraDescription,
+            full_description AS fullDescription,
+
+            category,
+            sub_category AS subCategory,
+            product_type AS productType,
+            catalog_category AS catalogCategory,
+
+            currency,
+            cost,
+            sell_price AS sellPrice,
+
+            available,
+            total_availability AS totalAvailability,
+
+            image_url AS imageUrl,
+            thumbnail_url AS thumbnailUrl,
+            brand_logo_url AS brandLogoUrl,
+            gallery_urls AS galleryUrls,
+
+            features,
+            specifications,
+
+            visible,
+
+            icecat_id AS icecatId,
+            icecat_matched AS icecatMatched,
+            icecat_matched_by AS icecatMatchedBy,
+            icecat_last_checked_at AS icecatLastCheckedAt,
+
+            source_last_synced_at AS lastSyncedAt
+        FROM catalog_products
+        WHERE {$whereSql}
+        ORDER BY {$orderSql}
+        LIMIT :limit OFFSET :offset
+    ");
+
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
+
+    $stmt->bindValue(':limit', $pageSize, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+    $stmt->execute();
+
+    $products = $stmt->fetchAll();
+
+    foreach ($products as &$product) {
+        $product['cost'] = isset($product['cost'])
+            ? (float)$product['cost']
+            : null;
+
+        $product['sellPrice'] = isset($product['sellPrice'])
+            ? (float)$product['sellPrice']
+            : null;
+
+        $product['available'] = (bool)$product['available'];
+        $product['visible'] = (bool)$product['visible'];
+
+        $product['totalAvailability'] = (int)($product['totalAvailability'] ?? 0);
+
+        $product['icecatMatched'] = (bool)$product['icecatMatched'];
+
+        if ($product['icecatId'] !== null) {
+            $product['icecatId'] = is_numeric($product['icecatId'])
+                ? (int)$product['icecatId']
+                : $product['icecatId'];
         }
 
-        return [
-            'id' => (string)$row['square_id'],
-            'variationId' => (string)$row['variation_id'],
+        $product['galleryUrls'] = json_decode($product['galleryUrls'] ?? '[]', true) ?: [];
+        $product['features'] = json_decode($product['features'] ?? '[]', true) ?: [];
+        $product['specifications'] = json_decode($product['specifications'] ?? '[]', true) ?: [];
+    }
 
-            'name' => (string)$row['name'],
-            'description' => (string)$row['description'],
-
-            'priceCents' => (int)$row['price_cents'],
-            'price' => (float)$row['price'],
-            'currency' => (string)$row['currency'],
-
-            'sku' => $row['sku'] !== null ? (string)$row['sku'] : null,
-
-            'imageIds' => $imageIds,
-            'primaryImageId' => $row['primary_image_id'] !== null
-                ? (string)$row['primary_image_id']
-                : null,
-            'imageUrl' => $row['image_url'] !== null
-                ? (string)$row['image_url']
-                : null,
-
-            'categoryId' => (string)$row['category_id'],
-            'categoryName' => (string)$row['category_name'],
-
-            'trackInventory' => (bool)$row['track_inventory'],
-            'stockable' => (bool)$row['stockable'],
-            'sellable' => (bool)$row['sellable'],
-            'soldOut' => (bool)$row['sold_out'],
-
-            'inventoryAlertThreshold' => $row['inventory_alert_threshold'] !== null
-                ? (int)$row['inventory_alert_threshold']
-                : null,
-
-            'quantity' => (int)$row['quantity'],
-
-            'updatedAt' => (string)$row['square_updated_at'],
-            'exportedAt' => (string)$row['exported_at'],
-            'importedAt' => (string)$row['imported_at'],
-        ];
-    }, $rows);
+    unset($product);
 
     echo json_encode([
         'products' => $products,
-        'total' => count($products),
-        'environment' => $dbName === 'catalog_dev' ? 'development' : 'production',
+        'page' => $page,
+        'pageSize' => $pageSize,
+        'total' => $total,
+        'totalPages' => max(1, (int)ceil($total / $pageSize)),
+        'environment' => getEnvironmentFromDatabaseName($dbName),
+        'database' => $dbName,
     ]);
 } catch (Throwable $error) {
     http_response_code(500);
 
     echo json_encode([
         'success' => false,
-        'error' => 'Failed to load Square products',
+        'error' => 'Failed to load catalog products',
+        'environment' => getEnvironmentFromDatabaseName($dbName),
+        'database' => $dbName,
         'details' => $error->getMessage(),
     ]);
 }

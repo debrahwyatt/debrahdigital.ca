@@ -248,7 +248,7 @@ export const useCatalog = () => {
   const [error, setError] = useState('')
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('laptops')
+  const [selectedCategory, setSelectedCategory] = useState('all')
   const [sortOption, setSortOption] = useState('price-low')
   const [currentPage, setCurrentPage] = useState(1)
 

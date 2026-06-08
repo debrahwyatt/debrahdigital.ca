@@ -1,239 +1,83 @@
 export type CatalogCategory = {
   label: string
   value: string
-  keywords: string[]
-  requiredTerms: string[]
-  blockedTerms: string[]
 }
-
-const sharedBlockedTerms = [
-  'apple',
-  'macbook',
-  'ipad',
-  'iphone',
-  'imac',
-
-  'battery',
-  'adapter',
-  'charger',
-  'power supply',
-  'ac adapter',
-  'power adapter',
-  'cable',
-
-  'dock',
-  'docking',
-  'docking station',
-
-  'sleeve',
-  'case',
-  'backpack',
-
-  'warranty',
-  'service',
-  'license',
-
-  'privacy filter',
-  'screen protector',
-  'replacement',
-  'spare',
-
-  'toner',
-  'ink cartridge',
-]
 
 export const catalogCategories: CatalogCategory[] = [
   {
-    label: 'Laptops',
-    value: 'laptops',
-    keywords: [
-      'ThinkBook',
-      'ThinkPad',
-      'EliteBook',
-      'ProBook',
-      'Latitude',
-      'Inspiron',
-      'Vostro',
-      'Chromebook',
-      'Vivobook',
-      'TravelMate',
-    ],
-    requiredTerms: [
-      'notebook',
-      'laptop',
-      'thinkbook',
-      'thinkpad',
-      'elitebook',
-      'probook',
-      'latitude',
-      'inspiron',
-      'vostro',
-      'chromebook',
-      'vivobook',
-      'travelmate',
-    ],
-    blockedTerms: [
-      ...sharedBlockedTerms,
-
-      // Accessory-specific storage/memory terms.
-      // Do NOT block plain "ssd", "ram", or "memory" because laptops contain those specs.
-      'memory module',
-      'memory upgrade',
-      'ram module',
-      'ssd upgrade',
-      'solid state drive',
-      'hard drive',
-      'm.2 drive',
-      'nvme drive',
-    ],
+    label: 'All Categories',
+    value: 'all',
   },
   {
-    label: 'Desktop PCs',
-    value: 'desktops',
-    keywords: [
-      'OptiPlex',
-      'ThinkCentre',
-      'ProDesk',
-      'EliteDesk',
-      'Vostro Desktop',
-      'Desktop PC',
-      'Mini PC',
-    ],
-    requiredTerms: [
-      'desktop',
-      'mini pc',
-      'optiplex',
-      'thinkcentre',
-      'prodesk',
-      'elitedesk',
-      'vostro',
-      'tower',
-    ],
-    blockedTerms: [
-      ...sharedBlockedTerms,
-      'memory module',
-      'memory upgrade',
-      'ram module',
-      'ssd upgrade',
-      'solid state drive',
-      'hard drive',
-      'm.2 drive',
-      'nvme drive',
-    ],
+    label: 'Cables',
+    value: 'cables',
   },
   {
-    label: 'Monitors',
-    value: 'monitors',
-    keywords: [
-      'ThinkVision',
-      'UltraSharp',
-      'ProDisplay',
-      'Dell Monitor',
-      'HP Monitor',
-      'Lenovo Monitor',
-      'LED Monitor',
-      'LCD Monitor',
-    ],
-    requiredTerms: [
-      'monitor',
-      'display',
-      'lcd',
-      'led',
-      'thinkvision',
-      'ultrasharp',
-      'prodisplay',
-    ],
-    blockedTerms: [
-      ...sharedBlockedTerms,
-      'mount',
-      'stand',
-      'arm',
-      'privacy screen',
-    ],
+    label: 'Accessories',
+    value: 'accessories',
   },
   {
-    label: 'Printers',
-    value: 'printers',
-    keywords: [
-      'LaserJet',
-      'OfficeJet',
-      'Brother printer',
-      'Canon printer',
-      'Epson printer',
-    ],
-    requiredTerms: [
-      'printer',
-      'laserjet',
-      'officejet',
-      'brother',
-      'canon',
-      'epson',
-      'multifunction',
-      'mfp',
-    ],
-    blockedTerms: [
-      'toner',
-      'ink cartridge',
-      'drum',
-      'maintenance kit',
-      'fuser',
-      'printhead',
-      'paper tray',
-      'label',
-      'ribbon',
-      'warranty',
-      'service',
-    ],
+    label: 'Supplies & Media',
+    value: 'supplies-and-media',
   },
   {
-    label: 'All-in-One PCs',
-    value: 'all-in-one',
-    keywords: [
-      'All-in-One PC',
-      'AIO Desktop',
-      'ThinkCentre AIO',
-      'HP All-in-One',
-      'Dell All-in-One',
-    ],
-    requiredTerms: [
-      'all-in-one',
-      'all in one',
-      'aio',
-      'thinkcentre aio',
-    ],
-    blockedTerms: [
-      ...sharedBlockedTerms,
-      'memory module',
-      'memory upgrade',
-      'ram module',
-      'ssd upgrade',
-      'solid state drive',
-      'hard drive',
-    ],
+    label: 'Power Protection / UPS',
+    value: 'power-protection-ups',
   },
   {
-    label: 'Business Workstations',
-    value: 'workstations',
-    keywords: [
-      'Precision Workstation',
-      'ZBook',
-      'ThinkStation',
-      'Workstation',
-    ],
-    requiredTerms: [
-      'workstation',
-      'precision',
-      'zbook',
-      'thinkstation',
-    ],
-    blockedTerms: [
-      ...sharedBlockedTerms,
-      'memory module',
-      'memory upgrade',
-      'ram module',
-      'ssd upgrade',
-      'solid state drive',
-      'hard drive',
-    ],
+    label: 'Network Devices',
+    value: 'network-devices',
+  },
+  {
+    label: 'Storage Devices',
+    value: 'storage-devices',
+  },
+  {
+    label: 'Input/Output Devices',
+    value: 'input-output-devices',
+  },
+  {
+    label: 'Displays',
+    value: 'displays',
+  },
+  {
+    label: 'Computer Systems',
+    value: 'computer-systems',
+  },
+  {
+    label: 'Data Capture / POS',
+    value: 'data-capture-pos',
+  },
+  {
+    label: 'System Components',
+    value: 'system-components',
+  },
+  {
+    label: 'Printers & Office Equipment',
+    value: 'printers-and-office-equipment',
+  },
+  {
+    label: 'Communications',
+    value: 'communications',
+  },
+  {
+    label: 'Imaging Devices',
+    value: 'imaging-devices',
+  },
+  {
+    label: 'Physical Security',
+    value: 'physical-security',
+  },
+  {
+    label: 'Presentation Devices',
+    value: 'presentation-devices',
+  },
+  {
+    label: 'Software',
+    value: 'software',
+  },
+  {
+    label: 'Professional Sound',
+    value: 'professional-sound',
   },
 ]
