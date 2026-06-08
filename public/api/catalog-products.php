@@ -3,66 +3,100 @@ declare(strict_types=1);
 
 header('Content-Type: application/json');
 
-$IMPORT_TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+$dbUser = 'XXXXXXXXXXXXXXXXXX';
+$dbPass = 'XXXXXXXXXXXXXX';
 
-$providedToken = $_SERVER['HTTP_X_CATALOG_IMPORT_TOKEN'] ?? '';
+function getCatalogDatabaseName(): string {
+    $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
 
-if (!hash_equals($IMPORT_TOKEN, $providedToken)) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
+    if (
+        str_starts_with($host, 'dev.') ||
+        str_contains($host, 'localhost') ||
+        str_contains($host, '127.0.0.1')
+    ) {
+        return 'catalog_dev';
+    }
 
-$rawBody = file_get_contents('php://input');
-
-if (!$rawBody) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Missing JSON body']);
-    exit;
-}
-
-$data = json_decode($rawBody, true);
-
-if (!is_array($data) || !isset($data['products']) || !is_array($data['products'])) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid catalog JSON']);
-    exit;
+    return 'catalog';
 }
 
 $dbName = getCatalogDatabaseName();
-
 $dsn = "mysql:host=localhost;dbname={$dbName};charset=utf8mb4";
-$dbUser = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
-$dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
-function getImportEnvironment(): string {
-    $env = strtolower(trim($_SERVER['HTTP_X_DDS_ENVIRONMENT'] ?? 'production'));
+$category = $_GET['category'] ?? null;
+$search = trim($_GET['search'] ?? '');
+$sort = $_GET['sort'] ?? 'price-low';
+$ingramPartNumber = trim($_GET['ingramPartNumber'] ?? '');
 
-    if ($env === 'development' || $env === 'dev') {
-        return 'development';
-    }
+$page = max(1, (int)($_GET['page'] ?? 1));
+$pageSize = min(100, max(1, (int)($_GET['pageSize'] ?? 24)));
 
-    return 'production';
+if ($ingramPartNumber !== '') {
+    $page = 1;
+    $pageSize = 1;
 }
 
-function getCatalogDatabaseName(): string {
-    $env = getImportEnvironment();
+$offset = ($page - 1) * $pageSize;
 
-    return $env === 'development'
-        ? 'catalog_dev'
-        : 'catalog';
+$where = [
+    'visible = 1',
+    'available = 1',
+    'sell_price > 0',
+];
+
+$params = [];
+
+if ($ingramPartNumber !== '') {
+    $where[] = 'ingram_part_number = :ingram_part_number';
+    $params[':ingram_part_number'] = $ingramPartNumber;
+} else {
+    if ($category) {
+        $where[] = 'catalog_category = :category';
+        $params[':category'] = $category;
+    }
+
+    if ($search !== '') {
+        $where[] = '(
+            description LIKE :search
+            OR extra_description LIKE :search
+            OR full_description LIKE :search
+            OR vendor_name LIKE :search
+            OR vendor_part_number LIKE :search
+            OR ingram_part_number LIKE :search
+            OR upc LIKE :search
+            OR category LIKE :search
+            OR sub_category LIKE :search
+            OR product_type LIKE :search
+            OR catalog_category LIKE :search
+        )';
+
+        $params[':search'] = '%' . $search . '%';
+    }
 }
 
-function mysqlDate(?string $iso): ?string {
-    if (!$iso) {
-        return null;
-    }
+$whereSql = implode(' AND ', $where);
 
-    try {
-        return (new DateTime($iso))->format('Y-m-d H:i:s');
-    } catch (Exception $e) {
-        return null;
-    }
+switch ($sort) {
+    case 'price-high':
+        $orderSql = 'sell_price DESC, description ASC';
+        break;
+
+    case 'za':
+        $orderSql = 'description DESC';
+        break;
+
+    case 'az':
+        $orderSql = 'description ASC';
+        break;
+
+    case 'availability':
+        $orderSql = 'total_availability DESC, sell_price ASC, description ASC';
+        break;
+
+    case 'price-low':
+    default:
+        $orderSql = 'sell_price ASC, description ASC';
+        break;
 }
 
 try {
@@ -71,215 +105,93 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 
-    $pdo->beginTransaction();
-
-    $syncStmt = $pdo->prepare("
-        INSERT INTO catalog_sync_runs (
-            source,
-            last_synced_at,
-            ingram_last_synced_at,
-            icecat_last_synced_at,
-            product_count,
-            ingram_product_count,
-            icecat_product_count,
-            icecat_matched_count,
-            icecat_with_image_count
-        ) VALUES (
-            :source,
-            :last_synced_at,
-            :ingram_last_synced_at,
-            :icecat_last_synced_at,
-            :product_count,
-            :ingram_product_count,
-            :icecat_product_count,
-            :icecat_matched_count,
-            :icecat_with_image_count
-        )
+    $countStmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM catalog_products
+        WHERE $whereSql
     ");
 
-    $syncStmt->execute([
-        ':source' => $data['source'] ?? 'unknown',
-        ':last_synced_at' => mysqlDate($data['lastSyncedAt'] ?? null),
-        ':ingram_last_synced_at' => mysqlDate($data['ingramLastSyncedAt'] ?? null),
-        ':icecat_last_synced_at' => mysqlDate($data['icecatLastSyncedAt'] ?? null),
-        ':product_count' => (int)($data['productCount'] ?? count($data['products'])),
-        ':ingram_product_count' => (int)($data['ingramProductCount'] ?? 0),
-        ':icecat_product_count' => (int)($data['icecatProductCount'] ?? 0),
-        ':icecat_matched_count' => (int)($data['icecatMatchedCount'] ?? 0),
-        ':icecat_with_image_count' => (int)($data['icecatWithImageCount'] ?? 0),
-    ]);
+    $countStmt->execute($params);
+    $total = (int)$countStmt->fetchColumn();
 
-    $syncRunId = (int)$pdo->lastInsertId();
-
-    $upsertStmt = $pdo->prepare("
-        INSERT INTO catalog_products (
-            ingram_part_number,
-            vendor_part_number,
+    $stmt = $pdo->prepare("
+        SELECT
+            ingram_part_number AS ingramPartNumber,
+            vendor_part_number AS vendorPartNumber,
             upc,
-            vendor_name,
+            vendor_name AS vendorName,
             description,
-            extra_description,
-            full_description,
+            extra_description AS extraDescription,
+            full_description AS fullDescription,
             category,
-            sub_category,
-            product_type,
-            catalog_category,
+            sub_category AS subCategory,
+            product_type AS productType,
+            catalog_category AS catalogCategory,
             currency,
-            cost,
-            sell_price,
+            sell_price AS sellPrice,
             available,
-            total_availability,
-            image_url,
-            thumbnail_url,
-            brand_logo_url,
-            gallery_urls,
+            total_availability AS totalAvailability,
+            image_url AS imageUrl,
+            thumbnail_url AS thumbnailUrl,
+            brand_logo_url AS brandLogoUrl,
+            gallery_urls AS galleryUrls,
             features,
             specifications,
             visible,
-            icecat_id,
-            icecat_matched,
-            icecat_matched_by,
-            icecat_last_checked_at,
-            source_last_synced_at,
-            sync_run_id
-        ) VALUES (
-            :ingram_part_number,
-            :vendor_part_number,
-            :upc,
-            :vendor_name,
-            :description,
-            :extra_description,
-            :full_description,
-            :category,
-            :sub_category,
-            :product_type,
-            :catalog_category,
-            :currency,
-            :cost,
-            :sell_price,
-            :available,
-            :total_availability,
-            :image_url,
-            :thumbnail_url,
-            :brand_logo_url,
-            :gallery_urls,
-            :features,
-            :specifications,
-            :visible,
-            :icecat_id,
-            :icecat_matched,
-            :icecat_matched_by,
-            :icecat_last_checked_at,
-            :source_last_synced_at,
-            :sync_run_id
-        )
-        ON DUPLICATE KEY UPDATE
-            vendor_part_number = VALUES(vendor_part_number),
-            upc = VALUES(upc),
-            vendor_name = VALUES(vendor_name),
-            description = VALUES(description),
-            extra_description = VALUES(extra_description),
-            full_description = VALUES(full_description),
-            category = VALUES(category),
-            sub_category = VALUES(sub_category),
-            product_type = VALUES(product_type),
-            catalog_category = VALUES(catalog_category),
-            currency = VALUES(currency),
-            cost = VALUES(cost),
-            sell_price = VALUES(sell_price),
-            available = VALUES(available),
-            total_availability = VALUES(total_availability),
-            image_url = VALUES(image_url),
-            thumbnail_url = VALUES(thumbnail_url),
-            brand_logo_url = VALUES(brand_logo_url),
-            gallery_urls = VALUES(gallery_urls),
-            features = VALUES(features),
-            specifications = VALUES(specifications),
-            visible = VALUES(visible),
-            icecat_id = VALUES(icecat_id),
-            icecat_matched = VALUES(icecat_matched),
-            icecat_matched_by = VALUES(icecat_matched_by),
-            icecat_last_checked_at = VALUES(icecat_last_checked_at),
-            source_last_synced_at = VALUES(source_last_synced_at),
-            sync_run_id = VALUES(sync_run_id)
+            icecat_id AS icecatId,
+            icecat_matched AS icecatMatched,
+            icecat_matched_by AS icecatMatchedBy,
+            icecat_last_checked_at AS icecatLastCheckedAt,
+            source_last_synced_at AS lastSyncedAt
+        FROM catalog_products
+        WHERE $whereSql
+        ORDER BY $orderSql
+        LIMIT :limit OFFSET :offset
     ");
 
-    $imported = 0;
-
-    foreach ($data['products'] as $product) {
-        if (empty($product['ingramPartNumber'])) {
-            continue;
-        }
-
-        $cost = (float)($product['cost'] ?? 0);
-        $sellPrice = (float)($product['sellPrice'] ?? 0);
-
-        if ($cost <= 0 || $sellPrice <= 0) {
-            continue;
-        }
-
-        $upsertStmt->execute([
-            ':ingram_part_number' => $product['ingramPartNumber'],
-            ':vendor_part_number' => $product['vendorPartNumber'] ?? null,
-            ':upc' => $product['upc'] ?? null,
-            ':vendor_name' => $product['vendorName'] ?? null,
-            ':description' => $product['description'] ?? '',
-            ':extra_description' => $product['extraDescription'] ?? null,
-            ':full_description' => $product['fullDescription'] ?? null,
-            ':category' => $product['category'] ?? null,
-            ':sub_category' => $product['subCategory'] ?? null,
-            ':product_type' => $product['productType'] ?? null,
-            ':catalog_category' => $product['catalogCategory'] ?? 'uncategorized',
-            ':currency' => $product['currency'] ?? 'CAD',
-            ':cost' => $cost,
-            ':sell_price' => $sellPrice,
-            ':available' => !empty($product['available']) ? 1 : 0,
-            ':total_availability' => (int)($product['totalAvailability'] ?? 0),
-            ':image_url' => $product['imageUrl'] ?? null,
-            ':thumbnail_url' => $product['thumbnailUrl'] ?? null,
-            ':brand_logo_url' => $product['brandLogoUrl'] ?? null,
-            ':gallery_urls' => json_encode($product['galleryUrls'] ?? []),
-            ':features' => json_encode($product['features'] ?? []),
-            ':specifications' => json_encode($product['specifications'] ?? []),
-            ':visible' => !empty($product['visible']) ? 1 : 0,
-            ':icecat_id' => $product['icecatId'] ?? null,
-            ':icecat_matched' => !empty($product['icecatMatched']) ? 1 : 0,
-            ':icecat_matched_by' => $product['icecatMatchedBy'] ?? null,
-            ':icecat_last_checked_at' => mysqlDate($product['icecatLastCheckedAt'] ?? null),
-            ':source_last_synced_at' => mysqlDate($product['lastSyncedAt'] ?? null),
-            ':sync_run_id' => $syncRunId,
-        ]);
-
-        $imported++;
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
     }
 
-    // Hide products that were not in the latest successful import.
-    $hideOldStmt = $pdo->prepare("
-        UPDATE catalog_products
-        SET visible = 0, available = 0
-        WHERE sync_run_id IS NULL OR sync_run_id != :sync_run_id
-    ");
+    $stmt->bindValue(':limit', $pageSize, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
-    $hideOldStmt->execute([
-        ':sync_run_id' => $syncRunId,
-    ]);
+    $stmt->execute();
 
-    $pdo->commit();
+    $products = $stmt->fetchAll();
+
+    foreach ($products as &$product) {
+        $product['sellPrice'] = (float)$product['sellPrice'];
+        $product['available'] = (bool)$product['available'];
+        $product['visible'] = (bool)$product['visible'];
+        $product['totalAvailability'] = (int)$product['totalAvailability'];
+
+        $product['icecatMatched'] = (bool)$product['icecatMatched'];
+
+        if ($product['icecatId'] !== null) {
+            $product['icecatId'] = (int)$product['icecatId'];
+        }
+
+        $product['galleryUrls'] = json_decode($product['galleryUrls'] ?? '[]', true) ?: [];
+        $product['features'] = json_decode($product['features'] ?? '[]', true) ?: [];
+        $product['specifications'] = json_decode($product['specifications'] ?? '[]', true) ?: [];
+    }
+
+    unset($product);
 
     echo json_encode([
-        'success' => true,
-        'syncRunId' => $syncRunId,
-        'imported' => $imported,
+        'products' => $products,
+        'page' => $page,
+        'pageSize' => $pageSize,
+        'total' => $total,
+        'totalPages' => max(1, (int)ceil($total / $pageSize)),
+        'environment' => $dbName === 'catalog_dev' ? 'development' : 'production',
     ]);
 } catch (Throwable $e) {
-    if (isset($pdo) && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-
     http_response_code(500);
 
     echo json_encode([
-        'error' => 'Import failed',
+        'error' => 'Failed to load catalog products',
         'message' => $e->getMessage(),
     ]);
 }
