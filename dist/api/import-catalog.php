@@ -1,159 +1,75 @@
 <?php
-
 declare(strict_types=1);
 
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: application/json');
 
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+$IMPORT_TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(204);
-    exit;
-}
+$providedToken = $_SERVER['HTTP_X_CATALOG_IMPORT_TOKEN'] ?? '';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    http_response_code(405);
+if (!hash_equals($IMPORT_TOKEN, $providedToken)) {
+    http_response_code(401);
     echo json_encode([
         'success' => false,
-        'error' => 'Method not allowed',
+        'error' => 'Unauthorized',
     ]);
     exit;
 }
 
-$dbHost = 'localhost';
-$dbUser = 'debra512_shop_user';
-$dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+$rawBody = file_get_contents('php://input');
 
-function getCatalogDatabaseName(): string {
-    $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
+if (!$rawBody) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Missing JSON body',
+    ]);
+    exit;
+}
 
-    if (
-        str_starts_with($host, 'dev.') ||
-        str_contains($host, 'localhost') ||
-        str_contains($host, '127.0.0.1')
-    ) {
-        return 'debra512_shop_dev';
+$data = json_decode($rawBody, true);
+
+if (!is_array($data) || !isset($data['products']) || !is_array($data['products'])) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Invalid catalog JSON',
+    ]);
+    exit;
+}
+
+$dbUser = 'debrah512_catalog_user';
+$dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+
+function getImportEnvironment(): string {
+    $env = strtolower(trim($_SERVER['HTTP_X_DDS_ENVIRONMENT'] ?? 'production'));
+
+    if ($env === 'development' || $env === 'dev') {
+        return 'development';
     }
 
-    return 'debrah512_shop';
+    return 'production';
+}
+
+function getCatalogDatabaseName(): string {
+    return getImportEnvironment() === 'development'
+        ? 'debrah512_catalog_dev'
+        : 'debrah512_catalog';
+}
+
+function mysqlDate(?string $iso): ?string {
+    if (!$iso) {
+        return null;
+    }
+
+    try {
+        $date = new DateTime($iso);
+        $date->setTimezone(new DateTimeZone('America/Edmonton'));
+        return $date->format('Y-m-d H:i:s');
+    } catch (Exception $e) {
+        return null;
+    }
 }
 
 $dbName = getCatalogDatabaseName();
-
-try {
-    $pdo = new PDO(
-        "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4",
-        $dbUser,
-        $dbPass,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ],
-    );
-
-    $stmt = $pdo->query("
-        SELECT
-            variation_id,
-            square_id,
-
-            name,
-            description,
-
-            price_cents,
-            price,
-            currency,
-
-            sku,
-
-            image_ids_json,
-            primary_image_id,
-            image_url,
-
-            category_id,
-            category_name,
-
-            track_inventory,
-            stockable,
-            sellable,
-            sold_out,
-
-            inventory_alert_threshold,
-
-            quantity,
-
-            square_updated_at,
-            exported_at,
-            imported_at
-        FROM square_products
-        WHERE sellable = 1
-          AND sold_out = 0
-          AND quantity > 0
-        ORDER BY name ASC
-    ");
-
-    $rows = $stmt->fetchAll();
-
-    $products = array_map(function (array $row): array {
-        $imageIds = json_decode((string)$row['image_ids_json'], true);
-
-        if (!is_array($imageIds)) {
-            $imageIds = [];
-        }
-
-        return [
-            'id' => (string)$row['square_id'],
-            'variationId' => (string)$row['variation_id'],
-
-            'name' => (string)$row['name'],
-            'description' => (string)$row['description'],
-
-            'priceCents' => (int)$row['price_cents'],
-            'price' => (float)$row['price'],
-            'currency' => (string)$row['currency'],
-
-            'sku' => $row['sku'] !== null ? (string)$row['sku'] : null,
-
-            'imageIds' => $imageIds,
-            'primaryImageId' => $row['primary_image_id'] !== null
-                ? (string)$row['primary_image_id']
-                : null,
-            'imageUrl' => $row['image_url'] !== null
-                ? (string)$row['image_url']
-                : null,
-
-            'categoryId' => (string)$row['category_id'],
-            'categoryName' => (string)$row['category_name'],
-
-            'trackInventory' => (bool)$row['track_inventory'],
-            'stockable' => (bool)$row['stockable'],
-            'sellable' => (bool)$row['sellable'],
-            'soldOut' => (bool)$row['sold_out'],
-
-            'inventoryAlertThreshold' => $row['inventory_alert_threshold'] !== null
-                ? (int)$row['inventory_alert_threshold']
-                : null,
-
-            'quantity' => (int)$row['quantity'],
-
-            'updatedAt' => (string)$row['square_updated_at'],
-            'exportedAt' => (string)$row['exported_at'],
-            'importedAt' => (string)$row['imported_at'],
-        ];
-    }, $rows);
-
-    echo json_encode([
-        'products' => $products,
-        'total' => count($products),
-        'environment' => $dbName === 'catalog_dev' ? 'development' : 'production',
-    ]);
-} catch (Throwable $error) {
-    http_response_code(500);
-
-    echo json_encode([
-        'success' => false,
-        'error' => 'Failed to load Square products',
-        'details' => $error->getMessage(),
-    ]);
-}
+$dsn = "mysql:host=localhost;dbname={$dbName};charset=utf8mb4";
