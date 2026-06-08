@@ -22,13 +22,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
-/**
- * Update these to match your existing catalog DB connection.
- */
 $dbHost = 'localhost';
-$dbName = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 $dbUser = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 $dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+
+function getCatalogDatabaseName(): string {
+    $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
+
+    if (
+        str_starts_with($host, 'dev.') ||
+        str_contains($host, 'localhost') ||
+        str_contains($host, '127.0.0.1')
+    ) {
+        return 'catalog_dev';
+    }
+
+    return 'catalog';
+}
+
+$dbName = getCatalogDatabaseName();
 
 try {
     $pdo = new PDO(
@@ -84,54 +96,58 @@ try {
     $rows = $stmt->fetchAll();
 
     $products = array_map(function (array $row): array {
-        $imageIds = json_decode((string) $row['image_ids_json'], true);
+        $imageIds = json_decode((string)$row['image_ids_json'], true);
 
         if (!is_array($imageIds)) {
             $imageIds = [];
         }
 
         return [
-            'id' => (string) $row['square_id'],
-            'variationId' => (string) $row['variation_id'],
+            'id' => (string)$row['square_id'],
+            'variationId' => (string)$row['variation_id'],
 
-            'name' => (string) $row['name'],
-            'description' => (string) $row['description'],
+            'name' => (string)$row['name'],
+            'description' => (string)$row['description'],
 
-            'priceCents' => (int) $row['price_cents'],
-            'price' => (float) $row['price'],
-            'currency' => (string) $row['currency'],
+            'priceCents' => (int)$row['price_cents'],
+            'price' => (float)$row['price'],
+            'currency' => (string)$row['currency'],
 
-            'sku' => $row['sku'] !== null ? (string) $row['sku'] : null,
+            'sku' => $row['sku'] !== null ? (string)$row['sku'] : null,
 
             'imageIds' => $imageIds,
             'primaryImageId' => $row['primary_image_id'] !== null
-                ? (string) $row['primary_image_id']
+                ? (string)$row['primary_image_id']
                 : null,
             'imageUrl' => $row['image_url'] !== null
-                ? (string) $row['image_url']
+                ? (string)$row['image_url']
                 : null,
 
-            'categoryId' => (string) $row['category_id'],
-            'categoryName' => (string) $row['category_name'],
+            'categoryId' => (string)$row['category_id'],
+            'categoryName' => (string)$row['category_name'],
 
-            'trackInventory' => (bool) $row['track_inventory'],
-            'stockable' => (bool) $row['stockable'],
-            'sellable' => (bool) $row['sellable'],
-            'soldOut' => (bool) $row['sold_out'],
+            'trackInventory' => (bool)$row['track_inventory'],
+            'stockable' => (bool)$row['stockable'],
+            'sellable' => (bool)$row['sellable'],
+            'soldOut' => (bool)$row['sold_out'],
 
             'inventoryAlertThreshold' => $row['inventory_alert_threshold'] !== null
-                ? (int) $row['inventory_alert_threshold']
+                ? (int)$row['inventory_alert_threshold']
                 : null,
 
-            'quantity' => (int) $row['quantity'],
+            'quantity' => (int)$row['quantity'],
 
-            'updatedAt' => (string) $row['square_updated_at'],
-            'exportedAt' => (string) $row['exported_at'],
-            'importedAt' => (string) $row['imported_at'],
+            'updatedAt' => (string)$row['square_updated_at'],
+            'exportedAt' => (string)$row['exported_at'],
+            'importedAt' => (string)$row['imported_at'],
         ];
     }, $rows);
 
-    echo json_encode($products);
+    echo json_encode([
+        'products' => $products,
+        'total' => count($products),
+        'environment' => $dbName === 'catalog_dev' ? 'development' : 'production',
+    ]);
 } catch (Throwable $error) {
     http_response_code(500);
 
