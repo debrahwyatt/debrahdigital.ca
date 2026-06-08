@@ -19,6 +19,12 @@ type Product = {
   updatedAt: string
 }
 
+type ShopProductsResponse = {
+  products: Product[]
+  total: number
+  environment?: string
+}
+
 const SHOP_PRODUCTS_URL =
   import.meta.env.VITE_SHOP_PRODUCTS_URL ?? '/api/square-products.php'
 
@@ -42,13 +48,17 @@ function Shop() {
           throw new Error(`Failed to load products: ${response.status}`)
         }
 
-        const data = await response.json()
+        const data = await response.json() as ShopProductsResponse | Product[]
 
-        if (!Array.isArray(data)) {
-          throw new Error('Product API did not return an array')
+        const loadedProducts = Array.isArray(data)
+          ? data
+          : data.products
+
+        if (!Array.isArray(loadedProducts)) {
+          throw new Error('Product API did not return a products array')
         }
 
-        setProducts(data)
+        setProducts(loadedProducts)
       } catch (err) {
         setError('Unable to load shop products right now.')
         console.error(err)
