@@ -220,7 +220,7 @@ export const useCatalog = () => {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [sortOption, setSortOption] = useState('price-low')
+  const [sortOption, setSortOption] = useState('az')
   const [currentPage, setCurrentPage] = useState(1)
 
   const [totalProductCount, setTotalProductCount] = useState(0)

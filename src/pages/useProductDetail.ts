@@ -10,6 +10,7 @@ import type {
 } from './useCatalog'
 
 type CatalogApiResponse = {
+  success?: boolean
   products?: CatalogProduct[]
   page?: number
   pageSize?: number
@@ -18,11 +19,21 @@ type CatalogApiResponse = {
 }
 
 const CATALOG_DATA_URL =
-  import.meta.env.VITE_CATALOG_DATA_URL ?? '/api/catalog-products.php'
+  import.meta.env.VITE_CATALOG_PRODUCTS_URL ?? '/api/catalog-products.php'
+
+const cleanString = (
+  value?: string | number | null,
+): string => {
+  return String(value ?? '').trim()
+}
 
 const normalizeCatalogProduct = (product: CatalogProduct): CatalogProduct => {
   return {
     ...product,
+    ingramPartNumber: cleanString(product.ingramPartNumber),
+    vendorPartNumber: product.vendorPartNumber
+      ? cleanString(product.vendorPartNumber)
+      : product.vendorPartNumber,
     sellPrice:
       product.sellPrice == null
         ? undefined
@@ -38,11 +49,30 @@ const normalizeCatalogProduct = (product: CatalogProduct): CatalogProduct => {
   }
 }
 
+const findMatchingProduct = (
+  products: CatalogProduct[] | undefined,
+  ingramPartNumber: string,
+): CatalogProduct | null => {
+  if (!Array.isArray(products)) {
+    return null
+  }
+
+  const normalizedIngramPartNumber = cleanString(ingramPartNumber)
+
+  const matchedProduct = products.find((product) =>
+    cleanString(product.ingramPartNumber) === normalizedIngramPartNumber,
+  )
+
+  return matchedProduct ? normalizeCatalogProduct(matchedProduct) : null
+}
+
 const fetchCatalogProductByIngramPartNumber = async (
   ingramPartNumber: string,
 ): Promise<CatalogProduct | null> => {
+  const normalizedIngramPartNumber = cleanString(ingramPartNumber)
+
   const params = new URLSearchParams({
-    ingramPartNumber,
+    ingramPartNumber: normalizedIngramPartNumber,
   })
 
   const response = await fetch(`${CATALOG_DATA_URL}?${params.toString()}`, {
@@ -57,16 +87,10 @@ const fetchCatalogProductByIngramPartNumber = async (
     await response.json()
 
   if (Array.isArray(catalogData)) {
-    const matchedProduct = catalogData.find(
-      (product) => product.ingramPartNumber === ingramPartNumber,
-    )
-
-    return matchedProduct ? normalizeCatalogProduct(matchedProduct) : null
+    return findMatchingProduct(catalogData, normalizedIngramPartNumber)
   }
 
-  const product = catalogData.products?.[0]
-
-  return product ? normalizeCatalogProduct(product) : null
+  return findMatchingProduct(catalogData.products, normalizedIngramPartNumber)
 }
 
 export const useProductDetail = () => {
@@ -82,7 +106,9 @@ export const useProductDetail = () => {
     let isMounted = true
 
     const loadProduct = async () => {
-      if (!ingramPartNumber) {
+      const normalizedIngramPartNumber = cleanString(ingramPartNumber)
+
+      if (!normalizedIngramPartNumber) {
         setProduct(null)
         setError('Product not found.')
         return
@@ -93,7 +119,7 @@ export const useProductDetail = () => {
         setError('')
 
         const matchedProduct =
-          await fetchCatalogProductByIngramPartNumber(ingramPartNumber)
+          await fetchCatalogProductByIngramPartNumber(normalizedIngramPartNumber)
 
         if (!isMounted) return
 

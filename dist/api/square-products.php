@@ -2,11 +2,31 @@
 
 declare(strict_types=1);
 
-header('Content-Type: application/json; charset=utf-8');
+$allowedOrigins = [
+    'https://debrahdigital.ca',
+    'https://www.debrahdigital.ca',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+];
 
-header('Access-Control-Allow-Origin: *');
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: {$origin}");
+    header('Vary: Origin');
+} else {
+    header('Access-Control-Allow-Origin: https://debrahdigital.ca');
+}
+
+header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
+
+function sendJson(int $statusCode, array $payload): void {
+    http_response_code($statusCode);
+    echo json_encode($payload);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -14,43 +34,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    http_response_code(405);
-    echo json_encode([
+    sendJson(405, [
         'success' => false,
         'error' => 'Method not allowed',
     ]);
-    exit;
 }
 
-$configPath = __DIR__ . '/../../dds-shop-config.env';
+function loadShopConfig(): array {
+    $configPath = __DIR__ . '/../../dds-shop-config.env';
 
-$config = parse_ini_file($configPath);
+    if (!is_readable($configPath)) {
+        sendJson(500, [
+            'success' => false,
+            'error' => 'Server configuration error',
+            'message' => 'Shop configuration file is missing or not readable.',
+        ]);
+    }
 
-if ($config === false) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'error' => 'Server configuration error',
-    ]);
-    exit;
+    $config = parse_ini_file($configPath, false, INI_SCANNER_RAW);
+
+    if ($config === false) {
+        sendJson(500, [
+            'success' => false,
+            'error' => 'Server configuration error',
+            'message' => 'Shop configuration file could not be parsed.',
+        ]);
+    }
+
+    $requiredKeys = [
+        'SHOP_DB_HOST',
+        'SHOP_DB_USER',
+        'SHOP_DB_PASS',
+        'SHOP_DB_PROD',
+        'SHOP_DB_DEV',
+    ];
+
+    foreach ($requiredKeys as $key) {
+        if (!array_key_exists($key, $config) || trim((string)$config[$key]) === '') {
+            sendJson(500, [
+                'success' => false,
+                'error' => 'Server configuration error',
+                'message' => "Missing required config value: {$key}",
+            ]);
+        }
+    }
+
+    return $config;
 }
 
-$dbHost = $config['SHOP_DB_HOST'] ?? 'localhost';
-$dbUser = $config['SHOP_DB_USER'] ?? '';
-$dbPass = $config['SHOP_DB_PASS'] ?? '';
-$dbProd = $config['SHOP_DB_PROD'] ?? 'debra512_shop';
-$dbDev = $config['SHOP_DB_DEV'] ?? 'debra512_shop_dev';
+$config = loadShopConfig();
 
-if ($dbUser === '' || $dbPass === '') {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'error' => 'Database credentials are missing',
-    ]);
-    exit;
-}
+$dbHost = (string)$config['SHOP_DB_HOST'];
+$dbUser = (string)$config['SHOP_DB_USER'];
+$dbPass = (string)$config['SHOP_DB_PASS'];
+$dbProd = (string)$config['SHOP_DB_PROD'];
+$dbDev = (string)$config['SHOP_DB_DEV'];
 
 function getShopDatabaseName(string $dbProd, string $dbDev): string {
+    $requestedEnvironment = strtolower(trim((string)($_GET['environment'] ?? '')));
+
+    if ($requestedEnvironment === 'development' || $requestedEnvironment === 'dev') {
+        return $dbDev;
+    }
+
     $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
 
     if (
@@ -175,11 +221,10 @@ try {
         'products' => $products,
         'total' => count($products),
         'environment' => getEnvironmentFromDatabaseName($dbName),
+        'database' => $dbName,
     ]);
 } catch (Throwable $error) {
-    http_response_code(500);
-
-    echo json_encode([
+    sendJson(500, [
         'success' => false,
         'error' => 'Failed to load Square products',
         'environment' => getEnvironmentFromDatabaseName($dbName ?? ''),

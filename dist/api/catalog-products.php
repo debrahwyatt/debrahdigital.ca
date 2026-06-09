@@ -2,9 +2,23 @@
 
 declare(strict_types=1);
 
-header('Content-Type: application/json; charset=utf-8');
+$allowedOrigins = [
+    'https://debrahdigital.ca',
+    'https://www.debrahdigital.ca',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+];
 
-header('Access-Control-Allow-Origin: *');
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: {$origin}");
+    header('Vary: Origin');
+} else {
+    header('Access-Control-Allow-Origin: https://debrahdigital.ca');
+}
+
+header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
@@ -68,15 +82,21 @@ function loadCatalogConfig(): array {
     return $config;
 }
 
-$config = loadCatalogConfig();
+function cleanQueryString(mixed $value): string {
+    return trim((string)($value ?? ''));
+}
 
-$dbHost = (string)$config['CATALOG_DB_HOST'];
-$dbUser = (string)$config['CATALOG_DB_USER'];
-$dbPass = (string)$config['CATALOG_DB_PASS'];
-$dbProd = (string)$config['CATALOG_DB_PROD'];
-$dbDev = (string)$config['CATALOG_DB_DEV'];
+function normalizePartNumber(string $value): string {
+    return strtoupper(trim($value));
+}
 
 function getCatalogDatabaseName(string $dbProd, string $dbDev): string {
+    $requestedEnvironment = strtolower(trim((string)($_GET['environment'] ?? '')));
+
+    if ($requestedEnvironment === 'development' || $requestedEnvironment === 'dev') {
+        return $dbDev;
+    }
+
     $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
 
     if (
@@ -94,17 +114,70 @@ function getEnvironmentFromDatabaseName(string $dbName): string {
     return str_ends_with($dbName, '_dev') ? 'development' : 'production';
 }
 
+function decodeJsonArray(mixed $value): array {
+    if ($value === null || $value === '') {
+        return [];
+    }
+
+    if (is_array($value)) {
+        return $value;
+    }
+
+    $decoded = json_decode((string)$value, true);
+
+    return is_array($decoded) ? $decoded : [];
+}
+
+function normalizeProductRow(array $product): array {
+    $product['cost'] = isset($product['cost'])
+        ? (float)$product['cost']
+        : null;
+
+    $product['sellPrice'] = isset($product['sellPrice'])
+        ? (float)$product['sellPrice']
+        : null;
+
+    $product['available'] = (bool)$product['available'];
+    $product['visible'] = (bool)$product['visible'];
+
+    $product['totalAvailability'] = (int)($product['totalAvailability'] ?? 0);
+
+    $product['icecatMatched'] = (bool)$product['icecatMatched'];
+
+    if ($product['icecatId'] !== null) {
+        $product['icecatId'] = is_numeric($product['icecatId'])
+            ? (int)$product['icecatId']
+            : $product['icecatId'];
+    }
+
+    $product['galleryUrls'] = decodeJsonArray($product['galleryUrls'] ?? null);
+    $product['features'] = decodeJsonArray($product['features'] ?? null);
+    $product['specifications'] = decodeJsonArray($product['specifications'] ?? null);
+
+    return $product;
+}
+
+$config = loadCatalogConfig();
+
+$dbHost = (string)$config['CATALOG_DB_HOST'];
+$dbUser = (string)$config['CATALOG_DB_USER'];
+$dbPass = (string)$config['CATALOG_DB_PASS'];
+$dbProd = (string)$config['CATALOG_DB_PROD'];
+$dbDev = (string)$config['CATALOG_DB_DEV'];
+
 $dbName = getCatalogDatabaseName($dbProd, $dbDev);
 
-$category = $_GET['category'] ?? null;
-$search = trim((string)($_GET['search'] ?? ''));
-$sort = $_GET['sort'] ?? 'price-low';
-$ingramPartNumber = trim((string)($_GET['ingramPartNumber'] ?? ''));
+$category = cleanQueryString($_GET['category'] ?? null);
+$search = cleanQueryString($_GET['search'] ?? '');
+$sort = cleanQueryString($_GET['sort'] ?? 'price-low');
+$ingramPartNumber = cleanQueryString($_GET['ingramPartNumber'] ?? '');
 
 $page = max(1, (int)($_GET['page'] ?? 1));
 $pageSize = min(100, max(1, (int)($_GET['pageSize'] ?? 24)));
 
-if ($ingramPartNumber !== '') {
+$isDetailLookup = $ingramPartNumber !== '';
+
+if ($isDetailLookup) {
     $page = 1;
     $pageSize = 1;
 }
@@ -119,11 +192,11 @@ $where = [
 
 $params = [];
 
-if ($ingramPartNumber !== '') {
-    $where[] = 'ingram_part_number = :ingram_part_number';
-    $params[':ingram_part_number'] = $ingramPartNumber;
+if ($isDetailLookup) {
+    $where[] = 'UPPER(TRIM(ingram_part_number)) = :ingram_part_number';
+    $params[':ingram_part_number'] = normalizePartNumber($ingramPartNumber);
 } else {
-    if ($category && $category !== 'all') {
+    if ($category !== '' && $category !== 'all') {
         $where[] = 'catalog_category = :category';
         $params[':category'] = $category;
     }
@@ -149,27 +222,31 @@ if ($ingramPartNumber !== '') {
 
 $whereSql = implode(' AND ', $where);
 
-switch ($sort) {
-    case 'price-high':
-        $orderSql = 'sell_price DESC, description ASC';
-        break;
+if ($isDetailLookup) {
+    $orderSql = 'ingram_part_number ASC';
+} else {
+    switch ($sort) {
+        case 'price-high':
+            $orderSql = 'sell_price DESC, description ASC';
+            break;
 
-    case 'za':
-        $orderSql = 'description DESC';
-        break;
+        case 'za':
+            $orderSql = 'description DESC';
+            break;
 
-    case 'az':
-        $orderSql = 'description ASC';
-        break;
+        case 'az':
+            $orderSql = 'description ASC';
+            break;
 
-    case 'availability':
-        $orderSql = 'total_availability DESC, sell_price ASC, description ASC';
-        break;
+        case 'availability':
+            $orderSql = 'total_availability DESC, sell_price ASC, description ASC';
+            break;
 
-    case 'price-low':
-    default:
-        $orderSql = 'sell_price ASC, description ASC';
-        break;
+        case 'price-low':
+        default:
+            $orderSql = 'sell_price ASC, description ASC';
+            break;
+    }
 }
 
 try {
@@ -246,38 +323,13 @@ try {
 
     $stmt->execute();
 
-    $products = $stmt->fetchAll();
-
-    foreach ($products as &$product) {
-        $product['cost'] = isset($product['cost'])
-            ? (float)$product['cost']
-            : null;
-
-        $product['sellPrice'] = isset($product['sellPrice'])
-            ? (float)$product['sellPrice']
-            : null;
-
-        $product['available'] = (bool)$product['available'];
-        $product['visible'] = (bool)$product['visible'];
-
-        $product['totalAvailability'] = (int)($product['totalAvailability'] ?? 0);
-
-        $product['icecatMatched'] = (bool)$product['icecatMatched'];
-
-        if ($product['icecatId'] !== null) {
-            $product['icecatId'] = is_numeric($product['icecatId'])
-                ? (int)$product['icecatId']
-                : $product['icecatId'];
-        }
-
-        $product['galleryUrls'] = json_decode($product['galleryUrls'] ?? '[]', true) ?: [];
-        $product['features'] = json_decode($product['features'] ?? '[]', true) ?: [];
-        $product['specifications'] = json_decode($product['specifications'] ?? '[]', true) ?: [];
-    }
-
-    unset($product);
+    $products = array_map(
+        'normalizeProductRow',
+        $stmt->fetchAll(),
+    );
 
     echo json_encode([
+        'success' => true,
         'products' => $products,
         'page' => $page,
         'pageSize' => $pageSize,
