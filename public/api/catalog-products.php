@@ -2,9 +2,23 @@
 
 declare(strict_types=1);
 
-header('Content-Type: application/json; charset=utf-8');
+$allowedOrigins = [
+    'https://debrahdigital.ca',
+    'https://www.debrahdigital.ca',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+];
 
-header('Access-Control-Allow-Origin: *');
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: {$origin}");
+    header('Vary: Origin');
+} else {
+    header('Access-Control-Allow-Origin: https://debrahdigital.ca');
+}
+
+header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
@@ -77,6 +91,12 @@ $dbProd = (string)$config['CATALOG_DB_PROD'];
 $dbDev = (string)$config['CATALOG_DB_DEV'];
 
 function getCatalogDatabaseName(string $dbProd, string $dbDev): string {
+    $requestedEnvironment = strtolower(trim((string)($_GET['environment'] ?? '')));
+
+    if ($requestedEnvironment === 'development' || $requestedEnvironment === 'dev') {
+        return $dbDev;
+    }
+
     $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
 
     if (

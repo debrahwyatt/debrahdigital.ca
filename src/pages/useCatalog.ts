@@ -62,7 +62,7 @@ type CatalogApiResponse = {
 }
 
 const CATALOG_DATA_URL =
-  import.meta.env.VITE_CATALOG_DATA_URL ?? '/api/catalog-products.php'
+  import.meta.env.VITE_CATALOG_PRODUCTS_URL ?? '/api/catalog-products.php'
 
 const PRODUCTS_PER_PAGE = 24
 
