@@ -16,15 +16,31 @@ type CatalogApiResponse = {
   pageSize?: number
   total?: number
   totalPages?: number
+  environment?: string
+  database?: string
 }
 
 const CATALOG_DATA_URL =
   import.meta.env.VITE_CATALOG_PRODUCTS_URL ?? '/api/catalog-products.php'
 
+const buildCatalogUrl = (
+  params: URLSearchParams,
+): string => {
+  const separator = CATALOG_DATA_URL.includes('?') ? '&' : '?'
+
+  return `${CATALOG_DATA_URL}${separator}${params.toString()}`
+}
+
 const cleanString = (
   value?: string | number | null,
 ): string => {
   return String(value ?? '').trim()
+}
+
+const normalizePartNumber = (
+  value?: string | number | null,
+): string => {
+  return cleanString(value).toUpperCase()
 }
 
 const normalizeCatalogProduct = (product: CatalogProduct): CatalogProduct => {
@@ -57,10 +73,10 @@ const findMatchingProduct = (
     return null
   }
 
-  const normalizedIngramPartNumber = cleanString(ingramPartNumber)
+  const normalizedIngramPartNumber = normalizePartNumber(ingramPartNumber)
 
   const matchedProduct = products.find((product) =>
-    cleanString(product.ingramPartNumber) === normalizedIngramPartNumber,
+    normalizePartNumber(product.ingramPartNumber) === normalizedIngramPartNumber,
   )
 
   return matchedProduct ? normalizeCatalogProduct(matchedProduct) : null
@@ -69,13 +85,21 @@ const findMatchingProduct = (
 const fetchCatalogProductByIngramPartNumber = async (
   ingramPartNumber: string,
 ): Promise<CatalogProduct | null> => {
-  const normalizedIngramPartNumber = cleanString(ingramPartNumber)
+  const normalizedIngramPartNumber = normalizePartNumber(ingramPartNumber)
 
   const params = new URLSearchParams({
     ingramPartNumber: normalizedIngramPartNumber,
   })
 
-  const response = await fetch(`${CATALOG_DATA_URL}?${params.toString()}`, {
+  const url = buildCatalogUrl(params)
+
+  console.log('Loading product detail:', {
+    ingramPartNumber: normalizedIngramPartNumber,
+    apiUrl: CATALOG_DATA_URL,
+    requestUrl: url,
+  })
+
+  const response = await fetch(url, {
     cache: 'no-store',
   })
 
@@ -89,6 +113,15 @@ const fetchCatalogProductByIngramPartNumber = async (
   if (Array.isArray(catalogData)) {
     return findMatchingProduct(catalogData, normalizedIngramPartNumber)
   }
+
+  console.log('Product detail response:', {
+    success: catalogData.success,
+    productsReturned: catalogData.products?.length ?? 0,
+    total: catalogData.total,
+    environment: catalogData.environment,
+    database: catalogData.database,
+    firstProduct: catalogData.products?.[0],
+  })
 
   return findMatchingProduct(catalogData.products, normalizedIngramPartNumber)
 }
@@ -106,7 +139,7 @@ export const useProductDetail = () => {
     let isMounted = true
 
     const loadProduct = async () => {
-      const normalizedIngramPartNumber = cleanString(ingramPartNumber)
+      const normalizedIngramPartNumber = normalizePartNumber(ingramPartNumber)
 
       if (!normalizedIngramPartNumber) {
         setProduct(null)

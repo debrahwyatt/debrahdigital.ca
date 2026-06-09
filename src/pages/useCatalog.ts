@@ -54,17 +54,28 @@ export type CatalogProduct = {
 }
 
 type CatalogApiResponse = {
+  success?: boolean
   products?: CatalogProduct[]
   page?: number
   pageSize?: number
   total?: number
   totalPages?: number
+  environment?: string
+  database?: string
 }
 
 const CATALOG_DATA_URL =
   import.meta.env.VITE_CATALOG_PRODUCTS_URL ?? '/api/catalog-products.php'
 
 const PRODUCTS_PER_PAGE = 24
+
+const buildCatalogUrl = (
+  params: URLSearchParams,
+): string => {
+  const separator = CATALOG_DATA_URL.includes('?') ? '&' : '?'
+
+  return `${CATALOG_DATA_URL}${separator}${params.toString()}`
+}
 
 const getProductAvailabilityCount = (product: CatalogProduct): number => {
   const totalAvailability = Number(product.totalAvailability ?? 0)
@@ -178,7 +189,7 @@ const fetchCatalogProducts = async ({
     pageSize: String(PRODUCTS_PER_PAGE),
   })
 
-  const response = await fetch(`${CATALOG_DATA_URL}?${params.toString()}`, {
+  const response = await fetch(buildCatalogUrl(params), {
     cache: 'no-store',
   })
 
@@ -258,6 +269,9 @@ export const useCatalog = () => {
           category: selectedCategory,
           search: searchTerm,
           sort: sortOption,
+          environment: catalogData.environment,
+          database: catalogData.database,
+          apiUrl: CATALOG_DATA_URL,
         })
 
         console.log('Catalog availability debug:', {
@@ -361,7 +375,9 @@ export const useCatalog = () => {
   */
   const paginatedProducts = useMemo(() => {
     return sortedProducts
-  }, [sortedProducts])
+  }, [
+    sortedProducts,
+  ])
 
   useEffect(() => {
     setCurrentPage(1)
