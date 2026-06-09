@@ -24,11 +24,35 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$dbHost = 'localhost';
-$dbUser = 'debra512_shop_user';
-$dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXX';
+$configPath = __DIR__ . '/../../dds-shop-config.env';
 
-$expectedToken = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+$config = parse_ini_file($configPath);
+
+if ($config === false) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Server configuration error',
+    ]);
+    exit;
+}
+
+$dbHost = $config['SHOP_DB_HOST'] ?? 'localhost';
+$dbUser = $config['SHOP_DB_USER'] ?? '';
+$dbPass = $config['SHOP_DB_PASS'] ?? '';
+$dbProd = $config['SHOP_DB_PROD'] ?? 'debra512_shop';
+$dbDev = $config['SHOP_DB_DEV'] ?? 'debra512_shop_dev';
+
+$expectedToken = $config['SQUARE_IMPORT_TOKEN'] ?? '';
+
+if ($dbUser === '' || $dbPass === '' || $expectedToken === '') {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Server configuration is incomplete',
+    ]);
+    exit;
+}
 
 $headers = getallheaders();
 
@@ -37,7 +61,7 @@ $providedToken =
     ?? $headers['x-square-import-token']
     ?? '';
 
-if (!$expectedToken || !hash_equals($expectedToken, $providedToken)) {
+if (!hash_equals($expectedToken, $providedToken)) {
     http_response_code(401);
     echo json_encode([
         'success' => false,
@@ -56,10 +80,10 @@ function getImportEnvironment(): string {
     return 'production';
 }
 
-function getShopDatabaseName(): string {
+function getShopDatabaseName(string $dbProd, string $dbDev): string {
     return getImportEnvironment() === 'development'
-        ? 'debra512_shop_dev'
-        : 'debra512_shop';
+        ? $dbDev
+        : $dbProd;
 }
 
 function mysqlDate(?string $value): ?string {
@@ -111,7 +135,7 @@ if (!is_array($products)) {
     exit;
 }
 
-$dbName = getShopDatabaseName();
+$dbName = getShopDatabaseName($dbProd, $dbDev);
 
 try {
     $pdo = new PDO(

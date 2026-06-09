@@ -1,45 +1,86 @@
 <?php
+
 declare(strict_types=1);
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-$IMPORT_TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+function sendJson(int $statusCode, array $payload): void {
+    http_response_code($statusCode);
+    echo json_encode($payload);
+    exit;
+}
+
+function loadCatalogConfig(): array {
+    $configPath = __DIR__ . '/../../dds-catalog-config.env';
+
+    if (!is_readable($configPath)) {
+        sendJson(500, [
+            'success' => false,
+            'error' => 'Server configuration error',
+            'message' => 'Catalog configuration file is missing or not readable.',
+        ]);
+    }
+
+    $config = parse_ini_file($configPath, false, INI_SCANNER_RAW);
+
+    if ($config === false) {
+        sendJson(500, [
+            'success' => false,
+            'error' => 'Server configuration error',
+            'message' => 'Catalog configuration file could not be parsed.',
+        ]);
+    }
+
+    $requiredKeys = [
+        'CATALOG_IMPORT_TOKEN',
+        'CATALOG_DB_HOST',
+        'CATALOG_DB_USER',
+        'CATALOG_DB_PASS',
+        'CATALOG_DB_PROD',
+        'CATALOG_DB_DEV',
+    ];
+
+    foreach ($requiredKeys as $key) {
+        if (!array_key_exists($key, $config) || trim((string)$config[$key]) === '') {
+            sendJson(500, [
+                'success' => false,
+                'error' => 'Server configuration error',
+                'message' => "Missing required config value: {$key}",
+            ]);
+        }
+    }
+
+    return $config;
+}
+
+$config = loadCatalogConfig();
 
 $providedToken = $_SERVER['HTTP_X_CATALOG_IMPORT_TOKEN'] ?? '';
 
-if (!hash_equals($IMPORT_TOKEN, $providedToken)) {
-    http_response_code(401);
-    echo json_encode([
+if (!hash_equals((string)$config['CATALOG_IMPORT_TOKEN'], $providedToken)) {
+    sendJson(401, [
         'success' => false,
         'error' => 'Unauthorized',
     ]);
-    exit;
 }
 
 $rawBody = file_get_contents('php://input');
 
 if (!$rawBody) {
-    http_response_code(400);
-    echo json_encode([
+    sendJson(400, [
         'success' => false,
         'error' => 'Missing JSON body',
     ]);
-    exit;
 }
 
 $data = json_decode($rawBody, true);
 
 if (!is_array($data) || !isset($data['products']) || !is_array($data['products'])) {
-    http_response_code(400);
-    echo json_encode([
+    sendJson(400, [
         'success' => false,
         'error' => 'Invalid catalog JSON',
     ]);
-    exit;
 }
-
-$dbUser = 'debra512_catalog_user';
-$dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
 function getImportEnvironment(): string {
     $env = strtolower(trim($_SERVER['HTTP_X_DDS_ENVIRONMENT'] ?? 'production'));
@@ -51,10 +92,10 @@ function getImportEnvironment(): string {
     return 'production';
 }
 
-function getCatalogDatabaseName(): string {
+function getCatalogDatabaseName(array $config): string {
     return getImportEnvironment() === 'development'
-        ? 'debra512_catalog_dev'
-        : 'debra512_catalog';
+        ? (string)$config['CATALOG_DB_DEV']
+        : (string)$config['CATALOG_DB_PROD'];
 }
 
 function mysqlDate(?string $iso): ?string {
@@ -65,14 +106,19 @@ function mysqlDate(?string $iso): ?string {
     try {
         $date = new DateTime($iso);
         $date->setTimezone(new DateTimeZone('America/Edmonton'));
+
         return $date->format('Y-m-d H:i:s');
     } catch (Exception $e) {
         return null;
     }
 }
 
-$dbName = getCatalogDatabaseName();
-$dsn = "mysql:host=localhost;dbname={$dbName};charset=utf8mb4";
+$dbHost = (string)$config['CATALOG_DB_HOST'];
+$dbUser = (string)$config['CATALOG_DB_USER'];
+$dbPass = (string)$config['CATALOG_DB_PASS'];
+$dbName = getCatalogDatabaseName($config);
+
+$dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
 
 try {
     $pdo = new PDO($dsn, $dbUser, $dbPass, [
@@ -291,15 +337,11 @@ try {
         $pdo->rollBack();
     }
 
-    http_response_code(500);
-
-    echo json_encode([
+    sendJson(500, [
         'success' => false,
         'error' => 'Import failed',
         'environment' => getImportEnvironment(),
         'database' => $dbName ?? null,
         'message' => $e->getMessage(),
     ]);
-
-    exit;
 }

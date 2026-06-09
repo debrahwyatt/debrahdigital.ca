@@ -8,25 +8,75 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
+function sendJson(int $statusCode, array $payload): void {
+    http_response_code($statusCode);
+    echo json_encode($payload);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    http_response_code(405);
-    echo json_encode([
+    sendJson(405, [
         'success' => false,
         'error' => 'Method not allowed',
     ]);
-    exit;
 }
 
-$dbHost = 'localhost';
-$dbUser = 'debra512_catalog_user';
-$dbPass = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+function loadCatalogConfig(): array {
+    $configPath = __DIR__ . '/../../dds-catalog-config.env';
 
-function getCatalogDatabaseName(): string {
+    if (!is_readable($configPath)) {
+        sendJson(500, [
+            'success' => false,
+            'error' => 'Server configuration error',
+            'message' => 'Catalog configuration file is missing or not readable.',
+        ]);
+    }
+
+    $config = parse_ini_file($configPath, false, INI_SCANNER_RAW);
+
+    if ($config === false) {
+        sendJson(500, [
+            'success' => false,
+            'error' => 'Server configuration error',
+            'message' => 'Catalog configuration file could not be parsed.',
+        ]);
+    }
+
+    $requiredKeys = [
+        'CATALOG_DB_HOST',
+        'CATALOG_DB_USER',
+        'CATALOG_DB_PASS',
+        'CATALOG_DB_PROD',
+        'CATALOG_DB_DEV',
+    ];
+
+    foreach ($requiredKeys as $key) {
+        if (!array_key_exists($key, $config) || trim((string)$config[$key]) === '') {
+            sendJson(500, [
+                'success' => false,
+                'error' => 'Server configuration error',
+                'message' => "Missing required config value: {$key}",
+            ]);
+        }
+    }
+
+    return $config;
+}
+
+$config = loadCatalogConfig();
+
+$dbHost = (string)$config['CATALOG_DB_HOST'];
+$dbUser = (string)$config['CATALOG_DB_USER'];
+$dbPass = (string)$config['CATALOG_DB_PASS'];
+$dbProd = (string)$config['CATALOG_DB_PROD'];
+$dbDev = (string)$config['CATALOG_DB_DEV'];
+
+function getCatalogDatabaseName(string $dbProd, string $dbDev): string {
     $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
 
     if (
@@ -34,17 +84,17 @@ function getCatalogDatabaseName(): string {
         str_contains($host, 'localhost') ||
         str_contains($host, '127.0.0.1')
     ) {
-        return 'debra512_catalog_dev';
+        return $dbDev;
     }
 
-    return 'debra512_catalog';
+    return $dbProd;
 }
 
 function getEnvironmentFromDatabaseName(string $dbName): string {
     return str_ends_with($dbName, '_dev') ? 'development' : 'production';
 }
 
-$dbName = getCatalogDatabaseName();
+$dbName = getCatalogDatabaseName($dbProd, $dbDev);
 
 $category = $_GET['category'] ?? null;
 $search = trim((string)($_GET['search'] ?? ''));
@@ -237,13 +287,11 @@ try {
         'database' => $dbName,
     ]);
 } catch (Throwable $error) {
-    http_response_code(500);
-
-    echo json_encode([
+    sendJson(500, [
         'success' => false,
         'error' => 'Failed to load catalog products',
-        'environment' => getEnvironmentFromDatabaseName($dbName),
-        'database' => $dbName,
+        'environment' => getEnvironmentFromDatabaseName($dbName ?? ''),
+        'database' => $dbName ?? null,
         'details' => $error->getMessage(),
     ]);
 }
