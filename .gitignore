@@ -1,11 +1,5 @@
 node_modules
 
-# Local/server-only PHP API files with credentials
-public/api/*.php
-
-# Allow safe template examples
-!public/api/*.example.php
-
 # Environment files
 .env
 .env.local

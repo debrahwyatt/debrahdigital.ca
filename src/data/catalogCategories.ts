@@ -53,10 +53,6 @@ export const catalogCategories: CatalogCategory[] = [
     value: 'imaging-devices',
   },
   {
-    label: 'Physical Security',
-    value: 'physical-security',
-  },
-  {
     label: 'Presentation Devices',
     value: 'presentation-devices',
   },
