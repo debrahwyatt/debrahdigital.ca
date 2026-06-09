@@ -8,6 +8,9 @@ import {
 import type {
   CatalogProduct,
 } from './useCatalog'
+import {
+  resolveCatalogImageUrl,
+} from './useCatalog'
 
 type CatalogApiResponse = {
   success?: boolean
@@ -50,6 +53,9 @@ const normalizeCatalogProduct = (product: CatalogProduct): CatalogProduct => {
     vendorPartNumber: product.vendorPartNumber
       ? cleanString(product.vendorPartNumber)
       : product.vendorPartNumber,
+    imageUrl: resolveCatalogImageUrl(product.imageUrl),
+    thumbnailUrl: resolveCatalogImageUrl(product.thumbnailUrl),
+    brandLogoUrl: resolveCatalogImageUrl(product.brandLogoUrl),
     sellPrice:
       product.sellPrice == null
         ? undefined
@@ -61,6 +67,8 @@ const normalizeCatalogProduct = (product: CatalogProduct): CatalogProduct => {
         : Number(product.totalAvailability),
     galleryUrls: Array.isArray(product.galleryUrls)
       ? product.galleryUrls
+          .map((url) => resolveCatalogImageUrl(url))
+          .filter((url): url is string => Boolean(url))
       : [],
   }
 }
@@ -182,7 +190,9 @@ export const useProductDetail = () => {
     return () => {
       isMounted = false
     }
-  }, [ingramPartNumber])
+  }, [
+    ingramPartNumber,
+  ])
 
   return {
     product,

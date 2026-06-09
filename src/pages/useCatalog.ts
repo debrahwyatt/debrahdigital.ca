@@ -67,6 +67,12 @@ type CatalogApiResponse = {
 const CATALOG_DATA_URL =
   import.meta.env.VITE_CATALOG_PRODUCTS_URL ?? '/api/catalog-products.php'
 
+const CATALOG_ASSET_BASE_URL = String(
+  import.meta.env.VITE_CATALOG_ASSET_BASE_URL ?? 'https://debrahdigital.ca',
+).replace(/\/+$/, '')
+
+const CATALOG_IMAGE_BASE_URL = 'https://debrahdigital.ca'
+
 const PRODUCTS_PER_PAGE = 24
 
 const buildCatalogUrl = (
@@ -75,6 +81,16 @@ const buildCatalogUrl = (
   const separator = CATALOG_DATA_URL.includes('?') ? '&' : '?'
 
   return `${CATALOG_DATA_URL}${separator}${params.toString()}`
+}
+
+const cleanString = (
+  value?: string | number | null,
+): string => {
+  return String(value ?? '')
+    .trim()
+    .replace(/^"+|"+$/g, '')
+    .replace(/^'+|'+$/g, '')
+    .replace(/\\\//g, '/')
 }
 
 const getProductAvailabilityCount = (product: CatalogProduct): number => {
@@ -142,19 +158,74 @@ export const getPlaceholderImage = (): string => {
   return '/product-coming-soon.webp'
 }
 
+export const resolveCatalogImageUrl = (
+  value?: string | null,
+): string | null => {
+  const imageUrl = cleanString(value)
+
+  if (!imageUrl) {
+    return null
+  }
+
+  if (
+    imageUrl.startsWith('http://') ||
+    imageUrl.startsWith('https://') ||
+    imageUrl.startsWith('data:')
+  ) {
+    return imageUrl
+  }
+
+  if (imageUrl.startsWith('/catalog-images/')) {
+    return `${CATALOG_IMAGE_BASE_URL}${imageUrl}`
+  }
+
+  if (imageUrl.startsWith('catalog-images/')) {
+    return `${CATALOG_IMAGE_BASE_URL}/${imageUrl}`
+  }
+
+  if (imageUrl.startsWith('/')) {
+    return CATALOG_ASSET_BASE_URL
+      ? `${CATALOG_ASSET_BASE_URL}${imageUrl}`
+      : imageUrl
+  }
+
+  return CATALOG_ASSET_BASE_URL
+    ? `${CATALOG_ASSET_BASE_URL}/${imageUrl.replace(/^\/+/, '')}`
+    : imageUrl
+}
+
 export const getProductImage = (product: CatalogProduct): string => {
   return (
-    product.imageUrl ||
-    product.thumbnailUrl ||
-    product.galleryUrls?.[0] ||
-    product.brandLogoUrl ||
+    resolveCatalogImageUrl(product.imageUrl) ||
+    resolveCatalogImageUrl(product.thumbnailUrl) ||
+    resolveCatalogImageUrl(product.galleryUrls?.[0]) ||
+    resolveCatalogImageUrl(product.brandLogoUrl) ||
     getPlaceholderImage()
   )
+}
+
+const normalizeGalleryUrls = (
+  galleryUrls?: string[] | null,
+): string[] => {
+  if (!Array.isArray(galleryUrls)) {
+    return []
+  }
+
+  return galleryUrls
+    .map((url) => resolveCatalogImageUrl(url))
+    .filter((url): url is string => Boolean(url))
 }
 
 const normalizeCatalogProduct = (product: CatalogProduct): CatalogProduct => {
   return {
     ...product,
+    ingramPartNumber: cleanString(product.ingramPartNumber),
+    vendorPartNumber: product.vendorPartNumber
+      ? cleanString(product.vendorPartNumber)
+      : product.vendorPartNumber,
+    imageUrl: resolveCatalogImageUrl(product.imageUrl),
+    thumbnailUrl: resolveCatalogImageUrl(product.thumbnailUrl),
+    brandLogoUrl: resolveCatalogImageUrl(product.brandLogoUrl),
     sellPrice:
       product.sellPrice == null
         ? undefined
@@ -164,9 +235,7 @@ const normalizeCatalogProduct = (product: CatalogProduct): CatalogProduct => {
       product.totalAvailability == null
         ? 0
         : Number(product.totalAvailability),
-    galleryUrls: Array.isArray(product.galleryUrls)
-      ? product.galleryUrls
-      : [],
+    galleryUrls: normalizeGalleryUrls(product.galleryUrls),
   }
 }
 
@@ -200,7 +269,6 @@ const fetchCatalogProducts = async ({
   const catalogData: CatalogApiResponse | CatalogProduct[] =
     await response.json()
 
-  // Backward compatibility in case the endpoint ever returns a raw array.
   if (Array.isArray(catalogData)) {
     return {
       products: catalogData,
@@ -272,6 +340,8 @@ export const useCatalog = () => {
           environment: catalogData.environment,
           database: catalogData.database,
           apiUrl: CATALOG_DATA_URL,
+          assetBaseUrl: CATALOG_ASSET_BASE_URL,
+          catalogImageBaseUrl: CATALOG_IMAGE_BASE_URL,
         })
 
         console.log('Catalog availability debug:', {
@@ -301,10 +371,12 @@ export const useCatalog = () => {
               Array.isArray(product.galleryUrls) &&
               product.galleryUrls.length > 0,
           ).length,
-          firstProduct: products[0],
+          firstRawImageUrl: catalogData.products?.[0]?.imageUrl,
+          firstResolvedImageUrl: products[0]?.imageUrl,
           firstResolvedImage: products[0]
             ? getProductImage(products[0])
             : null,
+          firstProduct: products[0],
         })
       } catch (err) {
         console.error(err)
@@ -334,17 +406,6 @@ export const useCatalog = () => {
     currentPage,
   ])
 
-  /*
-    The PHP/database endpoint already filters by:
-    - selectedCategory
-    - searchTerm
-    - visible
-    - available
-    - sellPrice > 0
-
-    This client-side filter is intentionally kept as a safety net so bad API
-    data does not accidentally render.
-  */
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
       if (!productIsSafeToDisplay(product)) {
@@ -357,11 +418,6 @@ export const useCatalog = () => {
     allProducts,
   ])
 
-  /*
-    The PHP/database endpoint should already sort the full result set before
-    pagination. This local sort only sorts the current returned page as a
-    fallback.
-  */
   const sortedProducts = useMemo(() => {
     return sortCatalogProducts(filteredProducts, sortOption)
   }, [
@@ -369,10 +425,6 @@ export const useCatalog = () => {
     sortOption,
   ])
 
-  /*
-    Products are already paginated by the PHP/database endpoint.
-    Keep this variable name so Catalog.tsx does not need to change.
-  */
   const paginatedProducts = useMemo(() => {
     return sortedProducts
   }, [
