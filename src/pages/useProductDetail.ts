@@ -101,12 +101,6 @@ const fetchCatalogProductByIngramPartNumber = async (
 
   const url = buildCatalogUrl(params)
 
-  console.log('Loading product detail:', {
-    ingramPartNumber: normalizedIngramPartNumber,
-    apiUrl: CATALOG_DATA_URL,
-    requestUrl: url,
-  })
-
   const response = await fetch(url, {
     cache: 'no-store',
   })
@@ -121,15 +115,6 @@ const fetchCatalogProductByIngramPartNumber = async (
   if (Array.isArray(catalogData)) {
     return findMatchingProduct(catalogData, normalizedIngramPartNumber)
   }
-
-  console.log('Product detail response:', {
-    success: catalogData.success,
-    productsReturned: catalogData.products?.length ?? 0,
-    total: catalogData.total,
-    environment: catalogData.environment,
-    database: catalogData.database,
-    firstProduct: catalogData.products?.[0],
-  })
 
   return findMatchingProduct(catalogData.products, normalizedIngramPartNumber)
 }

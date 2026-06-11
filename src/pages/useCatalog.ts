@@ -75,6 +75,89 @@ const CATALOG_IMAGE_BASE_URL = 'https://debrahdigital.ca'
 
 const PRODUCTS_PER_PAGE = 24
 
+const CATEGORY_SEARCH_ALIASES: Record<string, string> = {
+  laptop: 'laptops',
+  laptops: 'laptops',
+  notebook: 'laptops',
+  notebooks: 'laptops',
+  chromebook: 'laptops',
+  chromebooks: 'laptops',
+
+  tablet: 'tablets',
+  tablets: 'tablets',
+  ipad: 'tablets',
+  ipads: 'tablets',
+
+  desktop: 'computer-systems',
+  desktops: 'computer-systems',
+  computer: 'computer-systems',
+  computers: 'computer-systems',
+  pc: 'computer-systems',
+  pcs: 'computer-systems',
+  workstation: 'computer-systems',
+  workstations: 'computer-systems',
+  server: 'computer-systems',
+  servers: 'computer-systems',
+
+  monitor: 'displays',
+  monitors: 'displays',
+  display: 'displays',
+  displays: 'displays',
+  tv: 'displays',
+
+  printer: 'printers-and-office-equipment',
+  printers: 'printers-and-office-equipment',
+  multifunction: 'printers-and-office-equipment',
+  plotter: 'printers-and-office-equipment',
+  plotters: 'printers-and-office-equipment',
+
+  projector: 'presentation-devices',
+  projectors: 'presentation-devices',
+
+  scanner: 'imaging-devices',
+  scanners: 'imaging-devices',
+  camera: 'imaging-devices',
+  cameras: 'imaging-devices',
+  webcam: 'imaging-devices',
+  webcams: 'imaging-devices',
+
+  network: 'network-devices',
+  networking: 'network-devices',
+  router: 'network-devices',
+  routers: 'network-devices',
+  switch: 'network-devices',
+  switches: 'network-devices',
+  transceiver: 'network-devices',
+  transceivers: 'network-devices',
+
+  ups: 'power-protection-ups',
+  battery: 'power-protection-ups',
+
+  keyboard: 'input-output-devices',
+  keyboards: 'input-output-devices',
+  mouse: 'input-output-devices',
+  mice: 'input-output-devices',
+
+  memory: 'system-components',
+  ram: 'system-components',
+  processor: 'system-components',
+  processors: 'system-components',
+  motherboard: 'system-components',
+  motherboards: 'system-components',
+  graphics: 'system-components',
+  gpu: 'system-components',
+
+  barcode: 'data-capture-pos',
+  pos: 'data-capture-pos',
+
+  phone: 'communications',
+  phones: 'communications',
+  conference: 'communications',
+
+  accessory: 'accessories',
+  accessories: 'accessories',
+}
+
 const buildCatalogUrl = (
   params: URLSearchParams,
 ): string => {
@@ -91,6 +174,75 @@ const cleanString = (
     .replace(/^"+|"+$/g, '')
     .replace(/^'+|'+$/g, '')
     .replace(/\\\//g, '/')
+}
+
+const normalizeSearchWord = (
+  value: string,
+): string => {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, '')
+}
+
+const getCatalogQueryParams = ({
+  selectedCategory,
+  searchTerm,
+}: {
+  selectedCategory: string
+  searchTerm: string
+}): {
+  category: string
+  search: string
+} => {
+  const cleanedSearchTerm = searchTerm.trim()
+
+  if (!cleanedSearchTerm) {
+    return {
+      category: selectedCategory,
+      search: '',
+    }
+  }
+
+  // If the user already selected a category, keep their search as a normal
+  // keyword search within that category.
+  if (selectedCategory !== 'all') {
+    return {
+      category: selectedCategory,
+      search: cleanedSearchTerm,
+    }
+  }
+
+  const originalWords = cleanedSearchTerm
+    .split(/\s+/)
+    .filter(Boolean)
+
+  const normalizedWords = originalWords.map(normalizeSearchWord)
+
+  const matchedCategory = normalizedWords
+    .map((word) => CATEGORY_SEARCH_ALIASES[word])
+    .find(Boolean)
+
+  if (!matchedCategory) {
+    return {
+      category: selectedCategory,
+      search: cleanedSearchTerm,
+    }
+  }
+
+  const remainingSearch = originalWords
+    .filter((word) => {
+      const normalizedWord = normalizeSearchWord(word)
+
+      return !CATEGORY_SEARCH_ALIASES[normalizedWord]
+    })
+    .join(' ')
+    .trim()
+
+  return {
+    category: matchedCategory,
+    search: remainingSearch,
+  }
 }
 
 const getProductAvailabilityCount = (product: CatalogProduct): number => {
@@ -250,9 +402,14 @@ const fetchCatalogProducts = async ({
   sortOption: string
   currentPage: number
 }): Promise<CatalogApiResponse> => {
+  const catalogQuery = getCatalogQueryParams({
+    selectedCategory,
+    searchTerm,
+  })
+
   const params = new URLSearchParams({
-    category: selectedCategory,
-    search: searchTerm.trim(),
+    category: catalogQuery.category,
+    search: catalogQuery.search,
     sort: sortOption,
     page: String(currentPage),
     pageSize: String(PRODUCTS_PER_PAGE),
@@ -285,13 +442,6 @@ const fetchCatalogProducts = async ({
   return catalogData
 }
 
-// export const scrollToCatalogTop = () => {
-//   window.scrollTo({
-//     top: 0,
-//     behavior: 'smooth',
-//   })
-// }
-
 export const useCatalog = () => {
   const [allProducts, setAllProducts] = useState<CatalogProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -299,7 +449,7 @@ export const useCatalog = () => {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [sortOption, setSortOption] = useState('az')
+  const [sortOption, setSortOption] = useState('price-low')
   const [currentPage, setCurrentPage] = useState(1)
 
   const [totalProductCount, setTotalProductCount] = useState(0)
@@ -327,57 +477,6 @@ export const useCatalog = () => {
         setAllProducts(products)
         setTotalProductCount(catalogData.total ?? products.length)
         setTotalPages(Math.max(1, catalogData.totalPages ?? 1))
-
-        console.log('Loaded catalog products from database:', {
-          productsOnPage: products.length,
-          total: catalogData.total ?? products.length,
-          page: catalogData.page ?? currentPage,
-          pageSize: catalogData.pageSize ?? PRODUCTS_PER_PAGE,
-          totalPages: catalogData.totalPages ?? 1,
-          category: selectedCategory,
-          search: searchTerm,
-          sort: sortOption,
-          environment: catalogData.environment,
-          database: catalogData.database,
-          apiUrl: CATALOG_DATA_URL,
-          assetBaseUrl: CATALOG_ASSET_BASE_URL,
-          catalogImageBaseUrl: CATALOG_IMAGE_BASE_URL,
-        })
-
-        console.log('Catalog availability debug:', {
-          productsOnPage: products.length,
-          displayableProducts: products.filter(productIsSafeToDisplay).length,
-          withAvailability: products.filter(
-            (product) => getProductAvailabilityCount(product) > 0,
-          ).length,
-          zeroAvailability: products.filter(
-            (product) => getProductAvailabilityCount(product) <= 0,
-          ).length,
-          firstProduct: products[0],
-          firstAvailability: products[0]
-            ? getProductAvailabilityCount(products[0])
-            : null,
-        })
-
-        console.log('Catalog image debug:', {
-          productsOnPage: products.length,
-          withImageUrl: products.filter((product) => Boolean(product.imageUrl))
-            .length,
-          withThumbnailUrl: products.filter((product) =>
-            Boolean(product.thumbnailUrl),
-          ).length,
-          withGalleryUrls: products.filter(
-            (product) =>
-              Array.isArray(product.galleryUrls) &&
-              product.galleryUrls.length > 0,
-          ).length,
-          firstRawImageUrl: catalogData.products?.[0]?.imageUrl,
-          firstResolvedImageUrl: products[0]?.imageUrl,
-          firstResolvedImage: products[0]
-            ? getProductImage(products[0])
-            : null,
-          firstProduct: products[0],
-        })
       } catch (err) {
         console.error(err)
 
@@ -456,7 +555,6 @@ export const useCatalog = () => {
     }
 
     setCurrentPage(safePage)
-    // scrollToCatalogTop()
   }
 
   const goToPreviousPage = () => {
@@ -470,7 +568,6 @@ export const useCatalog = () => {
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setCurrentPage(1)
-    // scrollToCatalogTop()
   }
 
   return {

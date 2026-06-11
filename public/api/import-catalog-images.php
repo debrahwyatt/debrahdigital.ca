@@ -142,6 +142,16 @@ function getExtensionFromUrl(string $url): string {
     return 'jpg';
 }
 
+function getOutputFormat(array $data): string {
+    $format = strtolower(cleanString($data['outputFormat'] ?? 'original'));
+
+    if ($format === 'webp') {
+        return 'webp';
+    }
+
+    return 'original';
+}
+
 function getPublicHtmlRoot(): string {
     $root = realpath(__DIR__ . '/../');
 
@@ -164,6 +174,108 @@ function ensureDirectory(string $path): void {
     if (!mkdir($path, 0755, true) && !is_dir($path)) {
         throw new RuntimeException("Could not create directory: {$path}");
     }
+}
+
+function publicUrlToLocalPath(
+    string $publicUrl,
+    string $imageRoot,
+    string $publicBaseUrl
+): ?string {
+    $publicUrl = cleanString($publicUrl);
+
+    if ($publicUrl === '') {
+        return null;
+    }
+
+    if (!str_starts_with($publicUrl, $publicBaseUrl . '/')) {
+        return null;
+    }
+
+    $relativePath = substr($publicUrl, strlen($publicBaseUrl . '/'));
+    $relativePath = str_replace('\\', '/', $relativePath);
+
+    $parts = explode('/', $relativePath);
+
+    foreach ($parts as $part) {
+        if ($part === '' || $part === '.' || $part === '..') {
+            return null;
+        }
+    }
+
+    return $imageRoot . '/' . $relativePath;
+}
+
+function replaceExtension(string $path, string $extension): string {
+    $directory = dirname($path);
+    $filename = pathinfo($path, PATHINFO_FILENAME);
+
+    return $directory . '/' . $filename . '.' . $extension;
+}
+
+function replacePublicUrlExtension(string $publicUrl, string $extension): string {
+    $directory = dirname($publicUrl);
+    $filename = pathinfo($publicUrl, PATHINFO_FILENAME);
+
+    return $directory . '/' . $filename . '.' . $extension;
+}
+
+function imageCreateFromFile(string $path, string $extension): GdImage {
+    $extension = strtolower($extension);
+
+    $image = match ($extension) {
+        'jpg', 'jpeg' => imagecreatefromjpeg($path),
+        'png' => imagecreatefrompng($path),
+        'gif' => imagecreatefromgif($path),
+        'webp' => imagecreatefromwebp($path),
+        default => false,
+    };
+
+    if (!$image instanceof GdImage) {
+        throw new RuntimeException("Could not read image for conversion: {$path}");
+    }
+
+    return $image;
+}
+
+function convertImageToWebp(
+    string $sourcePath,
+    string $targetPath,
+    int $quality = 82
+): void {
+    if (!extension_loaded('gd') || !function_exists('imagewebp')) {
+        throw new RuntimeException('PHP GD with WebP support is required to convert images to WebP.');
+    }
+
+    if (!is_file($sourcePath) || filesize($sourcePath) <= 0) {
+        throw new RuntimeException("Source image does not exist or is empty: {$sourcePath}");
+    }
+
+    $sourceExtension = strtolower(pathinfo($sourcePath, PATHINFO_EXTENSION));
+
+    if ($sourceExtension === 'webp') {
+        if ($sourcePath !== $targetPath) {
+            copy($sourcePath, $targetPath);
+            chmod($targetPath, 0644);
+        }
+
+        return;
+    }
+
+    $image = imageCreateFromFile($sourcePath, $sourceExtension);
+
+    imagepalettetotruecolor($image);
+    imagealphablending($image, true);
+    imagesavealpha($image, true);
+
+    $converted = imagewebp($image, $targetPath, $quality);
+
+    imagedestroy($image);
+
+    if (!$converted || !is_file($targetPath) || filesize($targetPath) <= 0) {
+        throw new RuntimeException("Could not convert image to WebP: {$sourcePath}");
+    }
+
+    chmod($targetPath, 0644);
 }
 
 function downloadRemoteImage(string $url, string $targetPath): array {
@@ -228,7 +340,8 @@ function saveCatalogImage(
     string $publicBaseUrl,
     string $ingramPartNumber,
     string $role,
-    int $index = 0
+    int $index = 0,
+    string $outputFormat = 'original'
 ): ?array {
     $sourceUrl = cleanString($sourceUrl);
 
@@ -236,22 +349,57 @@ function saveCatalogImage(
         return null;
     }
 
-    if (str_starts_with($sourceUrl, $publicBaseUrl . '/')) {
-        return [
-            'sourceUrl' => $sourceUrl,
-            'publicUrl' => $sourceUrl,
-            'status' => 'already-local',
-            'bytes' => 0,
-        ];
-    }
-
     $safeIngramPartNumber = safePathSegment($ingramPartNumber);
     $productDir = $imageRoot . '/' . $safeIngramPartNumber;
 
     ensureDirectory($productDir);
 
+    if (str_starts_with($sourceUrl, $publicBaseUrl . '/')) {
+        $localSourcePath = publicUrlToLocalPath($sourceUrl, $imageRoot, $publicBaseUrl);
+
+        if ($localSourcePath === null || !is_file($localSourcePath)) {
+            throw new RuntimeException("Local catalog image not found: {$sourceUrl}");
+        }
+
+        if ($outputFormat === 'webp') {
+            $webpPath = replaceExtension($localSourcePath, 'webp');
+            $webpPublicUrl = replacePublicUrlExtension($sourceUrl, 'webp');
+
+            if (is_file($webpPath) && filesize($webpPath) > 0) {
+                return [
+                    'sourceUrl' => $sourceUrl,
+                    'publicUrl' => $webpPublicUrl,
+                    'status' => 'existing',
+                    'bytes' => filesize($webpPath),
+                    'converted' => false,
+                ];
+            }
+
+            convertImageToWebp($localSourcePath, $webpPath);
+
+            return [
+                'sourceUrl' => $sourceUrl,
+                'publicUrl' => $webpPublicUrl,
+                'status' => 'converted',
+                'bytes' => filesize($webpPath),
+                'converted' => true,
+            ];
+        }
+
+        return [
+            'sourceUrl' => $sourceUrl,
+            'publicUrl' => $sourceUrl,
+            'status' => 'already-local',
+            'bytes' => filesize($localSourcePath),
+            'converted' => false,
+        ];
+    }
+
     $urlHash = urlHash($sourceUrl);
-    $extension = getExtensionFromUrl($sourceUrl);
+    $sourceExtension = getExtensionFromUrl($sourceUrl);
+    $targetExtension = $outputFormat === 'webp'
+        ? 'webp'
+        : $sourceExtension;
 
     if ($role === 'gallery') {
         $baseName = 'gallery-' . str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT) . '-' . $urlHash;
@@ -259,7 +407,7 @@ function saveCatalogImage(
         $baseName = $role . '-' . $urlHash;
     }
 
-    $fileName = "{$baseName}.{$extension}";
+    $fileName = "{$baseName}.{$targetExtension}";
     $targetPath = "{$productDir}/{$fileName}";
     $publicUrl = "{$publicBaseUrl}/{$safeIngramPartNumber}/{$fileName}";
 
@@ -269,23 +417,40 @@ function saveCatalogImage(
             'publicUrl' => $publicUrl,
             'status' => 'existing',
             'bytes' => filesize($targetPath),
+            'converted' => false,
         ];
     }
 
-    $result = downloadRemoteImage($sourceUrl, $targetPath);
+    $temporaryPath = "{$productDir}/{$baseName}.download";
+
+    $result = downloadRemoteImage($sourceUrl, $temporaryPath);
 
     $contentTypeExtension = getExtensionFromContentType($result['contentType'] ?? null);
+    $actualSourceExtension = $contentTypeExtension ?? $sourceExtension;
+    $downloadedSourcePath = "{$productDir}/{$baseName}.{$actualSourceExtension}";
 
-    if ($contentTypeExtension !== null && $contentTypeExtension !== $extension) {
-        $correctedFileName = "{$baseName}.{$contentTypeExtension}";
-        $correctedTargetPath = "{$productDir}/{$correctedFileName}";
-        $correctedPublicUrl = "{$publicBaseUrl}/{$safeIngramPartNumber}/{$correctedFileName}";
+    if ($temporaryPath !== $downloadedSourcePath) {
+        rename($temporaryPath, $downloadedSourcePath);
+    }
 
-        if ($correctedTargetPath !== $targetPath) {
-            rename($targetPath, $correctedTargetPath);
-            $targetPath = $correctedTargetPath;
-            $publicUrl = $correctedPublicUrl;
+    if ($outputFormat === 'webp') {
+        convertImageToWebp($downloadedSourcePath, $targetPath);
+
+        if ($downloadedSourcePath !== $targetPath && is_file($downloadedSourcePath)) {
+            unlink($downloadedSourcePath);
         }
+
+        return [
+            'sourceUrl' => $sourceUrl,
+            'publicUrl' => $publicUrl,
+            'status' => 'downloaded-converted',
+            'bytes' => filesize($targetPath),
+            'converted' => true,
+        ];
+    }
+
+    if ($downloadedSourcePath !== $targetPath) {
+        rename($downloadedSourcePath, $targetPath);
     }
 
     return [
@@ -293,6 +458,7 @@ function saveCatalogImage(
         'publicUrl' => $publicUrl,
         'status' => 'downloaded',
         'bytes' => filesize($targetPath) ?: ($result['bytes'] ?? 0),
+        'converted' => false,
     ];
 }
 
@@ -331,6 +497,8 @@ if (!is_array($data)) {
         'error' => 'Invalid JSON body',
     ]);
 }
+
+$outputFormat = getOutputFormat($data);
 
 if (isset($data['product']) && is_array($data['product'])) {
     $products = [$data['product']];
@@ -380,6 +548,7 @@ try {
     $failed = 0;
     $downloadedFiles = 0;
     $existingFiles = 0;
+    $convertedFiles = 0;
 
     $results = [];
 
@@ -415,17 +584,25 @@ try {
                 $imageRoot,
                 $publicBaseUrl,
                 $ingramPartNumber,
-                'main'
+                'main',
+                0,
+                $outputFormat
             );
 
             if ($mainImage !== null) {
                 $productResult['imageUrl'] = $mainImage['publicUrl'];
                 $productResult['downloads'][] = array_merge(['role' => 'main'], $mainImage);
 
-                if ($mainImage['status'] === 'downloaded') {
+                if ($mainImage['status'] === 'downloaded' || $mainImage['status'] === 'downloaded-converted') {
                     $downloadedFiles++;
-                } elseif ($mainImage['status'] === 'existing' || $mainImage['status'] === 'already-local') {
+                }
+
+                if ($mainImage['status'] === 'existing' || $mainImage['status'] === 'already-local') {
                     $existingFiles++;
+                }
+
+                if (($mainImage['converted'] ?? false) === true) {
+                    $convertedFiles++;
                 }
             }
 
@@ -434,17 +611,25 @@ try {
                 $imageRoot,
                 $publicBaseUrl,
                 $ingramPartNumber,
-                'thumbnail'
+                'thumbnail',
+                0,
+                $outputFormat
             );
 
             if ($thumbnailImage !== null) {
                 $productResult['thumbnailUrl'] = $thumbnailImage['publicUrl'];
                 $productResult['downloads'][] = array_merge(['role' => 'thumbnail'], $thumbnailImage);
 
-                if ($thumbnailImage['status'] === 'downloaded') {
+                if ($thumbnailImage['status'] === 'downloaded' || $thumbnailImage['status'] === 'downloaded-converted') {
                     $downloadedFiles++;
-                } elseif ($thumbnailImage['status'] === 'existing' || $thumbnailImage['status'] === 'already-local') {
+                }
+
+                if ($thumbnailImage['status'] === 'existing' || $thumbnailImage['status'] === 'already-local') {
                     $existingFiles++;
+                }
+
+                if (($thumbnailImage['converted'] ?? false) === true) {
+                    $convertedFiles++;
                 }
             }
 
@@ -453,17 +638,25 @@ try {
                 $imageRoot,
                 $publicBaseUrl,
                 $ingramPartNumber,
-                'brand'
+                'brand',
+                0,
+                $outputFormat
             );
 
             if ($brandLogo !== null) {
                 $productResult['brandLogoUrl'] = $brandLogo['publicUrl'];
                 $productResult['downloads'][] = array_merge(['role' => 'brand'], $brandLogo);
 
-                if ($brandLogo['status'] === 'downloaded') {
+                if ($brandLogo['status'] === 'downloaded' || $brandLogo['status'] === 'downloaded-converted') {
                     $downloadedFiles++;
-                } elseif ($brandLogo['status'] === 'existing' || $brandLogo['status'] === 'already-local') {
+                }
+
+                if ($brandLogo['status'] === 'existing' || $brandLogo['status'] === 'already-local') {
                     $existingFiles++;
+                }
+
+                if (($brandLogo['converted'] ?? false) === true) {
+                    $convertedFiles++;
                 }
             }
 
@@ -482,17 +675,24 @@ try {
                     $publicBaseUrl,
                     $ingramPartNumber,
                     'gallery',
-                    $galleryIndex
+                    $galleryIndex,
+                    $outputFormat
                 );
 
                 if ($galleryImage !== null) {
                     $productResult['galleryUrls'][] = $galleryImage['publicUrl'];
                     $productResult['downloads'][] = array_merge(['role' => 'gallery'], $galleryImage);
 
-                    if ($galleryImage['status'] === 'downloaded') {
+                    if ($galleryImage['status'] === 'downloaded' || $galleryImage['status'] === 'downloaded-converted') {
                         $downloadedFiles++;
-                    } elseif ($galleryImage['status'] === 'existing' || $galleryImage['status'] === 'already-local') {
+                    }
+
+                    if ($galleryImage['status'] === 'existing' || $galleryImage['status'] === 'already-local') {
                         $existingFiles++;
+                    }
+
+                    if (($galleryImage['converted'] ?? false) === true) {
+                        $convertedFiles++;
                     }
                 }
 
@@ -529,6 +729,7 @@ try {
         'database' => $dbName,
         'imageRoot' => $imageRoot,
         'publicBaseUrl' => $publicBaseUrl,
+        'outputFormat' => $outputFormat,
         'receivedCount' => $received,
         'updatedCount' => $updated,
         'missingOrUnchangedCount' => $missingOrUnchanged,
@@ -536,6 +737,7 @@ try {
         'failedCount' => $failed,
         'downloadedFiles' => $downloadedFiles,
         'existingFiles' => $existingFiles,
+        'convertedFiles' => $convertedFiles,
         'results' => $results,
     ]);
 
