@@ -11,7 +11,7 @@ function sendJson(int $statusCode, array $payload): void {
 }
 
 function loadSquareConfig(): array {
-    $configPath = __DIR__ . '/../../dds-square-config.env';
+    $configPath = __DIR__ . '/../../dds-shop-config.env';
 
     if (!is_readable($configPath)) {
         sendJson(500, [
@@ -33,11 +33,11 @@ function loadSquareConfig(): array {
 
     $requiredKeys = [
         'SQUARE_IMPORT_TOKEN',
-        'SQUARE_DB_HOST',
-        'SQUARE_DB_USER',
-        'SQUARE_DB_PASS',
-        'SQUARE_DB_PROD',
-        'SQUARE_DB_DEV',
+        'SHOP_DB_HOST',
+        'SHOP_DB_USER',
+        'SHOP_DB_PASS',
+        'SHOP_DB_PROD',
+        'SHOP_DB_DEV',
     ];
 
     foreach ($requiredKeys as $key) {
@@ -65,8 +65,8 @@ function getImportEnvironment(): string {
 
 function getSquareDatabaseName(array $config): string {
     return getImportEnvironment() === 'development'
-        ? (string)$config['SQUARE_DB_DEV']
-        : (string)$config['SQUARE_DB_PROD'];
+        ? (string)$config['SHOP_DB_DEV']
+        : (string)$config['SHOP_DB_PROD'];
 }
 
 function cleanString(mixed $value): string {
@@ -512,9 +512,9 @@ $publicBaseUrl = '/shop-images';
 try {
     ensureDirectory($imageRoot);
 
-    $dbHost = (string)$config['SQUARE_DB_HOST'];
-    $dbUser = (string)$config['SQUARE_DB_USER'];
-    $dbPass = (string)$config['SQUARE_DB_PASS'];
+    $dbHost = (string)$config['SHOP_DB_HOST'];
+    $dbUser = (string)$config['SHOP_DB_USER'];
+    $dbPass = (string)$config['SHOP_DB_PASS'];
     $dbName = getSquareDatabaseName($config);
 
     $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
