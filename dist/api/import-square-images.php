@@ -11,7 +11,7 @@ function sendJson(int $statusCode, array $payload): void {
 }
 
 function loadSquareConfig(): array {
-    $configPath = __DIR__ . '/../../dds-square-config.env';
+    $configPath = __DIR__ . '/../../dds-shop-config.env';
 
     if (!is_readable($configPath)) {
         sendJson(500, [
