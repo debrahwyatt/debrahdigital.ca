@@ -28,6 +28,33 @@ type ShopProductsResponse = {
 const SHOP_PRODUCTS_URL =
   import.meta.env.VITE_SHOP_PRODUCTS_URL ?? '/api/square-products.php'
 
+const SHOP_ASSET_BASE_URL =
+  import.meta.env.VITE_SHOP_ASSET_BASE_URL ?? ''
+
+const resolveShopImageUrl = (
+  value?: string | null,
+): string => {
+  const imageUrl = String(value ?? '').trim()
+
+  if (!imageUrl) {
+    return ''
+  }
+
+  if (
+    imageUrl.startsWith('http://') ||
+    imageUrl.startsWith('https://') ||
+    imageUrl.startsWith('data:')
+  ) {
+    return imageUrl
+  }
+
+  if (imageUrl.startsWith('/shop-images/')) {
+    return `${SHOP_ASSET_BASE_URL}${imageUrl}`
+  }
+
+  return imageUrl
+}
+
 function Shop() {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -172,43 +199,47 @@ function Shop() {
 
         {!isLoading && !error && filteredProducts.length > 0 && (
           <section className="shop-grid">
-            {filteredProducts.map((product) => (
-              <article
-                className="product-card shop-product-card"
-                key={product.variationId}
-              >
-                <div className="product-image-placeholder shop-product-image-placeholder">
-                  {product.imageUrl ? (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="product-image"
-                    />
-                  ) : (
-                    <span>No image</span>
-                  )}
-                </div>
+            {filteredProducts.map((product) => {
+              const imageUrl = resolveShopImageUrl(product.imageUrl)
 
-                <div className="product-card-body">
-                  <h2>{product.name}</h2>
+              return (
+                <article
+                  className="product-card shop-product-card"
+                  key={product.variationId}
+                >
+                  <div className="product-image-placeholder shop-product-image-placeholder">
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={product.name}
+                        className="product-image"
+                      />
+                    ) : (
+                      <span>No image</span>
+                    )}
+                  </div>
 
-                  <p className="product-price">
-                    ${product.price.toFixed(2)} {product.currency}
-                  </p>
+                  <div className="product-card-body">
+                    <h2>{product.name}</h2>
 
-                  <p className="product-meta">
-                    In stock: {product.quantity}
-                  </p>
+                    <p className="product-price">
+                      ${product.price.toFixed(2)} {product.currency}
+                    </p>
 
-                  <Link
-                    to={`/contact?product=${encodeURIComponent(product.name)}`}
-                    className="btn product-btn"
-                  >
-                    Request Item
-                  </Link>
-                </div>
-              </article>
-            ))}
+                    <p className="product-meta">
+                      In stock: {product.quantity}
+                    </p>
+
+                    <Link
+                      to={`/contact?product=${encodeURIComponent(product.name)}`}
+                      className="btn product-btn"
+                    >
+                      Request Item
+                    </Link>
+                  </div>
+                </article>
+              )
+            })}
           </section>
         )}
       </div>
