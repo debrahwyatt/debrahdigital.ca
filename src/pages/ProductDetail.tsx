@@ -5,6 +5,7 @@ import {
 } from 'react'
 import {
   Link,
+  useLocation,
 } from 'react-router-dom'
 import SEO from '../components/SEO'
 import {
@@ -17,6 +18,10 @@ import {
 } from './useProductDetail'
 
 const DESCRIPTION_PREVIEW_LENGTH = 450
+
+type ProductDetailLocationState = {
+  fromCatalog?: string
+}
 
 const getUniqueImages = (images: (string | null | undefined)[]): string[] => {
   return Array.from(
@@ -62,6 +67,13 @@ const getCombinedProductDescription = (
 }
 
 function ProductDetail() {
+  const location = useLocation()
+
+  const locationState = location.state as ProductDetailLocationState | null
+
+  const backToCatalogPath =
+    locationState?.fromCatalog ?? '/catalog'
+
   const {
     product,
     isLoading,
@@ -123,7 +135,7 @@ function ProductDetail() {
       <div className="page-wrapper product-detail-page">
         <div className="product-detail-container">
           <p className="product-back-link">
-            <Link to="/catalog">← Back to catalog</Link>
+            <Link to={backToCatalogPath}>← Back to catalog</Link>
           </p>
 
           {isLoading && (

@@ -23,6 +23,7 @@ const getAvailabilityCount = (
 function Catalog() {
   const {
     catalogCategories,
+    catalogUrl,
     sortedProducts,
     paginatedProducts,
 
@@ -197,6 +198,9 @@ function Catalog() {
                   >
                     <Link
                       to={productUrl}
+                      state={{
+                        fromCatalog: catalogUrl,
+                      }}
                       className="product-image-wrap product-image-link"
                       aria-label={`View details for ${productName}`}
                     >
@@ -216,6 +220,9 @@ function Catalog() {
                       <h2>
                         <Link
                           to={productUrl}
+                          state={{
+                            fromCatalog: catalogUrl,
+                          }}
                           className="product-title-link"
                         >
                           {productName}

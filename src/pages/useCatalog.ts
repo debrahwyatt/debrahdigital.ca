@@ -7,6 +7,9 @@ import type {
   FormEvent,
 } from 'react'
 import {
+  useSearchParams,
+} from 'react-router-dom'
+import {
   catalogCategories,
 } from '../data/catalogCategories'
 
@@ -158,12 +161,58 @@ const CATEGORY_SEARCH_ALIASES: Record<string, string> = {
   accessories: 'accessories',
 }
 
+const getSafePageFromUrl = (
+  value: string | null,
+): number => {
+  const page = Number(value ?? 1)
+
+  if (!Number.isFinite(page) || page < 1) {
+    return 1
+  }
+
+  return Math.floor(page)
+}
+
 const buildCatalogUrl = (
   params: URLSearchParams,
 ): string => {
   const separator = CATALOG_DATA_URL.includes('?') ? '&' : '?'
 
   return `${CATALOG_DATA_URL}${separator}${params.toString()}`
+}
+
+const buildCatalogPageUrl = ({
+  selectedCategory,
+  searchTerm,
+  sortOption,
+  currentPage,
+}: {
+  selectedCategory: string
+  searchTerm: string
+  sortOption: string
+  currentPage: number
+}): string => {
+  const params = new URLSearchParams()
+
+  if (selectedCategory !== 'all') {
+    params.set('category', selectedCategory)
+  }
+
+  if (searchTerm.trim()) {
+    params.set('search', searchTerm.trim())
+  }
+
+  if (sortOption !== 'price-low') {
+    params.set('sort', sortOption)
+  }
+
+  if (currentPage > 1) {
+    params.set('page', String(currentPage))
+  }
+
+  const queryString = params.toString()
+
+  return queryString ? `/catalog?${queryString}` : '/catalog'
 }
 
 const cleanString = (
@@ -204,8 +253,6 @@ const getCatalogQueryParams = ({
     }
   }
 
-  // If the user already selected a category, keep their search as a normal
-  // keyword search within that category.
   if (selectedCategory !== 'all') {
     return {
       category: selectedCategory,
@@ -443,17 +490,79 @@ const fetchCatalogProducts = async ({
 }
 
 export const useCatalog = () => {
+  const [urlSearchParams, setUrlSearchParams] = useSearchParams()
+
+  const initialPage = getSafePageFromUrl(urlSearchParams.get('page'))
+
   const [allProducts, setAllProducts] = useState<CatalogProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [sortOption, setSortOption] = useState('price-low')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [searchTerm, updateSearchTermState] = useState(
+    urlSearchParams.get('search') ?? '',
+  )
+
+  const [selectedCategory, updateSelectedCategoryState] = useState(
+    urlSearchParams.get('category') ?? 'all',
+  )
+
+  const [sortOption, updateSortOptionState] = useState(
+    urlSearchParams.get('sort') ?? 'price-low',
+  )
+
+  const [currentPage, setCurrentPage] = useState(initialPage)
 
   const [totalProductCount, setTotalProductCount] = useState(0)
-  const [totalPages, setTotalPages] = useState(1)
+  const [totalPages, setTotalPages] = useState(initialPage)
+
+  const catalogUrl = useMemo(() => {
+    return buildCatalogPageUrl({
+      selectedCategory,
+      searchTerm,
+      sortOption,
+      currentPage,
+    })
+  }, [
+    selectedCategory,
+    searchTerm,
+    sortOption,
+    currentPage,
+  ])
+
+  useEffect(() => {
+    const nextSearchParams = new URLSearchParams()
+
+    if (selectedCategory !== 'all') {
+      nextSearchParams.set('category', selectedCategory)
+    }
+
+    if (searchTerm.trim()) {
+      nextSearchParams.set('search', searchTerm.trim())
+    }
+
+    if (sortOption !== 'price-low') {
+      nextSearchParams.set('sort', sortOption)
+    }
+
+    if (currentPage > 1) {
+      nextSearchParams.set('page', String(currentPage))
+    }
+
+    if (nextSearchParams.toString() === urlSearchParams.toString()) {
+      return
+    }
+
+    setUrlSearchParams(nextSearchParams, {
+      replace: true,
+    })
+  }, [
+    selectedCategory,
+    searchTerm,
+    sortOption,
+    currentPage,
+    urlSearchParams,
+    setUrlSearchParams,
+  ])
 
   useEffect(() => {
     let isMounted = true
@@ -531,18 +640,11 @@ export const useCatalog = () => {
   ])
 
   useEffect(() => {
-    setCurrentPage(1)
-  }, [
-    selectedCategory,
-    searchTerm,
-    sortOption,
-  ])
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
+    if (!isLoading && currentPage > totalPages) {
       setCurrentPage(totalPages)
     }
   }, [
+    isLoading,
     currentPage,
     totalPages,
   ])
@@ -565,6 +667,21 @@ export const useCatalog = () => {
     goToPage(currentPage + 1)
   }
 
+  const setSearchTerm = (value: string) => {
+    updateSearchTermState(value)
+    setCurrentPage(1)
+  }
+
+  const setSelectedCategory = (value: string) => {
+    updateSelectedCategoryState(value)
+    setCurrentPage(1)
+  }
+
+  const setSortOption = (value: string) => {
+    updateSortOptionState(value)
+    setCurrentPage(1)
+  }
+
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setCurrentPage(1)
@@ -572,6 +689,7 @@ export const useCatalog = () => {
 
   return {
     catalogCategories,
+    catalogUrl,
     sortedProducts,
     paginatedProducts,
 
