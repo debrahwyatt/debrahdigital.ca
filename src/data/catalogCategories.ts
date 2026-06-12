@@ -27,10 +27,6 @@ export const catalogCategories: CatalogCategory[] = [
     value: 'monitors',
   },
   {
-    label: 'Large Format Displays',
-    value: 'large-format-displays',
-  },
-  {
     label: 'Printers',
     value: 'printers',
   },
@@ -38,6 +34,10 @@ export const catalogCategories: CatalogCategory[] = [
     label: 'Scanners',
     value: 'scanners',
   },
+  {
+    label: 'Barcode Scanners',
+    value: 'barcode-scanners',
+  },  
   {
     label: 'Webcams',
     value: 'webcams',
