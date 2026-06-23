@@ -65,10 +65,6 @@ export const catalogCategories: CatalogCategory[] = [
     value: 'monitor-accessories',
   },
   {
-    label: 'Printer / Plotter Accessories',
-    value: 'printer-plotter-accs',
-  },
-  {
     label: 'Projector Accessories',
     value: 'projector-accessorie',
   },
@@ -80,10 +76,10 @@ export const catalogCategories: CatalogCategory[] = [
     label: 'Mobility Accessories',
     value: 'mobility-accessories',
   },
-{
-  label: 'POS',
-  value: 'pos',
-},
+  {
+    label: 'POS',
+    value: 'pos',
+  },
 
   {
     label: 'Desk Accessories',
@@ -91,10 +87,6 @@ export const catalogCategories: CatalogCategory[] = [
   },
 
   // Input, POS, and data capture.
-  {
-    label: 'Keyboards & Keypads',
-    value: 'keyboards-and-keypads',
-  },
   {
     label: 'Pointing Devices',
     value: 'pointing-devices',
@@ -104,10 +96,6 @@ export const catalogCategories: CatalogCategory[] = [
   {
     label: 'Memory',
     value: 'memory',
-  },
-  {
-    label: 'Power Supplies',
-    value: 'power-supplies',
   },
   {
     label: 'USB & FireWire Connectivity',
@@ -132,20 +120,8 @@ export const catalogCategories: CatalogCategory[] = [
     value: 'routers-and-components',
   },
   {
-    label: 'Modems / Connectivity',
-    value: 'modems-connectivity',
-  },
-  {
-    label: 'Content Networking',
-    value: 'content-networking',
-  },
-  {
     label: 'Transceivers',
     value: 'transceivers',
-  },
-  {
-    label: 'Device / Terminal Servers',
-    value: 'device-terminal-svr',
   },
 
   // Power, racks, testing, and home tech.
@@ -158,17 +134,13 @@ export const catalogCategories: CatalogCategory[] = [
     value: 'rack-equipment',
   },
   {
-    label: 'Test Equipment',
-    value: 'test-equipment',
-  },
-  {
     label: 'Home Automation',
     value: 'home-automation',
   },
 
   // Phones and communications.
   {
-    label: 'Mobility Communications Devices',
+    label: 'Smart Phones',
     value: 'mobility-communications-devices',
   },
   {
