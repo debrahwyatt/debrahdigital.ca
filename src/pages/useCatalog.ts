@@ -78,6 +78,22 @@ const CATALOG_IMAGE_BASE_URL = 'https://debrahdigital.ca'
 
 const PRODUCTS_PER_PAGE = 24
 
+const MULTI_CATEGORY_FETCH_PAGE_SIZE = 120
+
+const IGNORED_SEARCH_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'or',
+  'the',
+  'for',
+  'with',
+  'to',
+  'of',
+  'in',
+  'on',
+])
+
 const CATEGORY_SEARCH_ALIASES: Record<string, string> = {
   laptop: 'laptops',
   laptops: 'laptops',
@@ -91,71 +107,108 @@ const CATEGORY_SEARCH_ALIASES: Record<string, string> = {
   ipad: 'tablets',
   ipads: 'tablets',
 
-  desktop: 'computer-systems',
-  desktops: 'computer-systems',
-  computer: 'computer-systems',
-  computers: 'computer-systems',
-  pc: 'computer-systems',
-  pcs: 'computer-systems',
-  workstation: 'computer-systems',
-  workstations: 'computer-systems',
-  server: 'computer-systems',
-  servers: 'computer-systems',
+  desktop: 'computers',
+  desktops: 'computers',
+  computer: 'computers',
+  computers: 'computers',
+  pc: 'computers',
+  pcs: 'computers',
+  workstation: 'computers',
+  workstations: 'computers',
+  server: 'computers',
+  servers: 'computers',
+  aio: 'computers',
 
-  monitor: 'displays',
-  monitors: 'displays',
-  display: 'displays',
-  displays: 'displays',
-  tv: 'displays',
+  monitor: 'monitors',
+  monitors: 'monitors',
+  display: 'monitors',
+  displays: 'monitors',
+  screen: 'monitors',
+  screens: 'monitors',
 
-  printer: 'printers-and-office-equipment',
-  printers: 'printers-and-office-equipment',
-  multifunction: 'printers-and-office-equipment',
-  plotter: 'printers-and-office-equipment',
-  plotters: 'printers-and-office-equipment',
+  printer: 'printers',
+  printers: 'printers',
+  printing: 'printers',
+  laser: 'printers',
+  inkjet: 'printers',
+  multifunction: 'printers',
+  mfp: 'printers',
+  plotter: 'printers',
+  plotters: 'printers',
 
-  projector: 'presentation-devices',
-  projectors: 'presentation-devices',
+  scanner: 'scanners',
+  scanners: 'scanners',
+  scan: 'scanners',
+  scanning: 'scanners',
 
-  scanner: 'imaging-devices',
-  scanners: 'imaging-devices',
-  camera: 'imaging-devices',
-  cameras: 'imaging-devices',
-  webcam: 'imaging-devices',
-  webcams: 'imaging-devices',
+  barcode: 'barcode-scanners',
+  barcodes: 'barcode-scanners',
 
-  network: 'network-devices',
-  networking: 'network-devices',
-  router: 'network-devices',
-  routers: 'network-devices',
-  switch: 'network-devices',
-  switches: 'network-devices',
-  transceiver: 'network-devices',
-  transceivers: 'network-devices',
+  webcam: 'webcams',
+  webcams: 'webcams',
 
-  ups: 'power-protection-ups',
-  battery: 'power-protection-ups',
+  camera: 'cameras',
+  cameras: 'cameras',
 
-  keyboard: 'input-output-devices',
-  keyboards: 'input-output-devices',
-  mouse: 'input-output-devices',
-  mice: 'input-output-devices',
+  conference: 'video-audio-conference',
+  conferencing: 'video-audio-conference',
+  headset: 'video-audio-conference',
+  headsets: 'video-audio-conference',
+  speakerphone: 'video-audio-conference',
+  speakerphones: 'video-audio-conference',
+  meeting: 'video-audio-conference',
 
-  memory: 'system-components',
-  ram: 'system-components',
-  processor: 'system-components',
-  processors: 'system-components',
-  motherboard: 'system-components',
-  motherboards: 'system-components',
-  graphics: 'system-components',
-  gpu: 'system-components',
+  projector: 'projectors',
+  projectors: 'projectors',
+  presentation: 'projectors',
 
-  barcode: 'data-capture-pos',
-  pos: 'data-capture-pos',
+  pos: 'pos',
+  checkout: 'pos',
+  register: 'pos',
+  receipt: 'pos',
 
-  phone: 'communications',
-  phones: 'communications',
-  conference: 'communications',
+  network: 'wireless-networking',
+  networking: 'wireless-networking',
+  wifi: 'wireless-networking',
+  wireless: 'wireless-networking',
+
+  switch: 'switches-and-hubs',
+  switches: 'switches-and-hubs',
+  hub: 'switches-and-hubs',
+  hubs: 'switches-and-hubs',
+
+  router: 'routers-and-components',
+  routers: 'routers-and-components',
+  firewall: 'routers-and-components',
+  firewalls: 'routers-and-components',
+  gateway: 'routers-and-components',
+  gateways: 'routers-and-components',
+
+  transceiver: 'transceivers',
+  transceivers: 'transceivers',
+
+  ups: 'power-equipment',
+  battery: 'power-equipment',
+  batteries: 'power-equipment',
+  power: 'power-equipment',
+  surge: 'power-equipment',
+
+  keyboard: 'pointing-devices',
+  keyboards: 'pointing-devices',
+  mouse: 'pointing-devices',
+  mice: 'pointing-devices',
+
+  memory: 'memory',
+  ram: 'memory',
+
+  phone: 'mobility-communications-devices',
+  phones: 'mobility-communications-devices',
+  smartphone: 'mobility-communications-devices',
+  smartphones: 'mobility-communications-devices',
+  iphone: 'mobility-communications-devices',
+  android: 'mobility-communications-devices',
+
+  voip: 'phone-systems',
 
   accessory: 'accessories',
   accessories: 'accessories',
@@ -234,6 +287,38 @@ const normalizeSearchWord = (
     .replace(/[^a-z0-9-]+/g, '')
 }
 
+const getCategoryMatchesFromSearch = (searchTerm: string): string[] => {
+  const normalizedWords = searchTerm
+    .split(/\s+/)
+    .map(normalizeSearchWord)
+    .filter(Boolean)
+    .filter((word) => !IGNORED_SEARCH_WORDS.has(word))
+
+  return Array.from(
+    new Set(
+      normalizedWords
+        .map((word) => CATEGORY_SEARCH_ALIASES[word])
+        .filter((category): category is string => Boolean(category)),
+    ),
+  )
+}
+
+const getRemainingSearchAfterCategoryWords = (searchTerm: string): string => {
+  return searchTerm
+    .split(/\s+/)
+    .filter(Boolean)
+    .filter((word) => {
+      const normalizedWord = normalizeSearchWord(word)
+
+      return (
+        !IGNORED_SEARCH_WORDS.has(normalizedWord) &&
+        !CATEGORY_SEARCH_ALIASES[normalizedWord]
+      )
+    })
+    .join(' ')
+    .trim()
+}
+
 const getCatalogQueryParams = ({
   selectedCategory,
   searchTerm,
@@ -260,35 +345,18 @@ const getCatalogQueryParams = ({
     }
   }
 
-  const originalWords = cleanedSearchTerm
-    .split(/\s+/)
-    .filter(Boolean)
+  const matchedCategories = getCategoryMatchesFromSearch(cleanedSearchTerm)
 
-  const normalizedWords = originalWords.map(normalizeSearchWord)
-
-  const matchedCategory = normalizedWords
-    .map((word) => CATEGORY_SEARCH_ALIASES[word])
-    .find(Boolean)
-
-  if (!matchedCategory) {
+  if (matchedCategories.length === 1) {
     return {
-      category: selectedCategory,
-      search: cleanedSearchTerm,
+      category: matchedCategories[0],
+      search: getRemainingSearchAfterCategoryWords(cleanedSearchTerm),
     }
   }
 
-  const remainingSearch = originalWords
-    .filter((word) => {
-      const normalizedWord = normalizeSearchWord(word)
-
-      return !CATEGORY_SEARCH_ALIASES[normalizedWord]
-    })
-    .join(' ')
-    .trim()
-
   return {
-    category: matchedCategory,
-    search: remainingSearch,
+    category: selectedCategory,
+    search: cleanedSearchTerm,
   }
 }
 
@@ -438,6 +506,45 @@ const normalizeCatalogProduct = (product: CatalogProduct): CatalogProduct => {
   }
 }
 
+const fetchCatalogProductsForCategory = async ({
+  category,
+  search,
+  sortOption,
+  page,
+  pageSize,
+}: {
+  category: string
+  search: string
+  sortOption: string
+  page: number
+  pageSize: number
+}): Promise<CatalogProduct[]> => {
+  const params = new URLSearchParams({
+    category,
+    search,
+    sort: sortOption,
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+
+  const response = await fetch(buildCatalogUrl(params), {
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to load catalog products from database')
+  }
+
+  const catalogData: CatalogApiResponse | CatalogProduct[] =
+    await response.json()
+
+  if (Array.isArray(catalogData)) {
+    return catalogData
+  }
+
+  return catalogData.products ?? []
+}
+
 const fetchCatalogProducts = async ({
   selectedCategory,
   searchTerm,
@@ -449,6 +556,62 @@ const fetchCatalogProducts = async ({
   sortOption: string
   currentPage: number
 }): Promise<CatalogApiResponse> => {
+  const cleanedSearchTerm = searchTerm.trim()
+
+  const matchedCategories =
+    selectedCategory === 'all'
+      ? getCategoryMatchesFromSearch(cleanedSearchTerm)
+      : []
+
+  if (matchedCategories.length > 1) {
+    const remainingSearch = getRemainingSearchAfterCategoryWords(cleanedSearchTerm)
+
+    const categoryProducts = await Promise.all(
+      matchedCategories.map((category) =>
+        fetchCatalogProductsForCategory({
+          category,
+          search: remainingSearch,
+          sortOption,
+          page: 1,
+          pageSize: MULTI_CATEGORY_FETCH_PAGE_SIZE,
+        }),
+      ),
+    )
+
+    const mergedProducts = categoryProducts.flat()
+
+    const uniqueProducts = Array.from(
+      new Map(
+        mergedProducts.map((product) => [
+          product.ingramPartNumber ??
+            product.vendorPartNumber ??
+            product.description ??
+            `${Date.now()}-${Math.random()}`,
+          product,
+        ]),
+      ).values(),
+    )
+
+    const normalizedProducts = uniqueProducts.map(normalizeCatalogProduct)
+    const safeProducts = normalizedProducts.filter(productIsSafeToDisplay)
+    const sortedProducts = sortCatalogProducts(safeProducts, sortOption)
+
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE
+    const endIndex = startIndex + PRODUCTS_PER_PAGE
+    const pagedProducts = sortedProducts.slice(startIndex, endIndex)
+
+    return {
+      products: pagedProducts,
+      page: currentPage,
+      pageSize: PRODUCTS_PER_PAGE,
+      total: sortedProducts.length,
+      totalPages: Math.max(
+        1,
+        Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE),
+      ),
+    }
+  }
+
   const catalogQuery = getCatalogQueryParams({
     selectedCategory,
     searchTerm,
@@ -515,6 +678,39 @@ export const useCatalog = () => {
   const [totalProductCount, setTotalProductCount] = useState(0)
   const [totalPages, setTotalPages] = useState(initialPage)
 
+  useEffect(() => {
+    const nextPage = getSafePageFromUrl(urlSearchParams.get('page'))
+    const nextSearchTerm = urlSearchParams.get('search') ?? ''
+    const nextSelectedCategory = urlSearchParams.get('category') ?? 'all'
+    const nextSortOption = urlSearchParams.get('sort') ?? 'price-low'
+
+    updateSearchTermState((currentSearchTerm) =>
+      currentSearchTerm === nextSearchTerm
+        ? currentSearchTerm
+        : nextSearchTerm,
+    )
+
+    updateSelectedCategoryState((currentSelectedCategory) =>
+      currentSelectedCategory === nextSelectedCategory
+        ? currentSelectedCategory
+        : nextSelectedCategory,
+    )
+
+    updateSortOptionState((currentSortOption) =>
+      currentSortOption === nextSortOption
+        ? currentSortOption
+        : nextSortOption,
+    )
+
+    setCurrentPage((currentCurrentPage) =>
+      currentCurrentPage === nextPage
+        ? currentCurrentPage
+        : nextPage,
+    )
+  }, [
+    urlSearchParams,
+  ])
+
   const catalogUrl = useMemo(() => {
     return buildCatalogPageUrl({
       selectedCategory,
@@ -529,40 +725,37 @@ export const useCatalog = () => {
     currentPage,
   ])
 
-  useEffect(() => {
+  const updateCatalogUrlParams = ({
+    nextCategory = selectedCategory,
+    nextSearchTerm = searchTerm,
+    nextSortOption = sortOption,
+    nextPage = currentPage,
+  }: {
+    nextCategory?: string
+    nextSearchTerm?: string
+    nextSortOption?: string
+    nextPage?: number
+  }) => {
     const nextSearchParams = new URLSearchParams()
 
-    if (selectedCategory !== 'all') {
-      nextSearchParams.set('category', selectedCategory)
+    if (nextCategory !== 'all') {
+      nextSearchParams.set('category', nextCategory)
     }
 
-    if (searchTerm.trim()) {
-      nextSearchParams.set('search', searchTerm.trim())
+    if (nextSearchTerm.trim()) {
+      nextSearchParams.set('search', nextSearchTerm.trim())
     }
 
-    if (sortOption !== 'price-low') {
-      nextSearchParams.set('sort', sortOption)
+    if (nextSortOption !== 'price-low') {
+      nextSearchParams.set('sort', nextSortOption)
     }
 
-    if (currentPage > 1) {
-      nextSearchParams.set('page', String(currentPage))
+    if (nextPage > 1) {
+      nextSearchParams.set('page', String(nextPage))
     }
 
-    if (nextSearchParams.toString() === urlSearchParams.toString()) {
-      return
-    }
-
-    setUrlSearchParams(nextSearchParams, {
-      replace: true,
-    })
-  }, [
-    selectedCategory,
-    searchTerm,
-    sortOption,
-    currentPage,
-    urlSearchParams,
-    setUrlSearchParams,
-  ])
+    setUrlSearchParams(nextSearchParams)
+  }
 
   useEffect(() => {
     let isMounted = true
@@ -641,7 +834,13 @@ export const useCatalog = () => {
 
   useEffect(() => {
     if (!isLoading && currentPage > totalPages) {
-      setCurrentPage(totalPages)
+      const safePage = totalPages
+
+      setCurrentPage(safePage)
+
+      updateCatalogUrlParams({
+        nextPage: safePage,
+      })
     }
   }, [
     isLoading,
@@ -657,6 +856,10 @@ export const useCatalog = () => {
     }
 
     setCurrentPage(safePage)
+
+    updateCatalogUrlParams({
+      nextPage: safePage,
+    })
   }
 
   const goToPreviousPage = () => {
@@ -674,17 +877,34 @@ export const useCatalog = () => {
 
   const setSelectedCategory = (value: string) => {
     updateSelectedCategoryState(value)
+    updateSearchTermState('')
     setCurrentPage(1)
+
+    updateCatalogUrlParams({
+      nextCategory: value,
+      nextSearchTerm: '',
+      nextPage: 1,
+    })
   }
 
   const setSortOption = (value: string) => {
     updateSortOptionState(value)
     setCurrentPage(1)
+
+    updateCatalogUrlParams({
+      nextSortOption: value,
+      nextPage: 1,
+    })
   }
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setCurrentPage(1)
+
+    updateCatalogUrlParams({
+      nextSearchTerm: searchTerm,
+      nextPage: 1,
+    })
   }
 
   return {
