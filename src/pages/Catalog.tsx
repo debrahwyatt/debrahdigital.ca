@@ -167,31 +167,22 @@ function Catalog() {
     scrollToTop()
   }
 
-  const handleReturnToCategories = () => {
-    setSelectedCategory('all')
-    setSearchTerm('')
-    navigate('/catalog')
-    scrollToTop()
-  }
-
   const handleResultSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     handleSearchSubmit(event)
 
-    const cleanedSearchTerm = searchTerm.trim()
+    const nextParams = new URLSearchParams()
 
-    if (cleanedSearchTerm) {
-      navigate(`/catalog?search=${encodeURIComponent(cleanedSearchTerm)}`)
-      scrollToTop()
-      return
+    nextParams.set('category', selectedCategory)
+
+    if (searchTerm.trim()) {
+      nextParams.set('search', searchTerm.trim())
     }
 
-    if (selectedCategory !== 'all') {
-      navigate(`/catalog?category=${encodeURIComponent(selectedCategory)}`)
-      scrollToTop()
-      return
+    if (sortOption !== 'price-low') {
+      nextParams.set('sort', sortOption)
     }
 
-    navigate('/catalog')
+    navigate(`/catalog?${nextParams.toString()}`)
     scrollToTop()
   }
 
@@ -213,9 +204,10 @@ function Catalog() {
                 <h1>What are you looking for?</h1>
 
                 <p>
-                  Browse technology available by special order. Pricing and
-                  availability are confirmed before payment, so you can request
-                  what you need without paying online first.
+                  Find the tech you need without the big-city runaround. Browse laptops,
+                  printers, monitors, networking gear, accessories, and more — then request the
+                  item through Debrah&apos;s Digital Solutions for local support, friendly service,
+                  and help choosing the right product.
                 </p>
 
                 <form
@@ -239,6 +231,7 @@ function Catalog() {
             <section className="catalog-category-section">
               <div className="catalog-section-heading">
                 <h2>Shop by category</h2>
+
                 <p>
                   Choose a category to narrow the catalog to the products
                   customers usually ask for.
@@ -296,16 +289,16 @@ function Catalog() {
                   value={selectedCategory}
                   onChange={(event) => {
                     const nextCategory = event.target.value
+                    const nextParams = new URLSearchParams(urlSearchParams)
 
                     setSelectedCategory(nextCategory)
 
-                    if (nextCategory === 'all') {
-                      navigate('/catalog')
-                      scrollToTop()
-                      return
-                    }
+                    nextParams.set('category', nextCategory)
+                    nextParams.delete('page')
 
-                    navigate(`/catalog?category=${encodeURIComponent(nextCategory)}`)
+                    const queryString = nextParams.toString()
+
+                    navigate(`/catalog?${queryString}`)
                     scrollToTop()
                   }}
                 >
@@ -315,17 +308,6 @@ function Catalog() {
                     </option>
                   ))}
                 </select>
-              </label>
-
-              <label>
-                Search
-
-                <input
-                  type="search"
-                  value={searchTerm}
-                  placeholder="Brand, model, category, or feature"
-                  onChange={(event) => setSearchTerm(event.target.value)}
-                />
               </label>
 
               <label>
@@ -345,10 +327,15 @@ function Catalog() {
                       nextParams.set('sort', nextSortOption)
                     }
 
+                    if (!nextParams.has('category')) {
+                      nextParams.set('category', selectedCategory)
+                    }
+
                     nextParams.delete('page')
 
                     const queryString = nextParams.toString()
-                    navigate(queryString ? `/catalog?${queryString}` : '/catalog')
+
+                    navigate(`/catalog?${queryString}`)
                   }}
                 >
                   <option value="az">A-Z</option>
@@ -358,12 +345,19 @@ function Catalog() {
                 </select>
               </label>
 
-              <button
-                type="button"
-                className="btn pagination-btn"
-                onClick={handleReturnToCategories}
-              >
-                Back to Categories
+              <label>
+                Search
+
+                <input
+                  type="search"
+                  value={searchTerm}
+                  placeholder="Brand, model, category, or feature"
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                />
+              </label>
+
+              <button type="submit" className="btn pagination-btn">
+                Search
               </button>
             </form>
           </section>

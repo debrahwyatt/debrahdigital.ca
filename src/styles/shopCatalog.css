@@ -597,3 +597,24 @@
     font-size: 2.25rem;
   }
 }
+
+/* Shop landing page */
+.shop-hero {
+  background:
+    radial-gradient(circle at top left, rgba(0, 205, 255, 0.2), transparent 34rem),
+    linear-gradient(135deg, rgba(0, 35, 69, 0.95), rgba(0, 13, 31, 0.95));
+}
+
+.shop-page .catalog-category-card {
+  border-color: rgba(0, 193, 238, 0.22);
+}
+
+.shop-page .catalog-category-card:hover,
+.shop-page .catalog-category-card:focus-visible {
+  border-color: rgba(0, 217, 255, 0.85);
+}
+
+.shop-page .catalog-category-icon img {
+  max-width: 88%;
+  max-height: 78%;
+}
